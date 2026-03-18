@@ -1,0 +1,90 @@
+@import "tailwindcss";
+@import "@nuxt/ui";
+
+@theme {
+  /* Primary */
+  --color-primary-50: #e6edf7;
+  --color-primary-100: #b3c9e6;
+  --color-primary-200: #80a5d5;
+  --color-primary-300: #4d81c4;
+  --color-primary-400: #1a5db3;
+  --color-primary-500: #00408f;
+  --color-primary-600: #003372;
+  --color-primary-700: #002655;
+  --color-primary-800: #001a39;
+  --color-primary-900: #000d1c;
+  --color-primary-950: #00060e;
+
+  /* Secondary */
+  --color-secondary-50: #f5fafd;
+  --color-secondary-100: #e8f3fa;
+  --color-secondary-200: #d6eaf5;
+  --color-secondary-300: #c5e2f3;
+  --color-secondary-400: #b5dcf1;
+  --color-secondary-500: #93c9e8;
+  --color-secondary-600: #71b6df;
+  --color-secondary-700: #4fa3d6;
+  --color-secondary-800: #2d90cd;
+  --color-secondary-900: #1a6fa3;
+  --color-secondary-950: #0e4f79;
+
+  /* Success */
+  --color-success-50: #f8fadc;
+  --color-success-100: #f0f4b3;
+  --color-success-200: #e4eb80;
+  --color-success-300: #d8e24d;
+  --color-success-400: #ccd91a;
+  --color-success-500: #bccf00;
+  --color-success-600: #96a600;
+  --color-success-700: #717c00;
+  --color-success-800: #4b5300;
+  --color-success-900: #262900;
+  --color-success-950: #131500;
+
+  /* Warning */
+  --color-warning-50: #fef9dc;
+  --color-warning-100: #fdf2b3;
+  --color-warning-200: #fceb80;
+  --color-warning-300: #fbe34d;
+  --color-warning-400: #fadc1a;
+  --color-warning-500: #f9d500;
+  --color-warning-600: #c7aa00;
+  --color-warning-700: #958000;
+  --color-warning-800: #645500;
+  --color-warning-900: #322b00;
+  --color-warning-950: #191500;
+
+  /* Danger / Error */
+  --color-error-50: #fae6e6;
+  --color-error-100: #f0b3b3;
+  --color-error-200: #e68080;
+  --color-error-300: #dc4d4d;
+  --color-error-400: #d21a1a;
+  --color-error-500: #c00d0d;
+  --color-error-600: #9a0a0a;
+  --color-error-700: #730808;
+  --color-error-800: #4d0505;
+  --color-error-900: #260303;
+  --color-error-950: #130101;
+
+  /* Neutral */
+  --color-neutral-50: #f9fafb;
+  --color-neutral-100: #f3f4f6;
+  --color-neutral-200: #e5e7eb;
+  --color-neutral-300: #d1d5db;
+  --color-neutral-400: #9ca3af;
+  --color-neutral-500: #6b7280;
+  --color-neutral-600: #4b5563;
+  --color-neutral-700: #374151;
+  --color-neutral-800: #1f2937;
+  --color-neutral-900: #111827;
+  --color-neutral-950: #030712;
+
+  /* Font */
+  --font-sans: "Plus Jakarta Sans", ui-sans-serif, system-ui, sans-serif;
+}
+
+body {
+  background-color: var(--color-neutral-50);
+  color: var(--color-neutral-900);
+}
