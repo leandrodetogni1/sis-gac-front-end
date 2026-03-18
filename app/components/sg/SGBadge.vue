@@ -5,22 +5,43 @@ const props = defineProps<{
 }>();
 
 const badgeConfig = computed(() => {
-  const configs: Record<string, { label: string; color: string }> = {
-    approved: { label: "Aprovado", color: "success" },
-    pending: { label: "Pendente", color: "warning" },
-    rejected: { label: "Rejeitado", color: "error" },
+  const configs: Record<
+    string,
+    { label: string; bg: string; text: string; border: string }
+  > = {
+    approved: {
+      label: "Aprovado",
+      bg: "bg-[#BCCF00]/10",
+      text: "text-[#BCCF00]",
+      border: "border-[#BCCF00]/30",
+    },
+    pending: {
+      label: "Pendente",
+      bg: "bg-[#F9D500]/10",
+      text: "text-[#F9D500]",
+      border: "border-[#F9D500]/30",
+    },
+    rejected: {
+      label: "Rejeitado",
+      bg: "bg-[#C00D0D]/10",
+      text: "text-[#C00D0D]",
+      border: "border-[#C00D0D]/30",
+    },
   };
-  return configs[props.status];
+  return configs[props.status]!;
 });
 </script>
 
 <template>
-  <UBadge
-    :color="badgeConfig.color as any"
-    variant="subtle"
+  <span
     :data-testid="testId"
-    class="rounded-full px-3 py-1 text-xs font-bold"
+    :class="[
+      'inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold',
+      badgeConfig.bg,
+      badgeConfig.text,
+      badgeConfig.border,
+    ]"
   >
     {{ badgeConfig.label }}
-  </UBadge>
+  </span>
 </template>

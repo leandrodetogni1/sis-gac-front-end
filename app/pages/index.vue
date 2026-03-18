@@ -1,29 +1,68 @@
 <script setup lang="ts">
 useHead({ title: "Dashboard — SWGAC" });
 
-const { activities, fetched, getActivities, filterByStatus } = useActivities();
+const { fetched, getActivities, filterByStatus } = useActivities();
 
-const totalHours = computed(() => {
-  return filterByStatus("approved").reduce((sum, a) => sum + a.hours, 0);
+const complementarCategories = computed(() => {
+  const approved = filterByStatus("approved").filter((a) => a.type === "complementar");
+
+  const ensino = approved.filter((a) => a.title.toLowerCase().includes("monitoria") || a.title.toLowerCase().includes("ensino"));
+  const pesquisa = approved.filter((a) => a.title.toLowerCase().includes("científica") || a.title.toLowerCase().includes("artigo") || a.title.toLowerCase().includes("pesquisa"));
+  const extensao = approved.filter((a) => a.title.toLowerCase().includes("extensão") || a.title.toLowerCase().includes("voluntário") || a.title.toLowerCase().includes("comunitár"));
+
+  return [
+    { label: "Ensino", min: 120, obtained: ensino.reduce((sum, a) => sum + a.hours, 0) },
+    { label: "Pesquisa", min: 120, obtained: pesquisa.reduce((sum, a) => sum + a.hours, 0) },
+    { label: "Extensão", min: 120, obtained: extensao.reduce((sum, a) => sum + a.hours, 0) },
+  ];
 });
 
-const requiredHours = 200;
-
-const progressPercentage = computed(() => {
-  return Math.min(Math.round((totalHours.value / requiredHours) * 100), 100);
+const complementarTotal = computed(() => {
+  return {
+    min: complementarCategories.value.reduce((sum, c) => sum + c.min, 0),
+    obtained: complementarCategories.value.reduce((sum, c) => sum + c.obtained, 0),
+  };
 });
 
-const approvedCount = computed(() => {
-  return filterByStatus("approved").length;
+const complementarApproved = computed(() => {
+  return complementarTotal.value.obtained;
 });
 
-const pendingCount = computed(() => {
-  return filterByStatus("pending").length;
+const livreHours = computed(() => {
+  const approved = filterByStatus("approved").filter((a) => a.type === "livre");
+  return approved.reduce((sum, a) => sum + a.hours, 0);
 });
 
-const typeLabel = (type: string) => {
-  return type === "complementar" ? "Complementar" : "Livre";
-};
+const livreMin = 210;
+
+const analysisMessages = computed(() => {
+  const messages: { text: string; type: "warning" | "error" | "info" }[] = [];
+
+  if (complementarTotal.value.obtained < complementarTotal.value.min) {
+    messages.push({
+      text: "Falta carga horária mínima em Atividades Complementares",
+      type: "warning",
+    });
+  }
+
+  const categoriesBelowMin = complementarCategories.value.filter((c) => c.obtained < c.min);
+  if (categoriesBelowMin.length > 0) {
+    const names = categoriesBelowMin.map((c) => c.label).join(" ou ");
+    messages.push({
+      text: `Falta carga horária mínima em ${categoriesBelowMin.length} das ${complementarCategories.value.length} categorias (${names} - mínimo 120h em uma delas).`,
+      type: "error",
+    });
+  }
+
+  if (livreHours.value < livreMin) {
+    messages.push({
+      text: "A carga horária em Formação Livre deve ser completada (min 210h, podendo aproveitar disciplinas fora do currículo ou optativas excedentes - além das exigidas no currículo).",
+      type: "info",
+    });
+  }
+
+  return messages;
+});
 
 onMounted(async () => {
   await getActivities();
@@ -43,152 +82,127 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div v-else>
-      <div class="mb-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-        <SGCard test-id="card-progress" class="sm:col-span-2 lg:col-span-1">
-          <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-primary-100">
-              <Icon name="lucide:clock" size="1.25rem" class="text-primary-500" />
-            </div>
-            <div>
-              <p class="text-sm text-neutral-500">Horas Completadas</p>
-              <p class="text-2xl font-bold text-neutral-900">
-                {{ totalHours }}<span class="text-base font-normal text-neutral-400">/{{ requiredHours }}h</span>
-              </p>
-            </div>
+    <div v-else class="flex flex-col gap-6">
+      <div class="grid gap-6 lg:grid-cols-2">
+        <SGCard test-id="card-complementar">
+          <h2 class="mb-4 text-base font-semibold text-neutral-900 md:text-lg">
+            Atividades Complementares
+          </h2>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" data-testid="complementar-table">
+              <thead>
+                <tr class="border-b border-neutral-200 text-xs font-medium uppercase text-neutral-500">
+                  <th class="pb-3 pr-4">Categoria</th>
+                  <th class="pb-3 pr-4 text-right">Min Horas</th>
+                  <th class="pb-3 text-right">Horas Obtidas</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  v-for="cat in complementarCategories"
+                  :key="cat.label"
+                  class="border-b border-neutral-100"
+                >
+                  <td class="py-3 pr-4 font-medium text-neutral-900">{{ cat.label }}</td>
+                  <td class="py-3 pr-4 text-right text-neutral-500">{{ cat.min }}h</td>
+                  <td
+                    class="py-3 text-right font-medium"
+                    :class="cat.obtained >= cat.min ? 'text-success-600' : 'text-error-500'"
+                  >
+                    {{ cat.obtained }}h
+                  </td>
+                </tr>
+              </tbody>
+              <tfoot>
+                <tr class="border-t-2 border-neutral-300 font-semibold">
+                  <td class="py-3 pr-4 text-neutral-900">Total</td>
+                  <td class="py-3 pr-4 text-right text-neutral-500">{{ complementarTotal.min }}h</td>
+                  <td
+                    class="py-3 text-right"
+                    :class="complementarTotal.obtained >= complementarTotal.min ? 'text-success-600' : 'text-error-500'"
+                  >
+                    {{ complementarTotal.obtained }}h
+                  </td>
+                </tr>
+                <tr class="font-semibold">
+                  <td class="py-2 pr-4 text-neutral-900">Aproveitado</td>
+                  <td />
+                  <td class="py-2 text-right text-neutral-900">{{ complementarApproved }}h</td>
+                </tr>
+              </tfoot>
+            </table>
           </div>
-          <div class="mt-4">
-            <div class="mb-1 flex items-center justify-between text-xs text-neutral-500">
-              <span>Progresso</span>
-              <span>{{ progressPercentage }}%</span>
-            </div>
-            <div class="h-2.5 w-full overflow-hidden rounded-full bg-neutral-200">
-              <div
-                class="h-full rounded-full bg-primary-500 transition-all duration-500"
-                :style="{ width: `${progressPercentage}%` }"
-                data-testid="progress-bar"
+        </SGCard>
+
+        <SGCard test-id="card-analysis">
+          <h2 class="mb-4 text-base font-semibold text-neutral-900 md:text-lg">
+            Análise
+          </h2>
+          <div v-if="analysisMessages.length === 0" class="flex items-center gap-2 text-sm text-success-600">
+            <Icon name="lucide:check-circle" size="1.25rem" />
+            <span>Todas as exigências foram cumpridas.</span>
+          </div>
+          <div v-else class="flex flex-col gap-3">
+            <div
+              v-for="(msg, index) in analysisMessages"
+              :key="index"
+              class="flex items-start gap-2 rounded-lg p-3 text-sm"
+              :class="{
+                'bg-warning-50 text-warning-700': msg.type === 'warning',
+                'bg-error-50 text-error-600': msg.type === 'error',
+                'bg-primary-50 text-primary-700': msg.type === 'info',
+              }"
+            >
+              <Icon
+                :name="msg.type === 'error' ? 'lucide:alert-circle' : msg.type === 'warning' ? 'lucide:alert-triangle' : 'lucide:info'"
+                size="1.25rem"
+                class="mt-0.5 shrink-0"
               />
-            </div>
-          </div>
-        </SGCard>
-
-        <SGCard test-id="card-approved">
-          <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-success-100">
-              <Icon name="lucide:check-circle" size="1.25rem" class="text-success-600" />
-            </div>
-            <div>
-              <p class="text-sm text-neutral-500">Aprovadas</p>
-              <p class="text-2xl font-bold text-neutral-900">{{ approvedCount }}</p>
-            </div>
-          </div>
-        </SGCard>
-
-        <SGCard test-id="card-pending">
-          <div class="flex items-center gap-3">
-            <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-warning-100">
-              <Icon name="lucide:clock-3" size="1.25rem" class="text-warning-600" />
-            </div>
-            <div>
-              <p class="text-sm text-neutral-500">Pendentes</p>
-              <p class="text-2xl font-bold text-neutral-900">{{ pendingCount }}</p>
+              <span>{{ msg.text }}</span>
             </div>
           </div>
         </SGCard>
       </div>
 
-      <SGCard test-id="card-activities">
-        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 class="text-base font-semibold text-neutral-900 md:text-lg">
-            Atividades Complementares
+      <div class="grid gap-6 lg:grid-cols-2">
+        <SGCard test-id="card-livre">
+          <h2 class="mb-4 text-base font-semibold text-neutral-900 md:text-lg">
+            Atividades — Formação Livre
           </h2>
-          <SGButton
-            test-id="create-activity-button"
-            variant="primary"
-            icon="lucide:plus"
-            size="sm"
-          >
-            Nova Atividade
-          </SGButton>
-        </div>
-
-        <div
-          v-if="activities.length === 0"
-          class="flex flex-col items-center justify-center py-12"
-          data-testid="empty-state"
-        >
-          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-            <Icon name="lucide:inbox" size="2rem" class="text-neutral-400" />
-          </div>
-          <p class="mt-4 text-sm font-medium text-neutral-900">Nenhuma atividade encontrada</p>
-          <p class="mt-1 text-sm text-neutral-500">Comece adicionando sua primeira atividade complementar.</p>
-          <SGButton
-            test-id="empty-state-create-button"
-            variant="primary"
-            icon="lucide:plus"
-            size="sm"
-            class="mt-4"
-            @click="getActivities()"
-          >
-            Criar Atividade
-          </SGButton>
-        </div>
-
-        <div v-else>
-          <div class="hidden overflow-x-auto md:block">
-            <table class="w-full text-left text-sm" data-testid="activities-table">
+          <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm" data-testid="livre-table">
               <thead>
                 <tr class="border-b border-neutral-200 text-xs font-medium uppercase text-neutral-500">
-                  <th class="pb-3 pr-4">Atividade</th>
-                  <th class="pb-3 pr-4">Tipo</th>
-                  <th class="pb-3 pr-4">Horas</th>
-                  <th class="pb-3 pr-4">Data</th>
-                  <th class="pb-3 pr-4">Aluno</th>
-                  <th class="pb-3">Status</th>
+                  <th class="pb-3 pr-4">Descrição</th>
+                  <th class="pb-3 text-right">Horas</th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="activity in activities"
-                  :key="activity.id"
-                  class="border-b border-neutral-100 transition-colors hover:bg-neutral-50"
-                  :data-testid="`activity-row-${activity.id}`"
-                >
-                  <td class="py-3 pr-4 font-medium text-neutral-900">{{ activity.title }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ typeLabel(activity.type) }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ activity.hours }}h</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ activity.date }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ activity.user.name }}</td>
-                  <td class="py-3">
-                    <SGBadge :status="activity.status" :test-id="`badge-${activity.id}`" />
-                  </td>
+                <tr class="border-b border-neutral-100">
+                  <td class="py-3 pr-4 font-medium text-neutral-900">Lançada</td>
+                  <td class="py-3 text-right text-neutral-500">{{ livreHours }}h</td>
+                </tr>
+                <tr class="border-b border-neutral-100">
+                  <td class="py-3 pr-4 font-medium text-neutral-900">Aproveitada da Complementar</td>
+                  <td class="py-3 text-right text-neutral-500">0h</td>
                 </tr>
               </tbody>
+              <tfoot>
+                <tr class="border-t-2 border-neutral-300 font-semibold">
+                  <td class="py-3 pr-4 text-neutral-900">Total</td>
+                  <td
+                    class="py-3 text-right"
+                    :class="livreHours >= livreMin ? 'text-success-600' : 'text-error-500'"
+                  >
+                    {{ livreHours }}h
+                  </td>
+                </tr>
+              </tfoot>
             </table>
           </div>
+        </SGCard>
 
-          <div class="space-y-3 md:hidden">
-            <div
-              v-for="activity in activities"
-              :key="activity.id"
-              class="rounded-lg border border-neutral-200 p-3"
-              :data-testid="`activity-card-${activity.id}`"
-            >
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <p class="font-medium text-neutral-900">{{ activity.title }}</p>
-                  <p class="mt-0.5 text-xs text-neutral-500">{{ typeLabel(activity.type) }} · {{ activity.user.name }}</p>
-                </div>
-                <SGBadge :status="activity.status" />
-              </div>
-              <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
-                <span class="font-medium text-neutral-700">{{ activity.hours }}h</span>
-                <span>{{ activity.date }}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </SGCard>
+      </div>
     </div>
   </div>
 </template>

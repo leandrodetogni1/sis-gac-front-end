@@ -3,7 +3,7 @@ const isSidebarOpen = ref(false);
 
 const navItems = [
   { label: "Dashboard", icon: "lucide:layout-dashboard", to: "/", testId: "sidebar-link-dashboard" },
-  { label: "Atividades", icon: "lucide:file-text", to: "/atividades", testId: "sidebar-link-atividades" },
+  { label: "Atividades", icon: "lucide:file-text", to: "/activities", testId: "sidebar-link-atividades" },
   { label: "Certificados", icon: "lucide:award", to: "/certificados", testId: "sidebar-link-certificados" },
   { label: "Configurações", icon: "lucide:settings", to: "/configuracoes", testId: "sidebar-link-configuracoes" },
 ];
@@ -11,7 +11,7 @@ const navItems = [
 const currentRoute = useRoute();
 
 const pageTitle = computed(() => {
-  const item = navItems.find((n) => n.to === currentRoute.path);
+  const item = navItems.find((n) => n.to === "/" ? currentRoute.path === "/" : currentRoute.path.startsWith(n.to));
   return item?.label ?? "SWGAC";
 });
 </script>
@@ -49,7 +49,7 @@ const pageTitle = computed(() => {
           :data-testid="item.testId"
           :class="[
             'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
-            currentRoute.path === item.to
+            (item.to === '/' ? currentRoute.path === '/' : currentRoute.path.startsWith(item.to))
               ? 'bg-secondary-100 text-primary-500'
               : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
           ]"
