@@ -74,10 +74,9 @@ const pageTitle = computed(() => {
       ]"
       data-testid="sidebar"
     >
-      <div class="flex h-16 items-center gap-3 border-b border-neutral-200 px-6">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-500 text-sm font-bold text-white">S</div>
-        <span class="text-lg font-bold text-neutral-900">SWGAC</span>
-      </div>
+      <NuxtLink to="/" class="flex h-30 items-center gap-3 border-b border-neutral-200 px-6">
+        <img src="/logo.png" alt="SWGAC" class="w-full max-w-52" />
+      </NuxtLink>
 
       <nav class="flex-1 space-y-1 p-4">
         <template v-for="item in navItems" :key="item.to">
