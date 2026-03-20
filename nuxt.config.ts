@@ -6,6 +6,10 @@ export default defineNuxtConfig({
 
   modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/icon"],
 
+  runtimeConfig: {
+    apiUrl: process.env.API_URL || "http://localhost:3001",
+  },
+
   css: ["~/assets/css/main.css"],
 
   fonts: {

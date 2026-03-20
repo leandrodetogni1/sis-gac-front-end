@@ -1,10 +1,15 @@
 <script setup lang="ts">
 useHead({ title: "Atividades — SWGAC" });
 
-const { activities, fetched, getActivities, filterByStatus } = useActivities();
+const { activities, fetched, error, getActivities } = useActivities();
 
-const typeLabel = (type: string) => {
-  return type === "complementar" ? "Complementar" : "Livre";
+const userName = (activity: import("~/interfaces/ActivityResponseDto").ActivityResponseDto) => {
+  if (!activity.users) return "—";
+  return `${activity.users.firstName} ${activity.users.lastName}`;
+};
+
+const activityLabel = (activity: import("~/interfaces/ActivityResponseDto").ActivityResponseDto) => {
+  return activity.activity_types?.label ?? activity.event ?? "—";
 };
 
 onMounted(async () => {
@@ -30,7 +35,18 @@ onMounted(async () => {
       </div>
 
       <SGCard test-id="card-activities">
-        <div v-if="activities.length === 0" class="flex flex-col items-center justify-center py-12" data-testid="empty-state">
+        <div v-if="error" class="flex flex-col items-center justify-center py-12" data-testid="error-state">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-red-50">
+            <Icon name="lucide:wifi-off" size="2rem" class="text-red-400" />
+          </div>
+          <p class="mt-4 text-sm font-medium text-neutral-900">Falha ao carregar atividades</p>
+          <p class="mt-1 text-sm text-neutral-500">{{ error }}</p>
+          <SGButton test-id="retry-button" variant="primary" icon="lucide:refresh-cw" size="sm" class="mt-4" @click="getActivities()">
+            Tentar novamente
+          </SGButton>
+        </div>
+
+        <div v-else-if="activities.length === 0" class="flex flex-col items-center justify-center py-12" data-testid="empty-state">
           <div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
             <Icon name="lucide:inbox" size="2rem" class="text-neutral-400" />
           </div>
@@ -54,9 +70,9 @@ onMounted(async () => {
               <thead>
                 <tr class="border-b border-neutral-200 text-xs font-medium uppercase text-neutral-500">
                   <th class="pb-3 pr-4">Atividade</th>
-                  <th class="pb-3 pr-4">Tipo</th>
+                  <th class="pb-3 pr-4">Categoria</th>
                   <th class="pb-3 pr-4">Horas</th>
-                  <th class="pb-3 pr-4">Data</th>
+                  <th class="pb-3 pr-4">Data Início</th>
                   <th class="pb-3 pr-4">Aluno</th>
                   <th class="pb-3">Status</th>
                 </tr>
@@ -68,13 +84,13 @@ onMounted(async () => {
                   class="border-b border-neutral-100 transition-colors hover:bg-neutral-50"
                   :data-testid="`activity-row-${activity.id}`"
                 >
-                  <td class="py-3 pr-4 font-medium text-neutral-900">{{ activity.title }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ typeLabel(activity.type) }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ activity.hours }}h</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ activity.date }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ activity.user.name }}</td>
+                  <td class="py-3 pr-4 font-medium text-neutral-900">{{ activityLabel(activity) }}</td>
+                  <td class="py-3 pr-4 text-neutral-500">{{ activity.category ?? "—" }}</td>
+                  <td class="py-3 pr-4 text-neutral-500">{{ activity.hours ?? 0 }}h</td>
+                  <td class="py-3 pr-4 text-neutral-500">{{ activity.startDate ?? "—" }}</td>
+                  <td class="py-3 pr-4 text-neutral-500">{{ userName(activity) }}</td>
                   <td class="py-3">
-                    <SGBadge :status="activity.status" :test-id="`badge-${activity.id}`" />
+                    <SGBadge :status="(activity.status as 'pending' | 'approved' | 'rejected') ?? 'pending'" :test-id="`badge-${activity.id}`" />
                   </td>
                 </tr>
               </tbody>
@@ -90,14 +106,14 @@ onMounted(async () => {
             >
               <div class="flex items-start justify-between gap-2">
                 <div>
-                  <p class="font-medium text-neutral-900">{{ activity.title }}</p>
-                  <p class="mt-0.5 text-xs text-neutral-500">{{ typeLabel(activity.type) }} · {{ activity.user.name }}</p>
+                  <p class="font-medium text-neutral-900">{{ activityLabel(activity) }}</p>
+                  <p class="mt-0.5 text-xs text-neutral-500">{{ activity.category ?? "—" }} · {{ userName(activity) }}</p>
                 </div>
-                <SGBadge :status="activity.status" />
+                <SGBadge :status="(activity.status as 'pending' | 'approved' | 'rejected') ?? 'pending'" />
               </div>
               <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
-                <span class="font-medium text-neutral-700">{{ activity.hours }}h</span>
-                <span>{{ activity.date }}</span>
+                <span class="font-medium text-neutral-700">{{ activity.hours ?? 0 }}h</span>
+                <span>{{ activity.startDate ?? "—" }}</span>
               </div>
             </div>
           </div>
