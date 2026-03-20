@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     const status = error?.statusCode ?? error?.status ?? 502;
     throw createError({
       statusCode: status,
-      statusMessage: "Não foi possível carregar os tipos de atividade",
+      message: "Não foi possível carregar os tipos de atividade",
     });
   }
 });

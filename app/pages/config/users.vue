@@ -3,6 +3,7 @@ useHead({ title: "Usuários — Configurações — SWGAC" });
 
 const { users, fetched, loading, error, getUsers, deleteUser } = useUsers();
 const { showToastSuccess } = useToastNotification();
+const { confirmAlert } = useAlerts();
 
 const showForm = ref(false);
 
@@ -13,10 +14,16 @@ const handleCreated = async () => {
 };
 
 const handleDelete = async (id: string, name: string) => {
-  if (!confirm(`Remover o usuário "${name}"?`)) return;
+  const confirmed = await confirmAlert(
+    `O usuário "${name}" será removido permanentemente.`,
+    "Remover usuário?",
+    "warning",
+  );
+  if (!confirmed) return;
 
   try {
     await deleteUser(id);
+    showToastSuccess("Usuário removido com sucesso");
   } catch {
     // error handled by composable
   }

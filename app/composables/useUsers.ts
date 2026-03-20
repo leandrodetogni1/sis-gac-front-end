@@ -15,7 +15,7 @@ export const useUsers = () => {
       users.value = data;
       return data;
     } catch (e: any) {
-      error.value = e?.data?.statusMessage ?? "Erro ao carregar usuários";
+      error.value = e?.data?.message ?? "Erro ao carregar usuários";
       return [];
     } finally {
       loading.value = false;
@@ -34,7 +34,7 @@ export const useUsers = () => {
       await getUsers();
       return data;
     } catch (e: any) {
-      error.value = e?.data?.statusMessage ?? "Erro ao criar usuário";
+      error.value = e?.data?.message ?? "Erro ao criar usuário";
       throw e;
     } finally {
       loading.value = false;
@@ -50,7 +50,7 @@ export const useUsers = () => {
       });
       await getUsers();
     } catch (e: any) {
-      error.value = e?.data?.statusMessage ?? "Erro ao remover usuário";
+      error.value = e?.data?.message ?? "Erro ao remover usuário";
       throw e;
     } finally {
       loading.value = false;

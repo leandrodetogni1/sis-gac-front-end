@@ -14,7 +14,7 @@ export const useActivityTypes = () => {
       activityTypes.value = data;
       return data;
     } catch (e: any) {
-      error.value = e?.data?.statusMessage ?? "Erro ao carregar tipos de atividade";
+      error.value = e?.data?.message ?? "Erro ao carregar tipos de atividade";
       return [];
     } finally {
       loading.value = false;

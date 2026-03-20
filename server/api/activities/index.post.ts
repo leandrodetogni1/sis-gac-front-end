@@ -14,7 +14,7 @@ export default defineEventHandler(async (event) => {
       const message = error?.data?.message ?? "Erro ao criar atividade";
       throw createError({
         statusCode: status,
-        statusMessage: message,
+        message,
       });
     }
 });

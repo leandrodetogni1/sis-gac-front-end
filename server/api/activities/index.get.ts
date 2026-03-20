@@ -13,7 +13,7 @@ export default defineEventHandler(async (event) => {
     const status = error?.statusCode ?? error?.status ?? 502;
     throw createError({
       statusCode: status,
-      statusMessage: "Não foi possível conectar à API",
+      message: "Não foi possível conectar à API",
     });
   }
 });

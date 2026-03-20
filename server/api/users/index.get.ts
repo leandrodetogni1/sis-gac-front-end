@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     throw createError({
       statusCode: error?.statusCode ?? 502,
-      statusMessage: "Não foi possível carregar os usuários",
+      message: "Não foi possível carregar os usuários",
     });
   }
 });

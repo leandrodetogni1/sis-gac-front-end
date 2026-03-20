@@ -10,7 +10,7 @@ export default defineEventHandler(async (event) => {
   } catch (error: any) {
     throw createError({
       statusCode: error?.statusCode ?? 502,
-      statusMessage: "Não foi possível remover o usuário",
+      message: "Não foi possível remover o usuário",
     });
   }
 });

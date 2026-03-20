@@ -15,7 +15,7 @@ export const useActivities = () => {
       activities.value = data;
       return data;
     } catch (e: any) {
-      error.value = e?.data?.statusMessage ?? "Erro ao carregar atividades";
+      error.value = e?.data?.message ?? "Erro ao carregar atividades";
       return [];
     } finally {
       loading.value = false;
@@ -33,7 +33,7 @@ export const useActivities = () => {
       });
       return data;
     } catch (e: any) {
-      error.value = e?.data?.statusMessage ?? "Erro ao criar atividade";
+      error.value = e?.data?.message ?? "Erro ao criar atividade";
       throw e;
     } finally {
       loading.value = false;
