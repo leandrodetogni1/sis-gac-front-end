@@ -24,7 +24,10 @@ const navItems: NavItem[] = [
     icon: "lucide:settings",
     to: "/config",
     testId: "sidebar-link-configuracoes",
-    children: [{ label: "Usuários", icon: "lucide:users", to: "/config/users", testId: "sidebar-link-users" }],
+    children: [
+      { label: "Usuários", icon: "lucide:users", to: "/config/users", testId: "sidebar-link-users" },
+      { label: "Atividades", icon: "lucide:file-text", to: "/config/activity-types", testId: "sidebar-link-activity-types" },
+    ],
   },
 ];
 

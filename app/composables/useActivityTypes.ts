@@ -3,6 +3,7 @@ import type { ActivityTypeResponseDto } from "~/interfaces/ActivityTypeResponseD
 export const useActivityTypes = () => {
   const activityTypes = ref<ActivityTypeResponseDto[]>([]);
   const loading = ref(false);
+  const fetched = ref(false);
   const error = ref<string | null>(null);
 
   const getActivityTypes = async (): Promise<ActivityTypeResponseDto[]> => {
@@ -17,12 +18,14 @@ export const useActivityTypes = () => {
       return [];
     } finally {
       loading.value = false;
+      fetched.value = true;
     }
   };
 
   return {
     activityTypes,
     loading,
+    fetched,
     error,
     getActivityTypes,
   };
