@@ -5,10 +5,10 @@ const { users, fetched, loading, error, getUsers, deleteUser } = useUsers();
 const { showToastSuccess } = useToastNotification();
 const { confirmAlert } = useAlerts();
 
-const showForm = ref(false);
+const openModal = ref(false);
 
 const handleCreated = async () => {
-  showForm.value = false;
+  openModal.value = false;
   showToastSuccess("Usuário adicionado com sucesso");
   await getUsers();
 };
@@ -48,26 +48,17 @@ onMounted(async () => {
         <h2 class="text-base font-semibold text-neutral-900 md:text-lg">Usuários</h2>
         <SGButton
           test-id="toggle-user-form-button"
-          :variant="showForm ? 'secondary' : 'primary'"
-          :icon="showForm ? 'lucide:x' : 'lucide:user-plus'"
-          @click="showForm = !showForm"
+          variant="primary"
+          icon="lucide:user-plus"
+          @click="openModal = true"
         >
-          {{ showForm ? "Cancelar" : "Adicionar Usuário" }}
+          Adicionar Usuário
         </SGButton>
       </div>
 
-      <Transition
-        enter-active-class="transition-all duration-300 ease-out"
-        enter-from-class="max-h-0 opacity-0"
-        enter-to-class="max-h-96 opacity-100"
-        leave-active-class="transition-all duration-200 ease-in"
-        leave-from-class="max-h-96 opacity-100"
-        leave-to-class="max-h-0 opacity-0"
-      >
-        <SGCard v-if="showForm" test-id="card-user-form" class="mb-6 overflow-hidden">
-          <config-user-form @created="handleCreated" />
-        </SGCard>
-      </Transition>
+      <SGModal v-model:open="openModal" title="Adicionar Usuário" description="Preencha os dados do novo usuário">
+        <config-user-form @created="handleCreated" />
+      </SGModal>
 
       <SGCard test-id="card-users">
         <div v-if="error" class="flex flex-col items-center justify-center py-12" data-testid="error-state">
@@ -87,7 +78,7 @@ onMounted(async () => {
           </div>
           <p class="mt-4 text-sm font-medium text-neutral-900">Nenhum usuário encontrado</p>
           <p class="mt-1 text-sm text-neutral-500">Comece adicionando o primeiro usuário.</p>
-          <SGButton test-id="empty-state-add-button" variant="primary" icon="lucide:user-plus" size="sm" class="mt-4" @click="showForm = true">
+          <SGButton test-id="empty-state-add-button" variant="primary" icon="lucide:user-plus" size="sm" class="mt-4" @click="openModal = true">
             Adicionar Usuário
           </SGButton>
         </div>

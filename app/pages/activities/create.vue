@@ -5,7 +5,7 @@ useHead({ title: "Nova Atividade — SWGAC" });
 
 const router = useRouter();
 const { createActivity, loading } = useActivities();
-const { showToastSuccess } = useToastNotification();
+const { showToastSuccess, showToastError } = useToastNotification();
 
 const activityClass = ref("");
 const activityTypeId = ref("");
@@ -58,8 +58,9 @@ const handleSubmit = async () => {
     await createActivity(payload);
     showToastSuccess("Atividade criada com sucesso");
     router.push("/activities");
-  } catch {
-    // error is handled by composable
+  } catch (e: any) {
+    console.error(e?.data?.message ?? e);
+    showToastError("Erro ao criar atividade");
   }
 };
 </script>

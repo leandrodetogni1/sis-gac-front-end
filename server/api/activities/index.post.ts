@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
       return res.data;
     } catch (error: any) {
       const status = error?.statusCode ?? error?.status ?? 502;
-      const message = error?.data?.message ?? "Erro ao criar atividade";
+      const message = error?.response?._data?.message ?? error?.data?.message ?? "Erro ao criar atividade";
       throw createError({
         statusCode: status,
         message,
