@@ -1,13 +1,56 @@
 <script setup lang="ts">
 const isSidebarOpen = ref(false);
 
-const navItems = [
+interface NavChild {
+  label: string;
+  icon: string;
+  to: string;
+  testId: string;
+}
+
+interface NavItem {
+  label: string;
+  icon: string;
+  to: string;
+  testId: string;
+  children?: NavChild[];
+}
+
+const navItems: NavItem[] = [
   { label: "Dashboard", icon: "lucide:layout-dashboard", to: "/", testId: "sidebar-link-dashboard" },
   { label: "Atividades", icon: "lucide:file-text", to: "/activities", testId: "sidebar-link-atividades" },
-  { label: "Configurações", icon: "lucide:settings", to: "/configuracoes", testId: "sidebar-link-configuracoes" },
+  {
+    label: "Configurações",
+    icon: "lucide:settings",
+    to: "/config",
+    testId: "sidebar-link-configuracoes",
+    children: [{ label: "Usuários", icon: "lucide:users", to: "/config/users", testId: "sidebar-link-users" }],
+  },
 ];
 
 const currentRoute = useRoute();
+
+const expandedMenus = ref<string[]>([]);
+
+const isItemActive = (item: NavItem) => {
+  if (item.to === "/") return currentRoute.path === "/";
+  return currentRoute.path.startsWith(item.to);
+};
+
+const isChildActive = (child: NavChild) => currentRoute.path === child.to;
+
+const toggleMenu = (to: string) => {
+  const idx = expandedMenus.value.indexOf(to);
+  if (idx >= 0) {
+    expandedMenus.value.splice(idx, 1);
+  } else {
+    expandedMenus.value.push(to);
+  }
+};
+
+const isExpanded = (item: NavItem) => {
+  return expandedMenus.value.includes(item.to) || isItemActive(item);
+};
 
 const pageTitle = computed(() => {
   const item = navItems.find((n) => (n.to === "/" ? currentRoute.path === "/" : currentRoute.path.startsWith(n.to)));
@@ -34,22 +77,55 @@ const pageTitle = computed(() => {
       </div>
 
       <nav class="flex-1 space-y-1 p-4">
-        <NuxtLink
-          v-for="item in navItems"
-          :key="item.to"
-          :to="item.to"
-          :data-testid="item.testId"
-          :class="[
-            'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
-            (item.to === '/' ? currentRoute.path === '/' : currentRoute.path.startsWith(item.to))
-              ? 'bg-secondary-100 text-primary-500'
-              : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
-          ]"
-          @click="isSidebarOpen = false"
-        >
-          <Icon :name="item.icon" size="1.25rem" />
-          {{ item.label }}
-        </NuxtLink>
+        <template v-for="item in navItems" :key="item.to">
+          <template v-if="item.children">
+            <button
+              :data-testid="item.testId"
+              :class="[
+                'flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+                isItemActive(item) ? 'bg-secondary-100 text-primary-500' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
+              ]"
+              @click="toggleMenu(item.to)"
+            >
+              <span class="flex items-center gap-3">
+                <Icon :name="item.icon" size="1.25rem" />
+                {{ item.label }}
+              </span>
+              <Icon name="lucide:chevron-down" size="1rem" class="transition-transform duration-200" :class="isExpanded(item) ? 'rotate-180' : ''" />
+            </button>
+
+            <div v-if="isExpanded(item)" class="mt-1 space-y-0.5 pl-4">
+              <NuxtLink
+                v-for="child in item.children"
+                :key="child.to"
+                :to="child.to"
+                :data-testid="child.testId"
+                :class="[
+                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all duration-200',
+                  isChildActive(child) ? 'bg-secondary-100 text-primary-500' : 'text-neutral-400 hover:bg-neutral-100 hover:text-neutral-900',
+                ]"
+                @click="isSidebarOpen = false"
+              >
+                <Icon :name="child.icon" size="1.125rem" />
+                {{ child.label }}
+              </NuxtLink>
+            </div>
+          </template>
+
+          <NuxtLink
+            v-else
+            :to="item.to"
+            :data-testid="item.testId"
+            :class="[
+              'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-all duration-200',
+              isItemActive(item) ? 'bg-secondary-100 text-primary-500' : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-900',
+            ]"
+            @click="isSidebarOpen = false"
+          >
+            <Icon :name="item.icon" size="1.25rem" />
+            {{ item.label }}
+          </NuxtLink>
+        </template>
       </nav>
 
       <div class="border-t border-neutral-200 p-4">
