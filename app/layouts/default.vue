@@ -4,14 +4,13 @@ const isSidebarOpen = ref(false);
 const navItems = [
   { label: "Dashboard", icon: "lucide:layout-dashboard", to: "/", testId: "sidebar-link-dashboard" },
   { label: "Atividades", icon: "lucide:file-text", to: "/activities", testId: "sidebar-link-atividades" },
-  { label: "Certificados", icon: "lucide:award", to: "/certificados", testId: "sidebar-link-certificados" },
   { label: "Configurações", icon: "lucide:settings", to: "/configuracoes", testId: "sidebar-link-configuracoes" },
 ];
 
 const currentRoute = useRoute();
 
 const pageTitle = computed(() => {
-  const item = navItems.find((n) => n.to === "/" ? currentRoute.path === "/" : currentRoute.path.startsWith(n.to));
+  const item = navItems.find((n) => (n.to === "/" ? currentRoute.path === "/" : currentRoute.path.startsWith(n.to)));
   return item?.label ?? "SWGAC";
 });
 </script>
@@ -19,12 +18,7 @@ const pageTitle = computed(() => {
 <template>
   <div class="flex min-h-screen">
     <Transition name="fade">
-      <div
-        v-if="isSidebarOpen"
-        class="fixed inset-0 z-30 bg-black/40 lg:hidden"
-        data-testid="sidebar-overlay"
-        @click="isSidebarOpen = false"
-      />
+      <div v-if="isSidebarOpen" class="fixed inset-0 z-30 bg-black/40 lg:hidden" data-testid="sidebar-overlay" @click="isSidebarOpen = false" />
     </Transition>
 
     <aside
@@ -35,9 +29,7 @@ const pageTitle = computed(() => {
       data-testid="sidebar"
     >
       <div class="flex h-16 items-center gap-3 border-b border-neutral-200 px-6">
-        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-500 text-sm font-bold text-white">
-          S
-        </div>
+        <div class="flex h-8 w-8 items-center justify-center rounded-lg bg-primary-500 text-sm font-bold text-white">S</div>
         <span class="text-lg font-bold text-neutral-900">SWGAC</span>
       </div>
 
@@ -62,9 +54,7 @@ const pageTitle = computed(() => {
 
       <div class="border-t border-neutral-200 p-4">
         <div class="flex items-center gap-3">
-          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600">
-            U
-          </div>
+          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600">U</div>
           <div class="flex-1 truncate">
             <p class="text-sm font-medium text-neutral-900">Usuário</p>
             <p class="truncate text-xs text-neutral-500">usuario@email.com</p>
@@ -74,23 +64,6 @@ const pageTitle = computed(() => {
     </aside>
 
     <div class="flex flex-1 flex-col">
-      <header
-        class="flex h-16 items-center gap-4 border-b border-neutral-200 bg-white px-4 md:px-6"
-        data-testid="header"
-      >
-        <button
-          class="rounded-lg p-2 text-neutral-500 transition-colors hover:bg-neutral-100 hover:text-neutral-900 lg:hidden"
-          data-testid="sidebar-toggle"
-          @click="isSidebarOpen = !isSidebarOpen"
-        >
-          <Icon name="lucide:menu" size="1.25rem" />
-        </button>
-
-        <h1 class="text-lg font-semibold text-neutral-900 md:text-xl">
-          {{ pageTitle }}
-        </h1>
-      </header>
-
       <main class="flex-1 p-4 md:p-6">
         <slot />
       </main>

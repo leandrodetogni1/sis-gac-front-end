@@ -9,8 +9,10 @@ const props = defineProps<{
   icon?: string;
 }>();
 
-const colorMap = computed(() => {
-  const map: Record<string, string> = {
+type UButtonColor = "primary" | "secondary" | "success" | "info" | "warning" | "error" | "neutral";
+
+const colorMap = computed<UButtonColor>(() => {
+  const map: Record<string, UButtonColor> = {
     primary: "primary",
     secondary: "secondary",
     danger: "error",
