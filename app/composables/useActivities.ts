@@ -40,6 +40,14 @@ export const useActivities = () => {
     }
   };
 
+  const approveActivity = async (id: string): Promise<void> => {
+    await $fetch(`/api/activities/${id}/approve`, { method: "PATCH" });
+  };
+
+  const rejectActivity = async (id: string): Promise<void> => {
+    await $fetch(`/api/activities/${id}/reject`, { method: "PATCH" });
+  };
+
   const filterByStatus = (status: string): ActivityResponseDto[] => {
     return activities.value.filter((a) => a.status === status);
   };
@@ -51,6 +59,8 @@ export const useActivities = () => {
     error,
     getActivities,
     createActivity,
+    approveActivity,
+    rejectActivity,
     filterByStatus,
   };
 };

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 const props = defineProps<{
-  status: "approved" | "pending" | "rejected";
+  status: string;
   testId?: string;
 }>();
 
 const badgeConfig = computed(() => {
+  const normalizedStatus = props.status?.toLowerCase();
   const configs: Record<string, { label: string; bg: string; text: string; border: string }> = {
     approved: {
       label: "Aprovado",
@@ -25,7 +26,7 @@ const badgeConfig = computed(() => {
       border: "border-[#C00D0D]/30",
     },
   };
-  return configs[props.status] ?? configs.pending;
+  return configs[normalizedStatus] ?? configs.pending;
 });
 </script>
 
