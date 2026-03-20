@@ -5,6 +5,7 @@ useHead({ title: "Nova Atividade — SWGAC" });
 
 const router = useRouter();
 const { createActivity, loading } = useActivities();
+const { showToastSuccess } = useToastNotification();
 
 const activityClass = ref("");
 const activityTypeId = ref("");
@@ -55,6 +56,7 @@ const handleSubmit = async () => {
 
   try {
     await createActivity(payload);
+    showToastSuccess("Atividade criada com sucesso");
     router.push("/activities");
   } catch {
     // error is handled by composable

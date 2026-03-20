@@ -2,11 +2,14 @@
 useHead({ title: "Usuários — Configurações — SWGAC" });
 
 const { users, fetched, loading, error, getUsers, deleteUser } = useUsers();
+const { showToastSuccess } = useToastNotification();
 
 const showForm = ref(false);
 
-const handleCreated = () => {
+const handleCreated = async () => {
   showForm.value = false;
+  showToastSuccess("Usuário adicionado com sucesso");
+  await getUsers();
 };
 
 const handleDelete = async (id: string, name: string) => {
