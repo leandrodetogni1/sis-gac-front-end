@@ -19,6 +19,7 @@ const emit = defineEmits(["update:modelValue"]);
     :rows="rows ?? 3"
     :data-testid="testId"
     color="primary"
+    class="w-full"
     @update:model-value="emit('update:modelValue', $event)"
   >
     <template v-if="label" #label>

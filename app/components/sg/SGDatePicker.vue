@@ -38,19 +38,17 @@ const displayText = computed(() => {
 
 <template>
   <UPopover :disabled="disabled">
-    <UButton
-      color="neutral"
-      variant="subtle"
-      icon="i-lucide-calendar"
-      block
-      class="justify-start"
+    <button
+      type="button"
       :disabled="disabled"
       :data-testid="testId"
+      class="flex w-full items-center gap-2 rounded-md border border-accented bg-default px-2.5 py-1.5 text-sm transition-colors hover:border-inverted focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
     >
-      <span :class="calendarValue ? 'text-neutral-900' : 'text-neutral-400'">
+      <Icon name="lucide:calendar" size="1rem" class="shrink-0 text-dimmed" />
+      <span :class="calendarValue ? 'text-default' : 'text-dimmed'">
         {{ displayText }}
       </span>
-    </UButton>
+    </button>
 
     <template #content>
       <UCalendar v-model="calendarValue" class="p-2" />

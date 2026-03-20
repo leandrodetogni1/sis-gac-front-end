@@ -26,22 +26,22 @@ onMounted(async () => {
     </div>
 
     <div v-else>
-      <SGCard test-id="card-activities">
-        <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <h2 class="text-base font-semibold text-neutral-900 md:text-lg">
-            Atividades Complementares
-          </h2>
-          <SGButton
-            test-id="create-activity-button"
-            variant="primary"
-            icon="lucide:plus"
-            size="sm"
-            @click="navigateTo('/activities/create')"
-          >
-            Nova Atividade
-          </SGButton>
-        </div>
+      <div class="mb-4 flex items-center justify-between">
+        <h2 class="text-base font-semibold text-neutral-900 md:text-lg">
+          Atividades Complementares
+        </h2>
+        <SGButton
+          test-id="create-activity-button"
+          variant="primary"
+          icon="lucide:plus"
+          size="sm"
+          @click="navigateTo('/activities/create')"
+        >
+          Nova Atividade
+        </SGButton>
+      </div>
 
+      <SGCard test-id="card-activities">
         <div
           v-if="activities.length === 0"
           class="flex flex-col items-center justify-center py-12"

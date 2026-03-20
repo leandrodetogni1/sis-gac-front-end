@@ -9,8 +9,8 @@ const { createActivity, loading } = useActivities();
 const title = ref("");
 const type = ref<ActivityType | "">("");
 const hours = ref<number | undefined>();
-const date = ref("");
-const description = ref("");
+const startDate = ref("");
+const endDate = ref("");
 const fileName = ref("");
 
 const typeOptions = [
@@ -24,7 +24,8 @@ const isValid = computed(() => {
     type.value !== "" &&
     hours.value !== undefined &&
     hours.value > 0 &&
-    date.value !== ""
+    startDate.value !== "" &&
+    endDate.value !== ""
   );
 });
 
@@ -42,7 +43,7 @@ const handleSubmit = async () => {
     title: title.value.trim(),
     type: type.value as ActivityType,
     hours: hours.value!,
-    date: date.value,
+    date: startDate.value,
     user: { name: "Usuário Atual" },
   };
 
@@ -52,7 +53,7 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="mx-auto max-w-xl py-6">
+  <div class="mx-auto max-w-2xl py-6">
     <div class="mb-6">
       <button
         class="flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
@@ -70,10 +71,10 @@ const handleSubmit = async () => {
       </p>
     </div>
 
-    <SGCard test-id="create-activity-card">
-      <form data-testid="create-activity-form" @submit.prevent="handleSubmit">
-        <div class="flex flex-col gap-5">
-          <div>
+    <form data-testid="create-activity-form" @submit.prevent="handleSubmit">
+      <div class="flex flex-col gap-6">
+        <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <div class="sm:col-span-2">
             <label class="mb-1.5 block text-sm font-medium text-neutral-700">
               Título <span class="text-error-500">*</span>
             </label>
@@ -96,94 +97,93 @@ const handleSubmit = async () => {
             />
           </div>
 
-          <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
-            <div>
-              <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-                Horas <span class="text-error-500">*</span>
-              </label>
-              <SGInput
-                :model-value="hours !== undefined ? String(hours) : ''"
-                type="number"
-                placeholder="Ex: 40"
-                test-id="input-hours"
-                @update:model-value="hours = $event ? Number($event) : undefined"
-              />
-            </div>
-
-            <div>
-              <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-                Data <span class="text-error-500">*</span>
-              </label>
-              <SGDatePicker
-                v-model="date"
-                placeholder="Selecione uma data"
-                test-id="input-date"
-              />
-            </div>
-          </div>
-
           <div>
             <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-              Descrição
+              Horas <span class="text-error-500">*</span>
             </label>
-            <SGTextarea
-              v-model="description"
-              placeholder="Descreva brevemente a atividade (opcional)"
-              :rows="4"
-              test-id="input-description"
+            <SGInput
+              :model-value="hours !== undefined ? String(hours) : ''"
+              type="number"
+              placeholder="Ex: 40"
+              test-id="input-hours"
+              @update:model-value="hours = $event ? Number($event) : undefined"
             />
           </div>
 
           <div>
             <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-              Comprovante
+              Data Inicial <span class="text-error-500">*</span>
             </label>
-            <label
-              class="flex cursor-pointer items-center gap-3 rounded-lg border border-dashed border-neutral-300 p-4 transition-colors hover:border-primary-400 hover:bg-primary-50"
-              data-testid="file-upload"
-            >
-              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-neutral-100">
-                <Icon name="lucide:upload" size="1.25rem" class="text-neutral-500" />
-              </div>
-              <div class="flex-1">
-                <p v-if="fileName" class="text-sm font-medium text-neutral-900">
-                  {{ fileName }}
-                </p>
-                <p v-else class="text-sm text-neutral-500">
-                  Clique para enviar um arquivo
-                </p>
-                <p class="text-xs text-neutral-400">PDF, PNG ou JPG até 5MB</p>
-              </div>
-              <input
-                type="file"
-                class="hidden"
-                accept=".pdf,.png,.jpg,.jpeg"
-                @change="handleFileChange"
-              />
+            <SGDatePicker
+              v-model="startDate"
+              placeholder="Selecione uma data"
+              test-id="input-start-date"
+            />
+          </div>
+
+          <div>
+            <label class="mb-1.5 block text-sm font-medium text-neutral-700">
+              Data Final <span class="text-error-500">*</span>
             </label>
+            <SGDatePicker
+              v-model="endDate"
+              placeholder="Selecione uma data"
+              test-id="input-end-date"
+            />
           </div>
         </div>
 
-        <div class="mt-8 flex flex-col gap-3 sm:flex-row sm:justify-end">
-          <SGButton
-            variant="secondary"
-            test-id="cancel-button"
-            type="button"
-            @click="router.back()"
+        <USeparator />
+
+        <div>
+          <label class="mb-1.5 block text-sm font-medium text-neutral-700">
+            Comprovante
+          </label>
+          <label
+            class="group flex cursor-pointer items-center gap-4 rounded-lg border border-dashed border-accented p-5 transition-all duration-200 hover:border-primary hover:bg-primary/5"
+            data-testid="file-upload"
           >
-            Cancelar
-          </SGButton>
-          <SGButton
-            variant="primary"
-            test-id="submit-button"
-            type="submit"
-            :loading="loading"
-            :disabled="!isValid || loading"
-          >
-            Registrar Atividade
-          </SGButton>
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/15">
+              <Icon name="lucide:upload-cloud" size="1.25rem" class="text-primary" />
+            </div>
+            <div class="flex-1 min-w-0">
+              <p v-if="fileName" class="truncate text-sm font-medium text-neutral-900">
+                {{ fileName }}
+              </p>
+              <p v-else class="text-sm text-neutral-600">
+                Clique para enviar um arquivo
+              </p>
+              <p class="mt-0.5 text-xs text-neutral-400">PDF, PNG ou JPG até 5MB</p>
+            </div>
+            <input
+              type="file"
+              class="hidden"
+              accept=".pdf,.png,.jpg,.jpeg"
+              @change="handleFileChange"
+            />
+          </label>
         </div>
-      </form>
-    </SGCard>
+      </div>
+
+      <div class="mt-8 flex items-center justify-end gap-3 border-t border-neutral-200 pt-6">
+        <SGButton
+          variant="secondary"
+          test-id="cancel-button"
+          type="button"
+          @click="router.back()"
+        >
+          Cancelar
+        </SGButton>
+        <SGButton
+          variant="primary"
+          test-id="submit-button"
+          type="submit"
+          :loading="loading"
+          :disabled="!isValid || loading"
+        >
+          Criar
+        </SGButton>
+      </div>
+    </form>
   </div>
 </template>

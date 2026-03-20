@@ -19,6 +19,7 @@ const emit = defineEmits(["update:modelValue"]);
     :options="options"
     :data-testid="testId"
     color="primary"
+    class="w-full"
     value-key="value"
     label-key="label"
     @update:model-value="emit('update:modelValue', $event)"
