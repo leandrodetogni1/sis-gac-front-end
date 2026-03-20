@@ -47,13 +47,22 @@ const toggleMenu = (to: string) => {
   if (idx >= 0) {
     expandedMenus.value.splice(idx, 1);
   } else {
-    expandedMenus.value.push(to);
+    expandedMenus.value = [to];
   }
 };
 
 const isExpanded = (item: NavItem) => {
-  return expandedMenus.value.includes(item.to) || isItemActive(item);
+  return expandedMenus.value.includes(item.to);
 };
+
+watch(
+  () => currentRoute.path,
+  (path) => {
+    const activeParent = navItems.find((item) => item.children && path.startsWith(item.to));
+    expandedMenus.value = activeParent ? [activeParent.to] : [];
+  },
+  { immediate: true },
+);
 </script>
 
 <template>

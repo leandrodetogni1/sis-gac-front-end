@@ -8,6 +8,9 @@ export default defineNuxtConfig({
 
   runtimeConfig: {
     apiUrl: process.env.API_URL || "http://localhost:3001",
+    public: {
+      defaultAuthorId: process.env.NUXT_PUBLIC_DEFAULT_AUTHOR_ID || "",
+    },
   },
 
   css: ["~/assets/css/main.css"],
