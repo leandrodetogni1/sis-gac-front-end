@@ -54,11 +54,6 @@ const toggleMenu = (to: string) => {
 const isExpanded = (item: NavItem) => {
   return expandedMenus.value.includes(item.to) || isItemActive(item);
 };
-
-const pageTitle = computed(() => {
-  const item = navItems.find((n) => (n.to === "/" ? currentRoute.path === "/" : currentRoute.path.startsWith(n.to)));
-  return item?.label ?? "SWGAC";
-});
 </script>
 
 <template>
@@ -74,7 +69,7 @@ const pageTitle = computed(() => {
       ]"
       data-testid="sidebar"
     >
-      <NuxtLink to="/" class="flex h-30 items-center gap-3 border-b border-neutral-200 px-6">
+      <NuxtLink to="/" class="flex h-24 items-center gap-3 justify-center">
         <img src="/logo.png" alt="SWGAC" class="w-full max-w-52" />
       </NuxtLink>
 
