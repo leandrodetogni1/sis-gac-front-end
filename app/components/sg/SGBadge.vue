@@ -28,7 +28,7 @@ const badgeConfig = computed(() => {
       border: "border-[#C00D0D]/30",
     },
   };
-  return configs[props.status]!;
+  return configs[props.status] ?? configs.pending;
 });
 </script>
 

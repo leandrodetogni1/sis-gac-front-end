@@ -43,7 +43,7 @@ const handleSubmit = async () => {
   if (!isValid.value || loading.value) return;
 
   const payload: CreateActivityDto = {
-    authorId: "12345678",
+    authorId: "36271d0c-8a96-46df-8c33-70fbb83c0254",
     activityTypeId: activityTypeId.value.trim(),
     class: activityClass.value,
     event: event.value.trim(),
