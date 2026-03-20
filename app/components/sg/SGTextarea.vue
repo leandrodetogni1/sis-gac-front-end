@@ -21,9 +21,5 @@ const emit = defineEmits(["update:modelValue"]);
     color="primary"
     class="w-full"
     @update:model-value="emit('update:modelValue', $event)"
-  >
-    <template v-if="label" #label>
-      {{ label }}
-    </template>
-  </UTextarea>
+  />
 </template>

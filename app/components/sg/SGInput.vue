@@ -18,14 +18,10 @@ const emit = defineEmits(["update:modelValue"]);
     :placeholder="placeholder"
     :type="type ?? 'text'"
     :disabled="disabled"
-    :icon="icon"
+    :leading-icon="icon"
     :data-testid="testId"
     color="primary"
     class="w-full"
     @update:model-value="emit('update:modelValue', $event)"
-  >
-    <template v-if="label" #label>
-      {{ label }}
-    </template>
-  </UInput>
+  />
 </template>

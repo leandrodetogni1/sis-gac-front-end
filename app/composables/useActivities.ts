@@ -1,4 +1,5 @@
 import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
+import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
 
 export const useActivities = () => {
   const activities = ref<ActivityResponseDto[]>([]);
@@ -22,6 +23,23 @@ export const useActivities = () => {
     }
   };
 
+  const createActivity = async (payload: CreateActivityDto): Promise<ActivityResponseDto> => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await $fetch<ActivityResponseDto>("/api/activities", {
+        method: "POST",
+        body: payload,
+      });
+      return data;
+    } catch (e: any) {
+      error.value = e?.data?.statusMessage ?? "Erro ao criar atividade";
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const filterByStatus = (status: string): ActivityResponseDto[] => {
     return activities.value.filter((a) => a.status === status);
   };
@@ -32,6 +50,7 @@ export const useActivities = () => {
     fetched,
     error,
     getActivities,
+    createActivity,
     filterByStatus,
   };
 };
