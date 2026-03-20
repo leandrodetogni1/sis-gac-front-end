@@ -5,10 +5,7 @@ const props = defineProps<{
 }>();
 
 const badgeConfig = computed(() => {
-  const configs: Record<
-    string,
-    { label: string; bg: string; text: string; border: string }
-  > = {
+  const configs: Record<string, { label: string; bg: string; text: string; border: string }> = {
     approved: {
       label: "Aprovado",
       bg: "bg-[#BCCF00]/10",
@@ -34,13 +31,9 @@ const badgeConfig = computed(() => {
 
 <template>
   <span
+    v-if="badgeConfig"
     :data-testid="testId"
-    :class="[
-      'inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold',
-      badgeConfig.bg,
-      badgeConfig.text,
-      badgeConfig.border,
-    ]"
+    :class="['inline-flex items-center rounded-full border px-3 py-1 text-xs font-bold', badgeConfig.bg, badgeConfig.text, badgeConfig.border]"
   >
     {{ badgeConfig.label }}
   </span>

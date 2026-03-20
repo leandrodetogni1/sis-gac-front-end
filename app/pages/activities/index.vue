@@ -90,7 +90,7 @@ onMounted(async () => {
                   <td class="py-3 pr-4 text-neutral-500">{{ activity.startDate ?? "—" }}</td>
                   <td class="py-3 pr-4 text-neutral-500">{{ userName(activity) }}</td>
                   <td class="py-3">
-                    <SGBadge :status="(activity.status as 'pending' | 'approved' | 'rejected') ?? 'pending'" :test-id="`badge-${activity.id}`" />
+                    <SGBadge :status="activity.status || 'pending'" :test-id="`badge-${activity.id}`" />
                   </td>
                 </tr>
               </tbody>
@@ -109,7 +109,7 @@ onMounted(async () => {
                   <p class="font-medium text-neutral-900">{{ activityLabel(activity) }}</p>
                   <p class="mt-0.5 text-xs text-neutral-500">{{ activity.category ?? "—" }} · {{ userName(activity) }}</p>
                 </div>
-                <SGBadge :status="(activity.status as 'pending' | 'approved' | 'rejected') ?? 'pending'" />
+                <SGBadge :status="activity.status || 'pending'" />
               </div>
               <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
                 <span class="font-medium text-neutral-700">{{ activity.hours ?? 0 }}h</span>

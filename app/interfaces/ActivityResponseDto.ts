@@ -2,7 +2,7 @@ export interface ActivityResponseDto {
   id: string;
   authorId: string | null;
   unity: string | null;
-  status: string | null;
+  status: "approved" | "pending" | "rejected" | null;
   category: string | null;
   class: string | null;
   activityTypeId: string | null;
