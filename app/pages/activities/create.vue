@@ -90,12 +90,12 @@ const handleSubmit = async () => {
             <SGInput v-model="event" placeholder="Ex: Monitoria de Algoritmos" test-id="input-event" />
           </div>
 
-          <div>
+          <div class="sm:col-span-2">
             <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Classe <span class="text-error-500">*</span> </label>
             <SGSelect v-model="activityClass" placeholder="Selecione a classe" :options="classOptions" test-id="select-class" />
           </div>
 
-          <div>
+          <div class="sm:col-span-2">
             <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Tipo de Atividade <span class="text-error-500">*</span> </label>
             <activities-activity-type-select v-model="activityTypeId" test-id="select-activity-type" />
           </div>

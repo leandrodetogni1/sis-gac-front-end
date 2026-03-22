@@ -1,7 +1,18 @@
 <script setup lang="ts">
+import type { SGTableColumn } from "~/types/SGTableColumn";
+
 useHead({ title: "Atividades — Configurações — SWGAC" });
 
 const { activityTypes, fetched, error, getActivityTypes } = useActivityTypes();
+
+const columns: SGTableColumn[] = [
+  { key: "cod", label: "Código" },
+  { key: "label", label: "Nome" },
+  { key: "category", label: "Categoria" },
+  { key: "unity", label: "Unidade" },
+  { key: "maxHoursInComplementarActivities", label: "Max Horas (Complementares)" },
+  { key: "maxHoursPerCertificateOrSemester", label: "Max Horas (Semestre)" },
+];
 
 const formatHours = (value: number | null) => {
   if (value === null || value === undefined) return "—";
@@ -28,85 +39,61 @@ onMounted(async () => {
       </div>
 
       <SGCard test-id="card-activity-types">
-        <div v-if="error" class="flex flex-col items-center justify-center py-12" data-testid="error-state">
-          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-error-50">
-            <Icon name="lucide:wifi-off" size="2rem" class="text-error-400" />
-          </div>
-          <p class="mt-4 text-sm font-medium text-neutral-900">Falha ao carregar tipos de atividade</p>
-          <p class="mt-1 text-sm text-neutral-500">{{ error }}</p>
-          <SGButton test-id="retry-button" variant="primary" icon="lucide:refresh-cw" size="sm" class="mt-4" @click="getActivityTypes()">
-            Tentar novamente
-          </SGButton>
-        </div>
+        <SGTable
+          :columns="columns"
+          :items="activityTypes"
+          :error="error"
+          error-text="Falha ao carregar tipos de atividade"
+          empty-text="Nenhum tipo de atividade encontrado"
+          empty-description="Não há tipos de atividade cadastrados no momento."
+          empty-icon="lucide:file-text"
+          test-id="activity-types-table"
+          @retry="getActivityTypes()"
+        >
+          <template #cell-cod="{ item: type }">
+            <span class="inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700">
+              {{ type.cod }}
+            </span>
+          </template>
 
-        <div v-else-if="activityTypes.length === 0" class="flex flex-col items-center justify-center py-12" data-testid="empty-state">
-          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-            <Icon name="lucide:file-text" size="2rem" class="text-neutral-400" />
-          </div>
-          <p class="mt-4 text-sm font-medium text-neutral-900">Nenhum tipo de atividade encontrado</p>
-          <p class="mt-1 text-sm text-neutral-500">Não há tipos de atividade cadastrados no momento.</p>
-        </div>
+          <template #cell-label="{ item: type }">
+            <span class="font-medium text-neutral-900">{{ type.label }}</span>
+          </template>
 
-        <div v-else>
-          <div class="hidden overflow-x-auto md:block">
-            <table class="w-full text-left text-sm" data-testid="activity-types-table">
-              <thead>
-                <tr class="border-b border-neutral-200 text-xs font-medium uppercase text-neutral-500">
-                  <th class="pb-3 pr-4">Código</th>
-                  <th class="pb-3 pr-4">Nome</th>
-                  <th class="pb-3 pr-4">Categoria</th>
-                  <th class="pb-3 pr-4">Unidade</th>
-                  <th class="pb-3 pr-4">Max Horas (Complementares)</th>
-                  <th class="pb-3">Max Horas (Semestre)</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="type in activityTypes"
-                  :key="type.id"
-                  class="border-b border-neutral-100 transition-colors hover:bg-neutral-50"
-                  :data-testid="`activity-type-row-${type.id}`"
-                >
-                  <td class="py-3 pr-4">
-                    <span class="inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700">
-                      {{ type.cod }}
-                    </span>
-                  </td>
-                  <td class="py-3 pr-4 font-medium text-neutral-900">{{ type.label }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ type.category ?? "—" }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ type.unity ?? "—" }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ formatHours(type.maxHoursInComplementarActivities) }}</td>
-                  <td class="py-3 text-neutral-500">{{ formatHours(type.maxHoursPerCertificateOrSemester) }}</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <template #cell-category="{ item: type }">
+            <span class="text-neutral-500">{{ type.category ?? "—" }}</span>
+          </template>
 
-          <div class="space-y-3 md:hidden">
-            <div
-              v-for="type in activityTypes"
-              :key="type.id"
-              class="rounded-lg border border-neutral-200 p-3"
-              :data-testid="`activity-type-card-${type.id}`"
-            >
-              <div class="flex items-start justify-between gap-2">
-                <div>
-                  <div class="flex items-center gap-2">
-                    <span class="inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700">
-                      {{ type.cod }}
-                    </span>
-                    <p class="font-medium text-neutral-900">{{ type.label }}</p>
-                  </div>
-                  <p class="mt-1 text-xs text-neutral-500">{{ type.category ?? "—" }} · {{ type.unity ?? "—" }}</p>
+          <template #cell-unity="{ item: type }">
+            <span class="text-neutral-500">{{ type.unity ?? "—" }}</span>
+          </template>
+
+          <template #cell-maxHoursInComplementarActivities="{ item: type }">
+            <span class="text-neutral-500">{{ formatHours(type.maxHoursInComplementarActivities) }}</span>
+          </template>
+
+          <template #cell-maxHoursPerCertificateOrSemester="{ item: type }">
+            <span class="text-neutral-500">{{ formatHours(type.maxHoursPerCertificateOrSemester) }}</span>
+          </template>
+
+          <template #mobile="{ item: type }">
+            <div class="flex items-start justify-between gap-2">
+              <div>
+                <div class="flex items-center gap-2">
+                  <span class="inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-xs font-medium text-primary-700">
+                    {{ type.cod }}
+                  </span>
+                  <p class="font-medium text-neutral-900">{{ type.label }}</p>
                 </div>
-              </div>
-              <div class="mt-2 flex items-center gap-4 text-xs text-neutral-500">
-                <span>Complementares: <span class="font-medium text-neutral-700">{{ formatHours(type.maxHoursInComplementarActivities) }}</span></span>
-                <span>Semestre: <span class="font-medium text-neutral-700">{{ formatHours(type.maxHoursPerCertificateOrSemester) }}</span></span>
+                <p class="mt-1 text-xs text-neutral-500">{{ type.category ?? "—" }} · {{ type.unity ?? "—" }}</p>
               </div>
             </div>
-          </div>
-        </div>
+            <div class="mt-2 flex items-center gap-4 text-xs text-neutral-500">
+              <span>Complementares: <span class="font-medium text-neutral-700">{{ formatHours(type.maxHoursInComplementarActivities) }}</span></span>
+              <span>Semestre: <span class="font-medium text-neutral-700">{{ formatHours(type.maxHoursPerCertificateOrSemester) }}</span></span>
+            </div>
+          </template>
+        </SGTable>
       </SGCard>
     </div>
   </div>

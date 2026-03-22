@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import type { SGTableColumn } from "~/types/SGTableColumn";
+
 useHead({ title: "Usuários — Configurações — SWGAC" });
 
 const { users, fetched, loading, error, getUsers, deleteUser } = useUsers();
@@ -6,6 +8,14 @@ const { showToastSuccess } = useToastNotification();
 const { confirmAlert } = useAlerts();
 
 const openModal = ref(false);
+
+const columns: SGTableColumn[] = [
+  { key: "name", label: "Nome" },
+  { key: "email", label: "Email" },
+  { key: "role", label: "Perfil" },
+  { key: "createdAt", label: "Criado em" },
+  { key: "actions", label: "Ações", align: "right" },
+];
 
 const handleCreated = async () => {
   openModal.value = false;
@@ -61,103 +71,83 @@ onMounted(async () => {
       </SGModal>
 
       <SGCard test-id="card-users">
-        <div v-if="error" class="flex flex-col items-center justify-center py-12" data-testid="error-state">
-          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-error-50">
-            <Icon name="lucide:wifi-off" size="2rem" class="text-error-400" />
-          </div>
-          <p class="mt-4 text-sm font-medium text-neutral-900">Falha ao carregar usuários</p>
-          <p class="mt-1 text-sm text-neutral-500">{{ error }}</p>
-          <SGButton test-id="retry-button" variant="primary" icon="lucide:refresh-cw" size="sm" class="mt-4" @click="getUsers()">
-            Tentar novamente
-          </SGButton>
-        </div>
-
-        <div v-else-if="users.length === 0" class="flex flex-col items-center justify-center py-12" data-testid="empty-state">
-          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-neutral-100">
-            <Icon name="lucide:users" size="2rem" class="text-neutral-400" />
-          </div>
-          <p class="mt-4 text-sm font-medium text-neutral-900">Nenhum usuário encontrado</p>
-          <p class="mt-1 text-sm text-neutral-500">Comece adicionando o primeiro usuário.</p>
-          <SGButton test-id="empty-state-add-button" variant="primary" icon="lucide:user-plus" size="sm" class="mt-4" @click="openModal = true">
-            Adicionar Usuário
-          </SGButton>
-        </div>
-
-        <div v-else>
-          <div class="hidden overflow-x-auto md:block">
-            <table class="w-full text-left text-sm" data-testid="users-table">
-              <thead>
-                <tr class="border-b border-neutral-200 text-xs font-medium uppercase text-neutral-500">
-                  <th class="pb-3 pr-4">Nome</th>
-                  <th class="pb-3 pr-4">Email</th>
-                  <th class="pb-3 pr-4">Perfil</th>
-                  <th class="pb-3 pr-4">Criado em</th>
-                  <th class="pb-3 text-right">Ações</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="user in users"
-                  :key="user.id"
-                  class="border-b border-neutral-100 transition-colors hover:bg-neutral-50"
-                  :data-testid="`user-row-${user.id}`"
-                >
-                  <td class="py-3 pr-4">
-                    <div class="flex items-center gap-2.5">
-                      <div
-                        class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600"
-                      >
-                        {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
-                      </div>
-                      <span class="font-medium text-neutral-900">{{ user.firstName }} {{ user.lastName }}</span>
-                    </div>
-                  </td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ user.email }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ user.role ?? "—" }}</td>
-                  <td class="py-3 pr-4 text-neutral-500">{{ user.createdAt ?? "—" }}</td>
-                  <td class="py-3 text-right">
-                    <button
-                      :data-testid="`delete-user-${user.id}`"
-                      class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
-                      :disabled="loading"
-                      @click="handleDelete(user.id, `${user.firstName} ${user.lastName}`)"
-                    >
-                      <Icon name="lucide:trash-2" size="1rem" />
-                    </button>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
-          <div class="space-y-3 md:hidden">
-            <div v-for="user in users" :key="user.id" class="rounded-lg border border-neutral-200 p-3" :data-testid="`user-card-${user.id}`">
-              <div class="flex items-start justify-between gap-2">
-                <div class="flex items-center gap-2.5">
-                  <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600">
-                    {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
-                  </div>
-                  <div>
-                    <p class="font-medium text-neutral-900">{{ user.firstName }} {{ user.lastName }}</p>
-                    <p class="text-xs text-neutral-500">{{ user.email }}</p>
-                  </div>
-                </div>
-                <button
-                  :data-testid="`delete-user-mobile-${user.id}`"
-                  class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
-                  :disabled="loading"
-                  @click="handleDelete(user.id, `${user.firstName} ${user.lastName}`)"
-                >
-                  <Icon name="lucide:trash-2" size="1rem" />
-                </button>
+        <SGTable
+          :columns="columns"
+          :items="users"
+          :error="error"
+          error-text="Falha ao carregar usuários"
+          empty-text="Nenhum usuário encontrado"
+          empty-description="Comece adicionando o primeiro usuário."
+          empty-icon="lucide:users"
+          test-id="users-table"
+          @retry="getUsers()"
+        >
+          <template #cell-name="{ item: user }">
+            <div class="flex items-center gap-2.5">
+              <div
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600"
+              >
+                {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
               </div>
-              <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
-                <span>{{ user.role ?? "—" }}</span>
-                <span>{{ user.createdAt ?? "—" }}</span>
-              </div>
+              <span class="font-medium text-neutral-900">{{ user.firstName }} {{ user.lastName }}</span>
             </div>
-          </div>
-        </div>
+          </template>
+
+          <template #cell-email="{ item: user }">
+            <span class="text-neutral-500">{{ user.email }}</span>
+          </template>
+
+          <template #cell-role="{ item: user }">
+            <span class="text-neutral-500">{{ user.role ?? "—" }}</span>
+          </template>
+
+          <template #cell-createdAt="{ item: user }">
+            <span class="text-neutral-500">{{ user.createdAt ?? "—" }}</span>
+          </template>
+
+          <template #cell-actions="{ item: user }">
+            <button
+              :data-testid="`delete-user-${user.id}`"
+              class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
+              :disabled="loading"
+              @click="handleDelete(user.id, `${user.firstName} ${user.lastName}`)"
+            >
+              <Icon name="lucide:trash-2" size="1rem" />
+            </button>
+          </template>
+
+          <template #empty-action>
+            <SGButton test-id="empty-state-add-button" variant="primary" icon="lucide:user-plus" size="sm" @click="openModal = true">
+              Adicionar Usuário
+            </SGButton>
+          </template>
+
+          <template #mobile="{ item: user }">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600">
+                  {{ user.firstName.charAt(0) }}{{ user.lastName.charAt(0) }}
+                </div>
+                <div>
+                  <p class="font-medium text-neutral-900">{{ user.firstName }} {{ user.lastName }}</p>
+                  <p class="text-xs text-neutral-500">{{ user.email }}</p>
+                </div>
+              </div>
+              <button
+                :data-testid="`delete-user-mobile-${user.id}`"
+                class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
+                :disabled="loading"
+                @click="handleDelete(user.id, `${user.firstName} ${user.lastName}`)"
+              >
+                <Icon name="lucide:trash-2" size="1rem" />
+              </button>
+            </div>
+            <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
+              <span>{{ user.role ?? "—" }}</span>
+              <span>{{ user.createdAt ?? "—" }}</span>
+            </div>
+          </template>
+        </SGTable>
       </SGCard>
     </div>
   </div>

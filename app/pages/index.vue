@@ -1,9 +1,21 @@
 <script setup lang="ts">
 import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
+import type { SGTableColumn } from "~/types/SGTableColumn";
 
 useHead({ title: "Dashboard — SWGAC" });
 
 const { fetched, getActivities, filterByStatus } = useActivities();
+
+const complementarColumns: SGTableColumn[] = [
+  { key: "label", label: "Categoria" },
+  { key: "min", label: "Min Horas", align: "right" },
+  { key: "obtained", label: "Horas Obtidas", align: "right" },
+];
+
+const livreColumns: SGTableColumn[] = [
+  { key: "description", label: "Descrição" },
+  { key: "hours", label: "Horas", align: "right" },
+];
 
 const complementarCategories = computed(() => {
   const approved = filterByStatus("approved").filter((a) => a.category?.toLowerCase() === "complementar");
@@ -37,6 +49,11 @@ const livreHours = computed(() => {
 });
 
 const livreMin = 210;
+
+const livreItems = computed(() => [
+  { id: "lancada", description: "Lançada", hours: livreHours.value },
+  { id: "aproveitada", description: "Aproveitada da Complementar", hours: 0 },
+]);
 
 const analysisMessages = computed(() => {
   const messages: { text: string; type: "warning" | "error" | "info" }[] = [];
@@ -85,40 +102,42 @@ onMounted(async () => {
       <div class="grid gap-6 lg:grid-cols-2">
         <SGCard test-id="card-complementar">
           <h2 class="mb-4 text-base font-semibold text-neutral-900 md:text-lg">Atividades Complementares</h2>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm" data-testid="complementar-table">
-              <thead>
-                <tr class="border-b border-neutral-200 text-xs font-medium uppercase text-neutral-500">
-                  <th class="pb-3 pr-4">Categoria</th>
-                  <th class="pb-3 pr-4 text-right">Min Horas</th>
-                  <th class="pb-3 text-right">Horas Obtidas</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="cat in complementarCategories" :key="cat.label" class="border-b border-neutral-100">
-                  <td class="py-3 pr-4 font-medium text-neutral-900">{{ cat.label }}</td>
-                  <td class="py-3 pr-4 text-right text-neutral-500">{{ cat.min }}h</td>
-                  <td class="py-3 text-right font-medium" :class="cat.obtained >= cat.min ? 'text-success-600' : 'text-error-500'">
-                    {{ cat.obtained }}h
-                  </td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr class="border-t-2 border-neutral-300 font-semibold">
-                  <td class="py-3 pr-4 text-neutral-900">Total</td>
-                  <td class="py-3 pr-4 text-right text-neutral-500">{{ complementarTotal.min }}h</td>
-                  <td class="py-3 text-right" :class="complementarTotal.obtained >= complementarTotal.min ? 'text-success-600' : 'text-error-500'">
-                    {{ complementarTotal.obtained }}h
-                  </td>
-                </tr>
-                <tr class="font-semibold">
-                  <td class="py-2 pr-4 text-neutral-900">Aproveitado</td>
-                  <td />
-                  <td class="py-2 text-right text-neutral-900">{{ complementarApproved }}h</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+          <SGTable
+            :columns="complementarColumns"
+            :items="complementarCategories"
+            item-key="label"
+            :hoverable="false"
+            test-id="complementar-table"
+          >
+            <template #cell-label="{ item: cat }">
+              <span class="font-medium text-neutral-900">{{ cat.label }}</span>
+            </template>
+
+            <template #cell-min="{ item: cat }">
+              <span class="text-neutral-500">{{ cat.min }}h</span>
+            </template>
+
+            <template #cell-obtained="{ item: cat }">
+              <span class="font-medium" :class="cat.obtained >= cat.min ? 'text-success-600' : 'text-error-500'">
+                {{ cat.obtained }}h
+              </span>
+            </template>
+
+            <template #footer>
+              <tr class="border-t-2 border-neutral-300 font-semibold">
+                <td class="py-3 pr-4 text-neutral-900">Total</td>
+                <td class="py-3 pr-4 text-right text-neutral-500">{{ complementarTotal.min }}h</td>
+                <td class="py-3 text-right" :class="complementarTotal.obtained >= complementarTotal.min ? 'text-success-600' : 'text-error-500'">
+                  {{ complementarTotal.obtained }}h
+                </td>
+              </tr>
+              <tr class="font-semibold">
+                <td class="py-2 pr-4 text-neutral-900">Aproveitado</td>
+                <td />
+                <td class="py-2 text-right text-neutral-900">{{ complementarApproved }}h</td>
+              </tr>
+            </template>
+          </SGTable>
         </SGCard>
 
         <SGCard test-id="card-analysis">
@@ -152,32 +171,27 @@ onMounted(async () => {
       <div class="grid gap-6 lg:grid-cols-2">
         <SGCard test-id="card-livre">
           <h2 class="mb-4 text-base font-semibold text-neutral-900 md:text-lg">Atividades — Formação Livre</h2>
-          <div class="overflow-x-auto">
-            <table class="w-full text-left text-sm" data-testid="livre-table">
-              <thead>
-                <tr class="border-b border-neutral-200 text-xs font-medium uppercase text-neutral-500">
-                  <th class="pb-3 pr-4">Descrição</th>
-                  <th class="pb-3 text-right">Horas</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr class="border-b border-neutral-100">
-                  <td class="py-3 pr-4 font-medium text-neutral-900">Lançada</td>
-                  <td class="py-3 text-right text-neutral-500">{{ livreHours }}h</td>
-                </tr>
-                <tr class="border-b border-neutral-100">
-                  <td class="py-3 pr-4 font-medium text-neutral-900">Aproveitada da Complementar</td>
-                  <td class="py-3 text-right text-neutral-500">0h</td>
-                </tr>
-              </tbody>
-              <tfoot>
-                <tr class="border-t-2 border-neutral-300 font-semibold">
-                  <td class="py-3 pr-4 text-neutral-900">Total</td>
-                  <td class="py-3 text-right" :class="livreHours >= livreMin ? 'text-success-600' : 'text-error-500'">{{ livreHours }}h</td>
-                </tr>
-              </tfoot>
-            </table>
-          </div>
+          <SGTable
+            :columns="livreColumns"
+            :items="livreItems"
+            :hoverable="false"
+            test-id="livre-table"
+          >
+            <template #cell-description="{ item }">
+              <span class="font-medium text-neutral-900">{{ item.description }}</span>
+            </template>
+
+            <template #cell-hours="{ item }">
+              <span class="text-neutral-500">{{ item.hours }}h</span>
+            </template>
+
+            <template #footer>
+              <tr class="border-t-2 border-neutral-300 font-semibold">
+                <td class="py-3 pr-4 text-neutral-900">Total</td>
+                <td class="py-3 text-right" :class="livreHours >= livreMin ? 'text-success-600' : 'text-error-500'">{{ livreHours }}h</td>
+              </tr>
+            </template>
+          </SGTable>
         </SGCard>
       </div>
     </div>
