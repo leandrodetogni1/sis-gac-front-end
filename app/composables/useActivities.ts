@@ -52,6 +52,24 @@ export const useActivities = () => {
     await $fetch(`/api/activities/${id}/reject`, { method: "PATCH" });
   };
 
+  const getActivitiesByUser = async (userId: string): Promise<ActivityResponseDto[]> => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await $fetch<ActivityResponseDto[]>("/api/activities", {
+        query: { authorId: userId },
+      });
+      activities.value = data;
+      return data;
+    } catch (e: any) {
+      error.value = e?.data?.message ?? "Erro ao carregar atividades";
+      return [];
+    } finally {
+      loading.value = false;
+      fetched.value = true;
+    }
+  };
+
   const filterByStatus = (status: string): ActivityResponseDto[] => {
     return activities.value.filter((a) => a.status === status);
   };
@@ -62,6 +80,7 @@ export const useActivities = () => {
     fetched,
     error,
     getActivities,
+    getActivitiesByUser,
     createActivity,
     approveActivity,
     verifyActivity,

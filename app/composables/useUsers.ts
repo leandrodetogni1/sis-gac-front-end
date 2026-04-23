@@ -41,6 +41,20 @@ export const useUsers = () => {
     }
   };
 
+  const getUser = async (id: string): Promise<UserResponseDto | null> => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await $fetch<UserResponseDto>(`/api/users/${id}`);
+      return data;
+    } catch (e: any) {
+      error.value = e?.data?.message ?? "Erro ao carregar usuário";
+      return null;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const deleteUser = async (id: string): Promise<void> => {
     loading.value = true;
     error.value = null;
@@ -63,6 +77,7 @@ export const useUsers = () => {
     fetched,
     error,
     getUsers,
+    getUser,
     createUser,
     deleteUser,
   };

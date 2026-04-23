@@ -60,7 +60,14 @@ const getUserName = (activity: ActivityResponseDto) => {
       </template>
 
       <template #cell-user="{ item: activity }">
-        <span class="text-neutral-500">{{ getUserName(activity) }}</span>
+        <span
+          v-if="activity.users"
+          class="cursor-pointer text-primary-700 hover:underline"
+          @click.stop="navigateTo(`/members/${activity.users.id}`)"
+        >
+          {{ getUserName(activity) }}
+        </span>
+        <span v-else class="text-neutral-500">—</span>
       </template>
 
       <template #cell-status="{ item: activity }">
