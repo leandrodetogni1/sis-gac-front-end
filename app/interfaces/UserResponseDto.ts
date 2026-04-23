@@ -4,6 +4,8 @@ export interface UserResponseDto {
   firstName: string;
   lastName: string;
   role: string | null;
+  matricula: number | null;
+  curso: string | null;
   createdAt: string | null;
   updatedAt: string | null;
 }

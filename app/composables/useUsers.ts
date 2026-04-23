@@ -72,6 +72,26 @@ export const useUsers = () => {
     }
   };
 
+  const patchUser = async (
+    id: string,
+    payload: { matricula: number; curso: string },
+  ): Promise<UserResponseDto> => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await api<UserResponseDto>(`/api/users/${id}`, {
+        method: "PATCH",
+        body: payload,
+      });
+      return data;
+    } catch (e: any) {
+      error.value = e?.data?.message ?? "Erro ao atualizar usuário";
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   return {
     users,
     loading,
@@ -81,5 +101,6 @@ export const useUsers = () => {
     getUser,
     createUser,
     deleteUser,
+    patchUser,
   };
 };
