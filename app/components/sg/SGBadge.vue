@@ -19,6 +19,12 @@ const badgeConfig = computed(() => {
       text: "text-[#F9D500]",
       border: "border-[#F9D500]/30",
     },
+    verified: {
+      label: "Verificado",
+      bg: "bg-[#1E88E5]/10",
+      text: "text-[#1E88E5]",
+      border: "border-[#1E88E5]/30",
+    },
     rejected: {
       label: "Rejeitado",
       bg: "bg-[#C00D0D]/10",

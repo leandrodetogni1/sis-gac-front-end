@@ -44,6 +44,10 @@ export const useActivities = () => {
     await $fetch(`/api/activities/${id}/approve`, { method: "PATCH" });
   };
 
+  const verifyActivity = async (id: string): Promise<void> => {
+    await $fetch(`/api/activities/${id}/verify`, { method: "PATCH" });
+  };
+
   const rejectActivity = async (id: string): Promise<void> => {
     await $fetch(`/api/activities/${id}/reject`, { method: "PATCH" });
   };
@@ -60,6 +64,7 @@ export const useActivities = () => {
     getActivities,
     createActivity,
     approveActivity,
+    verifyActivity,
     rejectActivity,
     filterByStatus,
   };

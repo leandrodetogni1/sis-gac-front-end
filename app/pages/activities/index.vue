@@ -47,6 +47,7 @@ onMounted(async () => {
       v-model:open="modalOpen"
       :activity="selectedActivity"
       @approved="onStatusChanged"
+      @verified="onStatusChanged"
       @rejected="onStatusChanged"
     />
   </div>

@@ -7,9 +7,9 @@ const props = defineProps<{
 
 const open = defineModel<boolean>("open", { default: false });
 
-const emit = defineEmits(["approved", "rejected"]);
+const emit = defineEmits(["approved", "verified", "rejected"]);
 
-const { approveActivity, rejectActivity } = useActivities();
+const { approveActivity, verifyActivity, rejectActivity } = useActivities();
 const { showToastSuccess, showToastError } = useToastNotification();
 const { confirmAlert } = useAlerts();
 
@@ -25,9 +25,13 @@ const userName = computed(() => {
   return `${props.activity.users.firstName} ${props.activity.users.lastName}`;
 });
 
-const isPending = computed(() => {
+const canVerify = computed(() => {
   const status = props.activity?.status?.toLowerCase();
   return status === "pending" || status === undefined || status === null;
+});
+
+const canApprove = computed(() => {
+  return props.activity?.status?.toLowerCase() === "verified";
 });
 
 const handleApprove = async () => {
@@ -50,6 +54,32 @@ const handleApprove = async () => {
     emit("approved");
   } catch {
     showToastError("Erro ao aprovar atividade");
+    open.value = true;
+  } finally {
+    actionLoading.value = false;
+  }
+};
+
+const handleVerify = async () => {
+  if (!props.activity) return;
+  open.value = false;
+  await nextTick();
+  const confirmed = await confirmAlert(
+    `A atividade "${label.value}" será verificada e enviada para aprovação da coordenação.`,
+    "Verificar atividade?",
+  );
+  if (!confirmed) {
+    open.value = true;
+    return;
+  }
+
+  actionLoading.value = true;
+  try {
+    await verifyActivity(props.activity.id);
+    showToastSuccess("Atividade verificada com sucesso");
+    emit("verified");
+  } catch {
+    showToastError("Erro ao verificar atividade");
     open.value = true;
   } finally {
     actionLoading.value = false;
@@ -124,7 +154,7 @@ const handleReject = async () => {
 
     <template #footer>
       <div class="flex w-full justify-end gap-2">
-        <span v-show="isPending">
+        <span v-show="canVerify || canApprove">
           <SGButton
             test-id="reject-activity-button"
             variant="danger"
@@ -136,7 +166,19 @@ const handleReject = async () => {
             Rejeitar
           </SGButton>
         </span>
-        <span v-show="isPending">
+        <span v-show="canVerify">
+          <SGButton
+            test-id="verify-activity-button"
+            variant="primary"
+            icon="lucide:check"
+            size="sm"
+            :disabled="actionLoading"
+            @click="handleVerify"
+          >
+            Verificar
+          </SGButton>
+        </span>
+        <span v-show="canApprove">
           <SGButton
             test-id="approve-activity-button"
             variant="primary"
