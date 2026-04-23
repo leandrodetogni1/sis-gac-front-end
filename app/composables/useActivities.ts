@@ -2,6 +2,7 @@ import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
 import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
 
 export const useActivities = () => {
+  const api = useApi();
   const activities = ref<ActivityResponseDto[]>([]);
   const loading = ref(false);
   const fetched = ref(false);
@@ -11,7 +12,7 @@ export const useActivities = () => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await $fetch<ActivityResponseDto[]>("/api/activities");
+      const data = await api<ActivityResponseDto[]>("/api/activities");
       activities.value = data;
       return data;
     } catch (e: any) {
@@ -27,7 +28,7 @@ export const useActivities = () => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await $fetch<ActivityResponseDto>("/api/activities", {
+      const data = await api<ActivityResponseDto>("/api/activities", {
         method: "POST",
         body: payload,
       });
@@ -41,22 +42,22 @@ export const useActivities = () => {
   };
 
   const approveActivity = async (id: string): Promise<void> => {
-    await $fetch(`/api/activities/${id}/approve`, { method: "PATCH" });
+    await api(`/api/activities/${id}/approve`, { method: "PATCH" });
   };
 
   const verifyActivity = async (id: string): Promise<void> => {
-    await $fetch(`/api/activities/${id}/verify`, { method: "PATCH" });
+    await api(`/api/activities/${id}/verify`, { method: "PATCH" });
   };
 
   const rejectActivity = async (id: string): Promise<void> => {
-    await $fetch(`/api/activities/${id}/reject`, { method: "PATCH" });
+    await api(`/api/activities/${id}/reject`, { method: "PATCH" });
   };
 
   const getActivitiesByUser = async (userId: string): Promise<ActivityResponseDto[]> => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await $fetch<ActivityResponseDto[]>("/api/activities", {
+      const data = await api<ActivityResponseDto[]>("/api/activities", {
         query: { authorId: userId },
       });
       activities.value = data;

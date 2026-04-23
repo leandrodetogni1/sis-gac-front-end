@@ -2,6 +2,7 @@ import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 import type { CreateUserDto } from "~/interfaces/CreateUserDto";
 
 export const useUsers = () => {
+  const api = useApi();
   const users = ref<UserResponseDto[]>([]);
   const loading = ref(false);
   const fetched = ref(false);
@@ -11,7 +12,7 @@ export const useUsers = () => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await $fetch<UserResponseDto[]>("/api/users");
+      const data = await api<UserResponseDto[]>("/api/users");
       users.value = data;
       return data;
     } catch (e: any) {
@@ -27,7 +28,7 @@ export const useUsers = () => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await $fetch<UserResponseDto>("/api/users", {
+      const data = await api<UserResponseDto>("/api/users", {
         method: "POST",
         body: payload,
       });
@@ -45,7 +46,7 @@ export const useUsers = () => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await $fetch<UserResponseDto>(`/api/users/${id}`);
+      const data = await api<UserResponseDto>(`/api/users/${id}`);
       return data;
     } catch (e: any) {
       error.value = e?.data?.message ?? "Erro ao carregar usuário";
@@ -59,7 +60,7 @@ export const useUsers = () => {
     loading.value = true;
     error.value = null;
     try {
-      await $fetch(`/api/users/${id}`, {
+      await api(`/api/users/${id}`, {
         method: "DELETE",
       });
       await getUsers();

@@ -3,6 +3,7 @@ import type { CreateActivityTypeDto } from "~/interfaces/CreateActivityTypeDto";
 import type { UpdateActivityTypeDto } from "~/interfaces/UpdateActivityTypeDto";
 
 export const useActivityTypes = () => {
+  const api = useApi();
   const activityTypes = ref<ActivityTypeResponseDto[]>([]);
   const loading = ref(false);
   const fetched = ref(false);
@@ -12,7 +13,7 @@ export const useActivityTypes = () => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await $fetch<ActivityTypeResponseDto[]>("/api/activity-types");
+      const data = await api<ActivityTypeResponseDto[]>("/api/activity-types");
       activityTypes.value = data;
       return data;
     } catch (e: any) {
@@ -28,7 +29,7 @@ export const useActivityTypes = () => {
     loading.value = true;
     error.value = null;
     try {
-      await $fetch("/api/activity-types", {
+      await api("/api/activity-types", {
         method: "POST",
         body: payload,
       });
@@ -45,7 +46,7 @@ export const useActivityTypes = () => {
     loading.value = true;
     error.value = null;
     try {
-      await $fetch(`/api/activity-types/${id}`, {
+      await api(`/api/activity-types/${id}`, {
         method: "PATCH",
         body: payload,
       });
@@ -62,7 +63,7 @@ export const useActivityTypes = () => {
     loading.value = true;
     error.value = null;
     try {
-      await $fetch(`/api/activity-types/${id}`, {
+      await api(`/api/activity-types/${id}`, {
         method: "DELETE",
       });
       await getActivityTypes();

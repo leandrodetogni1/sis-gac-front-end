@@ -4,7 +4,6 @@ import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
 useHead({ title: "Nova Atividade — SWGAC" });
 
 const router = useRouter();
-const config = useRuntimeConfig();
 const { createActivity, loading } = useActivities();
 const { showToastSuccess, showToastError } = useToastNotification();
 
@@ -45,7 +44,6 @@ const handleSubmit = async () => {
   if (!isValid.value || loading.value) return;
 
   const payload: CreateActivityDto = {
-    authorId: String(config.public.defaultAuthorId),
     activityTypeId: activityTypeId.value.trim(),
     class: activityClass.value,
     event: event.value.trim(),
@@ -55,7 +53,6 @@ const handleSubmit = async () => {
     endDate: endDate.value,
   };
 
-  console.log(payload)
   try {
     await createActivity(payload);
     showToastSuccess("Atividade criada com sucesso");

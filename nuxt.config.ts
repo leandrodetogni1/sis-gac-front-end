@@ -7,9 +7,9 @@ export default defineNuxtConfig({
   modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/icon"],
 
   runtimeConfig: {
-    apiUrl: process.env.API_URL || "http://localhost:3001",
+    apiUrl: process.env.API_URL || "http://localhost:3002/api",
     public: {
-      defaultAuthorId: process.env.NUXT_PUBLIC_DEFAULT_AUTHOR_ID || "",
+      googleClientId: process.env.GOOGLE_CLIENT_ID || "",
     },
   },
 

@@ -6,6 +6,7 @@ interface NavChild {
   icon: string;
   to: string;
   testId: string;
+  adminOnly?: boolean;
 }
 
 interface NavItem {
@@ -14,9 +15,10 @@ interface NavItem {
   to: string;
   testId: string;
   children?: NavChild[];
+  adminOnly?: boolean;
 }
 
-const navItems: NavItem[] = [
+const allNavItems: NavItem[] = [
   { label: "Dashboard", icon: "lucide:layout-dashboard", to: "/", testId: "sidebar-link-dashboard" },
   { label: "Atividades", icon: "lucide:file-text", to: "/activities", testId: "sidebar-link-atividades" },
   {
@@ -24,12 +26,28 @@ const navItems: NavItem[] = [
     icon: "lucide:settings",
     to: "/config",
     testId: "sidebar-link-configuracoes",
+    adminOnly: true,
     children: [
       { label: "Usuários", icon: "lucide:users", to: "/config/users", testId: "sidebar-link-users" },
       { label: "Atividades", icon: "lucide:file-text", to: "/config/activity-types", testId: "sidebar-link-activity-types" },
     ],
   },
 ];
+
+const { user } = useAuthState();
+const { signOut } = useGoogleSignIn();
+
+const isAdmin = computed(() => user.value?.role === "admin");
+
+const navItems = computed(() => {
+  return allNavItems.filter((item) => !item.adminOnly || isAdmin.value);
+});
+
+const userInitial = computed(() => (user.value?.firstName?.[0] ?? "U").toUpperCase());
+const userFullName = computed(() => {
+  if (!user.value) return "Usuário";
+  return `${user.value.firstName} ${user.value.lastName}`.trim();
+});
 
 const currentRoute = useRoute();
 
@@ -58,7 +76,7 @@ const isExpanded = (item: NavItem) => {
 watch(
   () => currentRoute.path,
   (path) => {
-    const activeParent = navItems.find((item) => item.children && path.startsWith(item.to));
+    const activeParent = navItems.value.find((item) => item.children && path.startsWith(item.to));
     expandedMenus.value = activeParent ? [activeParent.to] : [];
   },
   { immediate: true },
@@ -136,11 +154,21 @@ watch(
 
       <div class="border-t border-neutral-200 p-4">
         <div class="flex items-center gap-3">
-          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600">U</div>
-          <div class="flex-1 truncate">
-            <p class="text-sm font-medium text-neutral-900">Usuário</p>
-            <p class="truncate text-xs text-neutral-500">usuario@email.com</p>
+          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600">
+            {{ userInitial }}
           </div>
+          <div class="flex-1 truncate">
+            <p class="text-sm font-medium text-neutral-900" data-testid="sidebar-user-name">{{ userFullName }}</p>
+            <p class="truncate text-xs text-neutral-500" data-testid="sidebar-user-email">{{ user?.email ?? "" }}</p>
+          </div>
+          <button
+            class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-900"
+            data-testid="logout-button"
+            title="Sair"
+            @click="signOut"
+          >
+            <Icon name="lucide:log-out" size="1.125rem" />
+          </button>
         </div>
       </div>
     </aside>

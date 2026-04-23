@@ -1,5 +1,4 @@
 export interface CreateActivityDto {
-  authorId: string;
   activityTypeId: string;
   class: string;
   event: string;

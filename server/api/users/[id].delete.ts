@@ -1,16 +1,8 @@
 export default defineEventHandler(async (event) => {
-  const { apiUrl } = useRuntimeConfig();
   const id = getRouterParam(event, "id");
-
-  try {
-    await $fetch(`${apiUrl}/users/${id}`, {
-      method: "DELETE",
-    });
-    return { success: true };
-  } catch (error: any) {
-    throw createError({
-      statusCode: error?.statusCode ?? 502,
-      message: "Não foi possível remover o usuário",
-    });
-  }
+  await proxyToBackend(event, `/users/${id}`, {
+    method: "DELETE",
+    fallbackMessage: "Não foi possível remover o usuário",
+  });
+  return { success: true };
 });
