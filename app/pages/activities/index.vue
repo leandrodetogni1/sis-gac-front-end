@@ -13,7 +13,16 @@ if (user.value?.role === "member") {
 const selectedActivity = ref<ActivityResponseDto | null>(null);
 const modalOpen = ref(false);
 
-const statusFilter = ref<ActivityStatus | "ALL">("ALL");
+const route = useRoute();
+const router = useRouter();
+
+const readStatusFromQuery = (): ActivityStatus | "ALL" => {
+  const raw = Array.isArray(route.query.status) ? route.query.status[0] : route.query.status;
+  const allowed: ActivityStatus[] = ["PENDING", "VERIFIED", "APPROVED", "REJECTED"];
+  return allowed.includes(raw as ActivityStatus) ? (raw as ActivityStatus) : "ALL";
+};
+
+const statusFilter = ref<ActivityStatus | "ALL">(readStatusFromQuery());
 const statusOptions = [
   { label: "Todos os status", value: "ALL" },
   { label: "Pendente", value: "PENDING" },
@@ -38,7 +47,21 @@ const onStatusChanged = async () => {
   await fetchActivities();
 };
 
-watch(statusFilter, fetchActivities);
+watch(statusFilter, async (value) => {
+  const nextStatus = value === "ALL" ? undefined : value;
+  if (route.query.status !== nextStatus) {
+    await router.replace({ query: { ...route.query, status: nextStatus } });
+  }
+  await fetchActivities();
+});
+
+watch(
+  () => route.query.status,
+  () => {
+    const next = readStatusFromQuery();
+    if (next !== statusFilter.value) statusFilter.value = next;
+  },
+);
 
 onMounted(fetchActivities);
 </script>

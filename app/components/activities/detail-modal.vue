@@ -22,7 +22,12 @@ const actionLoading = ref(false);
 
 const isReviewer = computed(() => user.value?.role === "reviewer");
 const isAdminOrOwner = computed(() => user.value?.role === "admin" || user.value?.role === "owner");
-const canSeeEvents = computed(() => isReviewer.value || isAdminOrOwner.value);
+const isActivityAuthor = computed(
+  () => !!props.activity?.authorId && props.activity.authorId === user.value?.id,
+);
+const canSeeEvents = computed(
+  () => isReviewer.value || isAdminOrOwner.value || isActivityAuthor.value,
+);
 
 const label = computed(() => {
   if (!props.activity) return "—";

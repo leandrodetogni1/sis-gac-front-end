@@ -1,0 +1,131 @@
+<script setup lang="ts">
+import { Course, CourseLabels } from "~/enums/Course";
+import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
+import type { AdminDashboardRegularStudent } from "~/interfaces/AdminDashboardResponseDto";
+import type { SGTableColumn } from "~/types/SGTableColumn";
+
+defineProps<{
+  students: AdminDashboardRegularStudent[];
+}>();
+
+const columns: SGTableColumn[] = [
+  { key: "name", label: "Aluno" },
+  { key: "matricula", label: "Matrícula" },
+  { key: "course", label: "Curso" },
+  { key: "curriculumYear", label: "Currículo" },
+  { key: "totalHoursApproved", label: "Total", align: "right" },
+  { key: "complementaryHours", label: "Complementar", align: "right" },
+  { key: "freeHours", label: "Livre", align: "right" },
+  { key: "categoryHours", label: "Ens / Pesq / Ext", align: "right" },
+];
+
+const formatCourse = (value: Course | null) => {
+  if (!value) return "—";
+  return CourseLabels[value] ?? value;
+};
+
+const formatCurriculum = (value: CurriculumYear | null) => {
+  if (!value) return "—";
+  return CurriculumYearLabels[value] ?? value;
+};
+
+const handleRowClick = (student: AdminDashboardRegularStudent) => {
+  navigateTo(`/members/${student.user.id}`);
+};
+</script>
+
+<template>
+  <SGCard test-id="admin-regular-progress">
+    <div class="mb-4 flex items-start justify-between gap-3">
+      <div>
+        <h3 class="text-base font-semibold text-neutral-900 md:text-lg">Alunos em andamento</h3>
+        <p class="mt-1 text-xs text-neutral-500">
+          Panorama dos alunos regulares — quem está mais perto de virar formando
+        </p>
+      </div>
+      <Icon name="lucide:trending-up" size="1.5rem" class="text-primary-500" />
+    </div>
+
+    <SGTable
+      :columns="columns"
+      :items="students"
+      empty-text="Nenhum aluno regular cadastrado"
+      empty-description="Quando houver alunos com situação Regular, eles aparecem aqui."
+      empty-icon="lucide:users"
+      test-id="regular-students-table"
+      clickable
+      @row-click="handleRowClick"
+    >
+      <template #cell-name="{ item: student }">
+        <div class="flex items-center gap-2.5">
+          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600">
+            {{ student.user.firstName.charAt(0) }}{{ student.user.lastName.charAt(0) }}
+          </div>
+          <span class="font-medium text-neutral-900">{{ student.user.firstName }} {{ student.user.lastName }}</span>
+        </div>
+      </template>
+
+      <template #cell-matricula="{ item: student }">
+        <span class="text-neutral-500">{{ student.user.matricula ?? "—" }}</span>
+      </template>
+
+      <template #cell-course="{ item: student }">
+        <span class="text-neutral-500">{{ formatCourse(student.user.course) }}</span>
+      </template>
+
+      <template #cell-curriculumYear="{ item: student }">
+        <span class="text-neutral-500">{{ formatCurriculum(student.user.curriculumYear) }}</span>
+      </template>
+
+      <template #cell-totalHoursApproved="{ item: student }">
+        <span class="font-semibold text-neutral-900">{{ student.totalHoursApproved }}h</span>
+      </template>
+
+      <template #cell-complementaryHours="{ item: student }">
+        <span class="text-neutral-500">{{ student.complementaryHours }}h</span>
+      </template>
+
+      <template #cell-freeHours="{ item: student }">
+        <span class="text-neutral-500">{{ student.freeHours }}h</span>
+      </template>
+
+      <template #cell-categoryHours="{ item: student }">
+        <span class="text-neutral-500">
+          {{ student.categoryHours.ENSINO }} / {{ student.categoryHours.PESQUISA }} / {{ student.categoryHours.EXTENSAO }}
+        </span>
+      </template>
+
+      <template #mobile="{ item: student }">
+        <div class="flex items-start justify-between gap-2">
+          <div class="flex items-center gap-2.5">
+            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600">
+              {{ student.user.firstName.charAt(0) }}{{ student.user.lastName.charAt(0) }}
+            </div>
+            <div>
+              <p class="font-medium text-neutral-900">{{ student.user.firstName }} {{ student.user.lastName }}</p>
+              <p class="text-xs text-neutral-500">{{ student.user.matricula ?? "—" }} · {{ formatCourse(student.user.course) }}</p>
+            </div>
+          </div>
+          <Icon name="lucide:chevron-right" size="1.125rem" class="text-neutral-400" />
+        </div>
+        <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
+          <div>
+            <p class="font-medium uppercase tracking-wide text-neutral-500">Total</p>
+            <p class="mt-0.5 text-sm font-semibold text-neutral-900">{{ student.totalHoursApproved }}h</p>
+          </div>
+          <div>
+            <p class="font-medium uppercase tracking-wide text-neutral-500">Complementar</p>
+            <p class="mt-0.5 text-sm font-semibold text-neutral-900">{{ student.complementaryHours }}h</p>
+          </div>
+          <div>
+            <p class="font-medium uppercase tracking-wide text-neutral-500">Livre</p>
+            <p class="mt-0.5 text-sm font-semibold text-neutral-900">{{ student.freeHours }}h</p>
+          </div>
+        </div>
+        <p class="mt-2 text-xs text-neutral-500">
+          Ens {{ student.categoryHours.ENSINO }}h · Pesq {{ student.categoryHours.PESQUISA }}h · Ext {{ student.categoryHours.EXTENSAO }}h
+        </p>
+      </template>
+    </SGTable>
+  </SGCard>
+</template>

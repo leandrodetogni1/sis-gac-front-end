@@ -10,6 +10,7 @@ export const useUsers = () => {
   const getUsers = async (filters?: {
     role?: string;
     course?: string;
+    situation?: string;
   }): Promise<UserResponseDto[]> => {
     loading.value = true;
     error.value = null;
@@ -17,6 +18,7 @@ export const useUsers = () => {
       const query: Record<string, string> = {};
       if (filters?.role) query.role = filters.role;
       if (filters?.course) query.course = filters.course;
+      if (filters?.situation) query.situation = filters.situation;
       const data = await api<UserResponseDto[]>("/api/users", {
         query: Object.keys(query).length ? query : undefined,
       });

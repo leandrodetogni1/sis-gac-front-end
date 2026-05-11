@@ -12,6 +12,12 @@ const memberId = computed(() => route.params.id as string);
 
 const { getUser } = useUsers();
 const { activities, error: activitiesError, fetched, getActivitiesByUser } = useActivities();
+const { user: currentUser } = useAuthState();
+
+const canEdit = computed(() => {
+  const role = currentUser.value?.role;
+  return role === "admin" || role === "owner";
+});
 
 const user = ref<UserResponseDto | null>(null);
 const userError = ref<string | null>(null);
@@ -19,6 +25,12 @@ const pageLoading = ref(true);
 
 const selectedActivity = ref<ActivityResponseDto | null>(null);
 const modalOpen = ref(false);
+
+const editOpen = ref(false);
+
+const onUserUpdated = (updated: UserResponseDto) => {
+  user.value = updated;
+};
 
 const fullName = computed(() => {
   if (!user.value) return "—";
@@ -116,6 +128,16 @@ onMounted(async () => {
               <h1 class="text-lg font-semibold text-neutral-900">{{ fullName }}</h1>
               <p class="text-sm text-neutral-500">{{ user.email }}</p>
             </div>
+            <SGButton
+              v-if="canEdit"
+              variant="secondary"
+              size="sm"
+              icon="lucide:pencil"
+              test-id="member-edit-button"
+              @click="editOpen = true"
+            >
+              Editar
+            </SGButton>
           </div>
 
           <div class="mt-5 grid grid-cols-2 gap-4 border-t border-neutral-100 pt-4 text-sm md:grid-cols-3 lg:grid-cols-5">
@@ -160,6 +182,13 @@ onMounted(async () => {
       @approved="onStatusChanged"
       @verified="onStatusChanged"
       @rejected="onStatusChanged"
+    />
+
+    <members-edit-modal
+      v-if="user && canEdit"
+      v-model:open="editOpen"
+      :user="user"
+      @updated="onUserUpdated"
     />
   </div>
 </template>

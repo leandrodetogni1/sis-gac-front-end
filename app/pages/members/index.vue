@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Course, CourseLabels } from "~/enums/Course";
+import { Situation, SituationLabels } from "~/enums/Situation";
 import type { SGTableColumn } from "~/types/SGTableColumn";
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 
@@ -13,8 +14,22 @@ if (user.value && user.value.role !== "admin" && user.value.role !== "owner") {
 
 const { users, fetched, error, getUsers } = useUsers();
 
+const route = useRoute();
+const router = useRouter();
+
+const readCourseFromQuery = (): Course | "ALL" => {
+  const raw = Array.isArray(route.query.course) ? route.query.course[0] : route.query.course;
+  return Object.values(Course).includes(raw as Course) ? (raw as Course) : "ALL";
+};
+
+const readSituationFromQuery = (): Situation | "ALL" => {
+  const raw = Array.isArray(route.query.situation) ? route.query.situation[0] : route.query.situation;
+  return Object.values(Situation).includes(raw as Situation) ? (raw as Situation) : "ALL";
+};
+
 const search = ref("");
-const courseFilter = ref<Course | "ALL">("ALL");
+const courseFilter = ref<Course | "ALL">(readCourseFromQuery());
+const situationFilter = ref<Situation | "ALL">(readSituationFromQuery());
 
 const courseOptions = [
   { label: "Todos os cursos", value: "ALL" },
@@ -24,20 +39,56 @@ const courseOptions = [
   })),
 ];
 
+const situationOptions = [
+  { label: "Todas as situações", value: "ALL" },
+  ...Object.values(Situation).map((value) => ({
+    label: SituationLabels[value],
+    value,
+  })),
+];
+
 const fetchMembers = async () => {
   await getUsers({
     role: "member",
     course: courseFilter.value === "ALL" ? undefined : courseFilter.value,
+    situation: situationFilter.value === "ALL" ? undefined : situationFilter.value,
   });
 };
 
-watch(courseFilter, fetchMembers);
+const syncQuery = async () => {
+  const nextCourse = courseFilter.value === "ALL" ? undefined : courseFilter.value;
+  const nextSituation = situationFilter.value === "ALL" ? undefined : situationFilter.value;
+  if (route.query.course === nextCourse && route.query.situation === nextSituation) return;
+  await router.replace({
+    query: {
+      ...route.query,
+      course: nextCourse,
+      situation: nextSituation,
+    },
+  });
+};
+
+watch([courseFilter, situationFilter], async () => {
+  await syncQuery();
+  await fetchMembers();
+});
+
+watch(
+  () => [route.query.course, route.query.situation],
+  () => {
+    const nextCourse = readCourseFromQuery();
+    const nextSituation = readSituationFromQuery();
+    if (nextCourse !== courseFilter.value) courseFilter.value = nextCourse;
+    if (nextSituation !== situationFilter.value) situationFilter.value = nextSituation;
+  },
+);
 
 const columns: SGTableColumn[] = [
   { key: "name", label: "Nome" },
   { key: "email", label: "Email" },
   { key: "matricula", label: "Matrícula" },
   { key: "course", label: "Curso" },
+  { key: "situation", label: "Situação" },
   { key: "createdAt", label: "Cadastrado em" },
 ];
 
@@ -59,6 +110,11 @@ const formatCourse = (value: string | null) => {
   return CourseLabels[value as Course] ?? value;
 };
 
+const formatSituation = (value: string | null) => {
+  if (!value) return "—";
+  return SituationLabels[value as Situation] ?? value;
+};
+
 onMounted(fetchMembers);
 </script>
 
@@ -76,7 +132,7 @@ onMounted(fetchMembers);
         <h2 class="text-base font-semibold text-neutral-900 md:text-lg">Alunos</h2>
       </div>
 
-      <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+      <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
         <div class="w-full sm:max-w-sm">
           <SGInput
             v-model="search"
@@ -90,6 +146,14 @@ onMounted(fetchMembers);
             placeholder="Filtrar por curso"
             :options="courseOptions"
             test-id="filter-course"
+          />
+        </div>
+        <div class="w-full sm:max-w-xs">
+          <SGSelect
+            v-model="situationFilter"
+            placeholder="Filtrar por situação"
+            :options="situationOptions"
+            test-id="filter-situation"
           />
         </div>
       </div>
@@ -129,6 +193,10 @@ onMounted(fetchMembers);
             <span class="text-neutral-500">{{ formatCourse(member.course) }}</span>
           </template>
 
+          <template #cell-situation="{ item: member }">
+            <span class="text-neutral-500">{{ formatSituation(member.situation) }}</span>
+          </template>
+
           <template #cell-createdAt="{ item: member }">
             <span class="text-neutral-500">{{ formatDateTimeBR(member.createdAt) }}</span>
           </template>
@@ -147,7 +215,7 @@ onMounted(fetchMembers);
               <Icon name="lucide:chevron-right" size="1.125rem" class="text-neutral-400" />
             </div>
             <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
-              <span>{{ member.matricula ?? "—" }} · {{ formatCourse(member.course) }}</span>
+              <span>{{ member.matricula ?? "—" }} · {{ formatCourse(member.course) }} · {{ formatSituation(member.situation) }}</span>
               <span>{{ formatDateTimeBR(member.createdAt) }}</span>
             </div>
           </template>
