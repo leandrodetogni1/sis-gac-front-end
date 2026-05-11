@@ -16,18 +16,18 @@ export default defineNuxtRouteMiddleware(async (to) => {
     }
   }
 
+  const needsOnboarding =
+    user.value?.role === "member" && (!user.value.matricula || !user.value.course);
+
   if (user.value && isLoginPage) {
-    const needsOnboarding = user.value.role === "member" && !user.value.matricula;
     return navigateTo(needsOnboarding ? "/onboarding" : "/");
   }
 
-  const isMember = user.value?.role === "member";
-
-  if (user.value && isMember && !user.value.matricula && !isOnboardingPage) {
+  if (user.value && needsOnboarding && !isOnboardingPage) {
     return navigateTo("/onboarding");
   }
 
-  if (user.value && (!isMember || user.value.matricula) && isOnboardingPage) {
+  if (user.value && !needsOnboarding && isOnboardingPage) {
     return navigateTo("/");
   }
 });

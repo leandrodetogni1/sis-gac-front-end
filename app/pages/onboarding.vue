@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Course, CourseLabels } from "~/enums/Course";
+import { Situation, SituationLabels } from "~/enums/Situation";
 
 definePageMeta({ layout: false });
 useHead({ title: "Bem-vindo — SWGAC" });
@@ -9,9 +10,15 @@ const { patchUser, loading, error } = useUsers();
 
 const matricula = ref<string>("");
 const course = ref<Course | undefined>();
+const situation = ref<Situation | undefined>();
 
 const courseOptions = Object.values(Course).map((value) => ({
   label: CourseLabels[value],
+  value,
+}));
+
+const situationOptions = Object.values(Situation).map((value) => ({
+  label: SituationLabels[value],
   value,
 }));
 
@@ -25,6 +32,7 @@ const submit = async () => {
   const updated = await patchUser(user.value.id, {
     matricula: Number(matricula.value),
     course: course.value!,
+    ...(situation.value ? { situation: situation.value } : {}),
   });
   setUser({ ...user.value, ...updated });
   await navigateTo("/");
@@ -61,6 +69,13 @@ const submit = async () => {
         <div class="space-y-1.5">
           <label class="text-sm font-medium text-neutral-700">Curso</label>
           <SGSelect v-model="course" placeholder="Selecione seu curso" :options="courseOptions" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-sm font-medium text-neutral-700">
+            Situação <span class="text-xs text-neutral-400">(opcional)</span>
+          </label>
+          <SGSelect v-model="situation" placeholder="Selecione sua situação" :options="situationOptions" />
         </div>
 
         <p v-if="error" class="text-center text-sm text-red-500">{{ error }}</p>

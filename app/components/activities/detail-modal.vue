@@ -37,7 +37,8 @@ const canVerify = computed(() => {
 
 const canApprove = computed(() => {
   if (!isAdminOrOwner.value) return false;
-  return props.activity?.status?.toLowerCase() === "verified";
+  const status = props.activity?.status?.toLowerCase();
+  return status === "pending" || status === "verified" || status === undefined || status === null;
 });
 
 const canReject = computed(() => canVerify.value || canApprove.value);

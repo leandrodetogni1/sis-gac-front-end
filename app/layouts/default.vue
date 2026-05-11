@@ -16,6 +16,7 @@ interface NavItem {
   testId: string;
   children?: NavChild[];
   adminOnly?: boolean;
+  ownerOnly?: boolean;
   memberOnly?: boolean;
   staffOnly?: boolean;
 }
@@ -24,12 +25,13 @@ const allNavItems: NavItem[] = [
   { label: "Dashboard", icon: "lucide:layout-dashboard", to: "/", testId: "sidebar-link-dashboard" },
   { label: "Minhas Atividades", icon: "lucide:file-text", to: "/activities/me", testId: "sidebar-link-minhas-atividades", memberOnly: true },
   { label: "Atividades", icon: "lucide:file-text", to: "/activities", testId: "sidebar-link-atividades", staffOnly: true },
+  { label: "Alunos", icon: "lucide:graduation-cap", to: "/members", testId: "sidebar-link-alunos", adminOnly: true },
   {
     label: "Configurações",
     icon: "lucide:settings",
     to: "/config",
     testId: "sidebar-link-configuracoes",
-    adminOnly: true,
+    ownerOnly: true,
     children: [
       { label: "Usuários", icon: "lucide:users", to: "/config/users", testId: "sidebar-link-users" },
       { label: "Atividades", icon: "lucide:file-text", to: "/config/activity-types", testId: "sidebar-link-activity-types" },
@@ -40,7 +42,8 @@ const allNavItems: NavItem[] = [
 const { user } = useAuthState();
 const { signOut } = useGoogleSignIn();
 
-const isAdmin = computed(() => user.value?.role === "admin");
+const isOwner = computed(() => user.value?.role === "owner");
+const isAdminOrOwner = computed(() => user.value?.role === "admin" || user.value?.role === "owner");
 const isMember = computed(() => user.value?.role === "member");
 const isStaff = computed(() => {
   const role = user.value?.role;
@@ -49,7 +52,8 @@ const isStaff = computed(() => {
 
 const navItems = computed(() => {
   return allNavItems.filter((item) => {
-    if (item.adminOnly && !isAdmin.value) return false;
+    if (item.adminOnly && !isAdminOrOwner.value) return false;
+    if (item.ownerOnly && !isOwner.value) return false;
     if (item.memberOnly && !isMember.value) return false;
     if (item.staffOnly && !isStaff.value) return false;
     return true;

@@ -1,5 +1,4 @@
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
-import type { CreateUserDto } from "~/interfaces/CreateUserDto";
 
 export const useUsers = () => {
   const api = useApi();
@@ -8,11 +7,13 @@ export const useUsers = () => {
   const fetched = ref(false);
   const error = ref<string | null>(null);
 
-  const getUsers = async (): Promise<UserResponseDto[]> => {
+  const getUsers = async (filters?: { role?: string }): Promise<UserResponseDto[]> => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await api<UserResponseDto[]>("/api/users");
+      const data = await api<UserResponseDto[]>("/api/users", {
+        query: filters?.role ? { role: filters.role } : undefined,
+      });
       users.value = data;
       return data;
     } catch (e: any) {
@@ -21,24 +22,6 @@ export const useUsers = () => {
     } finally {
       loading.value = false;
       fetched.value = true;
-    }
-  };
-
-  const createUser = async (payload: CreateUserDto): Promise<UserResponseDto> => {
-    loading.value = true;
-    error.value = null;
-    try {
-      const data = await api<UserResponseDto>("/api/users", {
-        method: "POST",
-        body: payload,
-      });
-      await getUsers();
-      return data;
-    } catch (e: any) {
-      error.value = e?.data?.message ?? "Erro ao criar usuário";
-      throw e;
-    } finally {
-      loading.value = false;
     }
   };
 
@@ -74,7 +57,7 @@ export const useUsers = () => {
 
   const patchUser = async (
     id: string,
-    payload: { matricula: number; course: string },
+    payload: { matricula: number; course: string; situation?: string },
   ): Promise<UserResponseDto> => {
     loading.value = true;
     error.value = null;
@@ -99,7 +82,6 @@ export const useUsers = () => {
     error,
     getUsers,
     getUser,
-    createUser,
     deleteUser,
     patchUser,
   };
