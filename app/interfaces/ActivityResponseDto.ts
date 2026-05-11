@@ -10,6 +10,8 @@ export interface ActivityResponseDto {
   event: string | null;
   organization: string | null;
   hours: number | null;
+  hoursEquivalent: number | null;
+  certificateUrl: string | null;
   startDate: string | null;
   endDate: string | null;
   createdAt: string | null;

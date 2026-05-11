@@ -55,9 +55,6 @@ onMounted(fetchActivities);
     <div v-else>
       <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-base font-semibold text-neutral-900 md:text-lg">Atividades Complementares</h2>
-        <SGButton test-id="create-activity-button" variant="primary" icon="lucide:plus" @click="navigateTo('/activities/create')">
-          Nova Atividade
-        </SGButton>
       </div>
 
       <div class="mb-4 flex flex-wrap items-center gap-3">
@@ -71,7 +68,7 @@ onMounted(fetchActivities);
         </div>
       </div>
 
-      <activities-list :activities="activities" :error="error" @retry="fetchActivities" @select="onSelect" />
+      <activities-list :activities="activities" :error="error" :can-create="false" @retry="fetchActivities" @select="onSelect" />
     </div>
 
     <activities-detail-modal

@@ -22,19 +22,19 @@ const userName = computed(() => {
 </script>
 
 <template>
-  <div class="cursor-pointer rounded-lg border border-neutral-200 p-3 transition-colors hover:bg-neutral-50" :data-testid="`activity-card-${activity.id}`" @click="emit('select', activity)">
+  <div class="cursor-pointer rounded-lg border border-default p-3 transition-colors hover:bg-elevated" :data-testid="`activity-card-${activity.id}`" @click="emit('select', activity)">
     <div class="flex items-start justify-between gap-2">
       <div>
-        <p class="font-medium text-neutral-900">{{ label }}</p>
-        <p class="mt-0.5 text-xs text-neutral-500">
+        <p class="font-medium text-highlighted">{{ label }}</p>
+        <p class="mt-0.5 text-xs text-muted">
           {{ activity.activity_types?.category ?? "—" }}<template v-if="showUser"> · {{ userName }}</template>
         </p>
       </div>
       <SGBadge :status="activity.status || 'pending'" />
     </div>
-    <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
-      <span class="font-medium text-neutral-700">{{ activity.hours ?? 0 }}h</span>
-      <span>{{ activity.startDate ?? "—" }}</span>
+    <div class="mt-2 flex items-center justify-between text-xs text-muted">
+      <span class="font-medium text-toned">{{ activity.hoursEquivalent ?? activity.hours ?? 0 }}h</span>
+      <span>{{ formatDateTimeBR(activity.startDate) }}</span>
     </div>
   </div>
 </template>

@@ -71,21 +71,6 @@ const staffRows = computed<StaffRow[]>(() => {
   });
 });
 
-const dateFormatter = new Intl.DateTimeFormat("pt-BR", {
-  day: "2-digit",
-  month: "2-digit",
-  year: "numeric",
-  hour: "2-digit",
-  minute: "2-digit",
-});
-
-const formatDate = (value: string | null) => {
-  if (!value) return "—";
-  const d = new Date(value);
-  if (Number.isNaN(d.getTime())) return value;
-  return dateFormatter.format(d);
-};
-
 const roleLabel = (role: string | null) => {
   if (!role) return "—";
   const r = role.toLowerCase();
@@ -243,7 +228,7 @@ onMounted(async () => {
             </template>
 
             <template #cell-createdAt="{ item: row }">
-              <span class="text-neutral-500">{{ formatDate(row.createdAt) }}</span>
+              <span class="text-neutral-500">{{ formatDateTimeBR(row.createdAt) }}</span>
             </template>
 
             <template #cell-actions="{ item: row }">
@@ -333,7 +318,7 @@ onMounted(async () => {
                     Pendente
                   </span>
                 </span>
-                <span>{{ formatDate(row.createdAt) }}</span>
+                <span>{{ formatDateTimeBR(row.createdAt) }}</span>
               </div>
             </template>
           </SGTable>

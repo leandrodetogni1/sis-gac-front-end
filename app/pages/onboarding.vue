@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { Course, CourseLabels } from "~/enums/Course";
+import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 import { Situation, SituationLabels } from "~/enums/Situation";
 
 definePageMeta({ layout: false });
@@ -10,10 +11,16 @@ const { patchUser, loading, error } = useUsers();
 
 const matricula = ref<string>("");
 const course = ref<Course | undefined>();
+const curriculumYear = ref<CurriculumYear | undefined>();
 const situation = ref<Situation | undefined>();
 
 const courseOptions = Object.values(Course).map((value) => ({
   label: CourseLabels[value],
+  value,
+}));
+
+const curriculumYearOptions = Object.values(CurriculumYear).map((value) => ({
+  label: CurriculumYearLabels[value],
   value,
 }));
 
@@ -24,7 +31,7 @@ const situationOptions = Object.values(Situation).map((value) => ({
 
 const isValid = computed(() => {
   const mat = matricula.value.trim();
-  return /^\d{8}$/.test(mat) && Boolean(course.value);
+  return /^\d{8}$/.test(mat) && Boolean(course.value) && Boolean(curriculumYear.value);
 });
 
 const submit = async () => {
@@ -32,6 +39,7 @@ const submit = async () => {
   const updated = await patchUser(user.value.id, {
     matricula: Number(matricula.value),
     course: course.value!,
+    curriculumYear: curriculumYear.value!,
     ...(situation.value ? { situation: situation.value } : {}),
   });
   setUser({ ...user.value, ...updated });
@@ -69,6 +77,15 @@ const submit = async () => {
         <div class="space-y-1.5">
           <label class="text-sm font-medium text-neutral-700">Curso</label>
           <SGSelect v-model="course" placeholder="Selecione seu curso" :options="courseOptions" />
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-sm font-medium text-neutral-700">Currículo</label>
+          <SGSelect
+            v-model="curriculumYear"
+            placeholder="Selecione o ano do seu currículo"
+            :options="curriculumYearOptions"
+          />
         </div>
 
         <div class="space-y-1.5">

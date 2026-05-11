@@ -7,8 +7,9 @@ const props = withDefaults(
     activities: ActivityResponseDto[];
     error: string | null;
     showUser?: boolean;
+    canCreate?: boolean;
   }>(),
-  { showUser: true },
+  { showUser: true, canCreate: true },
 );
 
 const emit = defineEmits(["retry", "select"]);
@@ -59,11 +60,11 @@ const getUserName = (activity: ActivityResponseDto) => {
       </template>
 
       <template #cell-hours="{ item: activity }">
-        <span class="text-neutral-500">{{ activity.hours ?? 0 }}h</span>
+        <span class="text-neutral-500">{{ activity.hoursEquivalent ?? activity.hours ?? 0 }}h</span>
       </template>
 
       <template #cell-startDate="{ item: activity }">
-        <span class="text-neutral-500">{{ activity.startDate ?? "—" }}</span>
+        <span class="text-neutral-500">{{ formatDateTimeBR(activity.startDate) }}</span>
       </template>
 
       <template v-if="showUser" #cell-user="{ item: activity }">
@@ -81,7 +82,7 @@ const getUserName = (activity: ActivityResponseDto) => {
         <SGBadge :status="activity.status || 'pending'" :test-id="`badge-${activity.id}`" />
       </template>
 
-      <template #empty-action>
+      <template v-if="canCreate" #empty-action>
         <SGButton
           test-id="empty-state-create-button"
           variant="primary"

@@ -1,5 +1,7 @@
+import type { ActivityEventResponseDto } from "~/interfaces/ActivityEventResponseDto";
 import type { ActivityResponseDto, ActivityStatus } from "~/interfaces/ActivityResponseDto";
 import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
+import type { MeSummaryResponseDto } from "~/interfaces/MeSummaryResponseDto";
 
 export type ActivityFilters = {
   status?: ActivityStatus;
@@ -83,6 +85,14 @@ export const useActivities = () => {
     await api(`/api/activities/${id}/reject`, { method: "PATCH" });
   };
 
+  const getMySummary = async (): Promise<MeSummaryResponseDto> => {
+    return await api<MeSummaryResponseDto>("/api/activities/me/summary");
+  };
+
+  const getActivityEvents = async (id: string): Promise<ActivityEventResponseDto[]> => {
+    return await api<ActivityEventResponseDto[]>(`/api/activities/${id}/events`);
+  };
+
   const getActivitiesByUser = async (userId: string): Promise<ActivityResponseDto[]> => {
     loading.value = true;
     error.value = null;
@@ -118,6 +128,8 @@ export const useActivities = () => {
     approveActivity,
     verifyActivity,
     rejectActivity,
+    getMySummary,
+    getActivityEvents,
     filterByStatus,
   };
 };

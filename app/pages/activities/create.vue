@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { ActivityTypeResponseDto } from "~/interfaces/ActivityTypeResponseDto";
 import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
 
 useHead({ title: "Nova Atividade — SWGAC" });
@@ -10,13 +11,18 @@ const { showToastSuccess, showToastError } = useToastNotification();
 
 const listPath = computed(() => (user.value?.role === "member" ? "/activities/me" : "/activities"));
 
+const UNIT_FIXED_CODS = ["I1", "I2", "I3", "K"];
+const UNIT_EVENT_CODS = ["H1", "H2", "H3"];
+
 const activityClass = ref("");
 const activityTypeId = ref("");
+const selectedType = ref<ActivityTypeResponseDto | null>(null);
 const event = ref("");
 const organization = ref("");
 const hours = ref<number | undefined>();
 const startDate = ref("");
 const endDate = ref("");
+const certificateUrl = ref("");
 const fileName = ref("");
 
 const classOptions = [
@@ -24,16 +30,56 @@ const classOptions = [
   { label: "Livre", value: "LIVRE" },
 ];
 
+const unity = computed(() => selectedType.value?.unity ?? null);
+const cod = computed(() => selectedType.value?.cod ?? null);
+
+const isSemesterUnit = computed(() => unity.value === "SEMESTRE");
+const isHoursUnit = computed(() => unity.value === "HORAS");
+const isFixedUnit = computed(
+  () => unity.value === "UNIDADE" && cod.value !== null && UNIT_FIXED_CODS.includes(cod.value),
+);
+const isEventHoursUnit = computed(
+  () => unity.value === "UNIDADE" && cod.value !== null && UNIT_EVENT_CODS.includes(cod.value),
+);
+
+const showHoursInput = computed(() => isHoursUnit.value || isEventHoursUnit.value);
+
+const hoursLabel = computed(() => {
+  if (isHoursUnit.value) return "Horas do certificado";
+  if (isEventHoursUnit.value) return "Horas do evento";
+  return "Horas";
+});
+
+const handleTypeChange = (type: ActivityTypeResponseDto | null) => {
+  selectedType.value = type;
+  if (!showHoursInput.value) {
+    hours.value = undefined;
+  }
+};
+
+const isCertificateUrlValid = computed(() => {
+  const value = certificateUrl.value.trim();
+  if (value.length === 0) return true;
+  return value.length <= 500;
+});
+
 const isValid = computed(() => {
-  return (
-    activityClass.value !== "" &&
-    activityTypeId.value.trim().length > 0 &&
-    event.value.trim().length > 0 &&
-    hours.value !== undefined &&
-    hours.value > 0 &&
-    startDate.value !== "" &&
-    endDate.value !== ""
-  );
+  if (
+    activityClass.value === "" ||
+    activityTypeId.value.trim().length === 0 ||
+    event.value.trim().length === 0 ||
+    startDate.value === "" ||
+    endDate.value === "" ||
+    !isCertificateUrlValid.value
+  ) {
+    return false;
+  }
+
+  if (showHoursInput.value) {
+    return hours.value !== undefined && hours.value > 0;
+  }
+
+  return true;
 });
 
 const handleFileChange = (e: Event) => {
@@ -43,17 +89,27 @@ const handleFileChange = (e: Event) => {
   }
 };
 
+const buildHoursPayload = (): number | undefined => {
+  if (isFixedUnit.value) return 1;
+  if (showHoursInput.value) return hours.value;
+  return undefined;
+};
+
 const handleSubmit = async () => {
   if (!isValid.value || loading.value) return;
+
+  const trimmedCertificate = certificateUrl.value.trim();
+  const hoursPayload = buildHoursPayload();
 
   const payload: CreateActivityDto = {
     activityTypeId: activityTypeId.value.trim(),
     class: activityClass.value,
     event: event.value.trim(),
     organization: organization.value.trim() || undefined,
-    hours: hours.value!,
     startDate: startDate.value,
     endDate: endDate.value,
+    ...(hoursPayload !== undefined ? { hours: hoursPayload } : {}),
+    ...(trimmedCertificate ? { certificateUrl: trimmedCertificate } : {}),
   };
 
   try {
@@ -97,7 +153,11 @@ const handleSubmit = async () => {
 
           <div class="sm:col-span-2">
             <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Tipo de Atividade <span class="text-error-500">*</span> </label>
-            <activities-activity-type-select v-model="activityTypeId" test-id="select-activity-type" />
+            <activities-activity-type-select
+              v-model="activityTypeId"
+              test-id="select-activity-type"
+              @change="handleTypeChange"
+            />
           </div>
 
           <div>
@@ -106,14 +166,38 @@ const handleSubmit = async () => {
           </div>
 
           <div>
-            <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Horas <span class="text-error-500">*</span> </label>
+            <label class="mb-1.5 block text-sm font-medium text-neutral-700">
+              {{ hoursLabel }} <span v-if="showHoursInput" class="text-error-500">*</span>
+            </label>
             <SGInput
+              v-if="showHoursInput"
               :model-value="hours !== undefined ? String(hours) : ''"
               type="number"
               placeholder="Ex: 40"
               test-id="input-hours"
               @update:model-value="hours = $event ? Number($event) : undefined"
             />
+            <p
+              v-else-if="isSemesterUnit"
+              class="rounded-md border border-dashed border-default bg-elevated px-3 py-2 text-xs text-muted"
+              data-testid="hours-info-semester"
+            >
+              Calculado automaticamente a partir das datas.
+            </p>
+            <p
+              v-else-if="isFixedUnit"
+              class="rounded-md border border-dashed border-default bg-elevated px-3 py-2 text-xs text-muted"
+              data-testid="hours-info-fixed"
+            >
+              Valor único registrado automaticamente.
+            </p>
+            <p
+              v-else
+              class="rounded-md border border-dashed border-default bg-elevated px-3 py-2 text-xs text-dimmed"
+              data-testid="hours-info-none"
+            >
+              Selecione o tipo de atividade para definir as horas.
+            </p>
           </div>
 
           <div>
@@ -124,6 +208,21 @@ const handleSubmit = async () => {
           <div>
             <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Data Final <span class="text-error-500">*</span> </label>
             <SGDatePicker v-model="endDate" placeholder="Selecione uma data" test-id="input-end-date" />
+          </div>
+
+          <div class="sm:col-span-2">
+            <label class="mb-1.5 block text-sm font-medium text-neutral-700">
+              Link de validação do certificado <span class="text-xs text-neutral-400">(opcional)</span>
+            </label>
+            <SGInput
+              v-model="certificateUrl"
+              type="url"
+              placeholder="https://..."
+              test-id="input-certificate-url"
+            />
+            <p v-if="!isCertificateUrlValid" class="mt-1 text-xs text-error-500">
+              O link deve ter no máximo 500 caracteres.
+            </p>
           </div>
         </div>
 

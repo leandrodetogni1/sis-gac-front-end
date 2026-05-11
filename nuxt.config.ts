@@ -6,6 +6,11 @@ export default defineNuxtConfig({
 
   modules: ["@nuxt/ui", "@nuxt/fonts", "@nuxt/icon"],
 
+  colorMode: {
+    preference: "light",
+    fallback: "light",
+  },
+
   runtimeConfig: {
     apiUrl: process.env.API_URL || "http://localhost:3002/api",
     public: {

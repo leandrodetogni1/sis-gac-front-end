@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
 
-const props = defineProps<{
-  activity: ActivityResponseDto | null;
-}>();
+const props = withDefaults(
+  defineProps<{
+    activity: ActivityResponseDto | null;
+    showUser?: boolean;
+  }>(),
+  { showUser: true },
+);
 
 const open = defineModel<boolean>("open", { default: false });
 
@@ -18,6 +22,7 @@ const actionLoading = ref(false);
 
 const isReviewer = computed(() => user.value?.role === "reviewer");
 const isAdminOrOwner = computed(() => user.value?.role === "admin" || user.value?.role === "owner");
+const canSeeEvents = computed(() => isReviewer.value || isAdminOrOwner.value);
 
 const label = computed(() => {
   if (!props.activity) return "—";
@@ -128,36 +133,60 @@ const handleReject = async () => {
     <template #body>
       <div v-if="activity" class="space-y-4">
         <div class="flex items-center justify-between">
-          <h3 class="text-base font-semibold text-neutral-900">{{ label }}</h3>
+          <h3 class="text-base font-semibold text-highlighted">{{ label }}</h3>
           <SGBadge :status="activity.status || 'pending'" />
         </div>
 
         <div class="grid grid-cols-2 gap-3 text-sm">
           <div>
-            <p class="text-xs font-medium uppercase text-neutral-500">Categoria</p>
-            <p class="mt-0.5 text-neutral-900">{{ activity.activity_types?.category ?? "—" }}</p>
+            <p class="text-xs font-medium uppercase text-muted">Categoria</p>
+            <p class="mt-0.5 text-highlighted">{{ activity.activity_types?.category ?? "—" }}</p>
           </div>
           <div>
-            <p class="text-xs font-medium uppercase text-neutral-500">Horas</p>
-            <p class="mt-0.5 text-neutral-900">{{ activity.hours ?? 0 }}h</p>
+            <p class="text-xs font-medium uppercase text-muted">Horas reconhecidas</p>
+            <p class="mt-0.5 text-highlighted">{{ activity.hoursEquivalent ?? 0 }}h</p>
           </div>
           <div>
-            <p class="text-xs font-medium uppercase text-neutral-500">Data Início</p>
-            <p class="mt-0.5 text-neutral-900">{{ activity.startDate ?? "—" }}</p>
+            <p class="text-xs font-medium uppercase text-muted">Horas informadas</p>
+            <p class="mt-0.5 text-highlighted">{{ activity.hours ?? "—" }}<span v-if="activity.hours !== null">h</span></p>
           </div>
           <div>
-            <p class="text-xs font-medium uppercase text-neutral-500">Data Fim</p>
-            <p class="mt-0.5 text-neutral-900">{{ activity.endDate ?? "—" }}</p>
+            <p class="text-xs font-medium uppercase text-muted">Organização</p>
+            <p class="mt-0.5 text-highlighted">{{ activity.organization ?? "—" }}</p>
           </div>
           <div>
-            <p class="text-xs font-medium uppercase text-neutral-500">Aluno</p>
-            <p class="mt-0.5 text-neutral-900">{{ userName }}</p>
+            <p class="text-xs font-medium uppercase text-muted">Data Início</p>
+            <p class="mt-0.5 text-highlighted">{{ formatDateTimeBR(activity.startDate) }}</p>
           </div>
           <div>
-            <p class="text-xs font-medium uppercase text-neutral-500">Organização</p>
-            <p class="mt-0.5 text-neutral-900">{{ activity.organization ?? "—" }}</p>
+            <p class="text-xs font-medium uppercase text-muted">Data Fim</p>
+            <p class="mt-0.5 text-highlighted">{{ formatDateTimeBR(activity.endDate) }}</p>
+          </div>
+          <div v-if="showUser">
+            <p class="text-xs font-medium uppercase text-muted">Aluno</p>
+            <p class="mt-0.5 text-highlighted">{{ userName }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-medium uppercase text-muted">Certificado</p>
+            <a
+              v-if="activity.certificateUrl"
+              :href="activity.certificateUrl"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="mt-0.5 inline-flex items-center gap-1 text-primary hover:underline"
+              data-testid="certificate-link"
+            >
+              <Icon name="lucide:external-link" size="0.875rem" />
+              Abrir link
+            </a>
+            <p v-else class="mt-0.5 text-muted">—</p>
           </div>
         </div>
+
+        <template v-if="canSeeEvents">
+          <USeparator />
+          <activities-events-timeline :activity-id="activity.id" />
+        </template>
       </div>
     </template>
 

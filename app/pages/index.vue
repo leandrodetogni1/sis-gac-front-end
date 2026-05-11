@@ -4,7 +4,10 @@ import type { SGTableColumn } from "~/types/SGTableColumn";
 
 useHead({ title: "Dashboard — SWGAC" });
 
+const { user } = useAuthState();
 const { fetched, getMyActivities, filterByStatus } = useActivities();
+
+const isMember = computed(() => user.value?.role === "member");
 
 const complementarColumns: SGTableColumn[] = [
   { key: "label", label: "Categoria" },
@@ -25,10 +28,13 @@ const complementarCategories = computed(() => {
   const pesquisa = approved.filter((a) => category(a) === "pesquisa");
   const extensao = approved.filter((a) => category(a) === "extensao" || category(a) === "extensão");
 
+  const sumHours = (list: ActivityResponseDto[]) =>
+    list.reduce((sum, a) => sum + (a.hoursEquivalent ?? a.hours ?? 0), 0);
+
   return [
-    { label: "Ensino", min: 120, obtained: ensino.reduce((sum, a) => sum + (a.hours ?? 0), 0) },
-    { label: "Pesquisa", min: 120, obtained: pesquisa.reduce((sum, a) => sum + (a.hours ?? 0), 0) },
-    { label: "Extensão", min: 120, obtained: extensao.reduce((sum, a) => sum + (a.hours ?? 0), 0) },
+    { label: "Ensino", min: 120, obtained: sumHours(ensino) },
+    { label: "Pesquisa", min: 120, obtained: sumHours(pesquisa) },
+    { label: "Extensão", min: 120, obtained: sumHours(extensao) },
   ];
 });
 
@@ -45,7 +51,7 @@ const complementarApproved = computed(() => {
 
 const livreHours = computed(() => {
   const approved = filterByStatus("approved").filter((a) => a.class?.toLowerCase() === "livre");
-  return approved.reduce((sum, a) => sum + (a.hours ?? 0), 0);
+  return approved.reduce((sum, a) => sum + (a.hoursEquivalent ?? a.hours ?? 0), 0);
 });
 
 const livreMin = 210;
@@ -85,12 +91,15 @@ const analysisMessages = computed(() => {
 });
 
 onMounted(async () => {
+  if (isMember.value) return;
   await getMyActivities();
 });
 </script>
 
 <template>
-  <div>
+  <dashboard-member-summary v-if="isMember" />
+
+  <div v-else>
     <div v-if="!fetched" class="flex min-h-[60vh] items-center justify-center" data-testid="page-loading">
       <div class="flex flex-col items-center gap-4">
         <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />

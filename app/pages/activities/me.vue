@@ -77,6 +77,7 @@ onMounted(fetchActivities);
     <activities-detail-modal
       v-model:open="modalOpen"
       :activity="selectedActivity"
+      :show-user="false"
       @approved="onStatusChanged"
       @verified="onStatusChanged"
       @rejected="onStatusChanged"

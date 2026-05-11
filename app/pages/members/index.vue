@@ -31,11 +31,6 @@ const filteredUsers = computed(() => {
   });
 });
 
-const formatDate = (date: string | null) => {
-  if (!date) return "—";
-  return new Date(date).toLocaleDateString("pt-BR");
-};
-
 const handleRowClick = (member: UserResponseDto) => {
   navigateTo(`/members/${member.id}`);
 };
@@ -103,7 +98,7 @@ onMounted(async () => {
           </template>
 
           <template #cell-createdAt="{ item: member }">
-            <span class="text-neutral-500">{{ formatDate(member.createdAt) }}</span>
+            <span class="text-neutral-500">{{ formatDateTimeBR(member.createdAt) }}</span>
           </template>
 
           <template #mobile="{ item: member }">
@@ -121,7 +116,7 @@ onMounted(async () => {
             </div>
             <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
               <span>{{ member.matricula ?? "—" }} · {{ member.course ?? "—" }}</span>
-              <span>{{ formatDate(member.createdAt) }}</span>
+              <span>{{ formatDateTimeBR(member.createdAt) }}</span>
             </div>
           </template>
         </SGTable>

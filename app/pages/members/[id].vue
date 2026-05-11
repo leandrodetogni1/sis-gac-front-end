@@ -39,11 +39,7 @@ const roleLabel = computed(() => {
   return map[role.toLowerCase()] ?? role;
 });
 
-const createdAt = computed(() => {
-  const date = user.value?.createdAt;
-  if (!date) return "—";
-  return new Date(date).toLocaleDateString("pt-BR");
-});
+const createdAt = computed(() => formatDateTimeBR(user.value?.createdAt));
 
 const onSelect = (activity: ActivityResponseDto) => {
   selectedActivity.value = activity;

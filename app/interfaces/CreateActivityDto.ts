@@ -3,7 +3,8 @@ export interface CreateActivityDto {
   class: string;
   event: string;
   organization?: string;
-  hours: number;
+  hours?: number;
   startDate: string;
   endDate: string;
+  certificateUrl?: string;
 }
