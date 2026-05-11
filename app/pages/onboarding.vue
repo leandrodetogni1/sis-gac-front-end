@@ -8,7 +8,7 @@ const { user, setUser } = useAuthState();
 const { patchUser, loading, error } = useUsers();
 
 const matricula = ref<string>("");
-const curso = ref<Course | undefined>();
+const course = ref<Course | undefined>();
 
 const courseOptions = Object.values(Course).map((value) => ({
   label: CourseLabels[value],
@@ -17,14 +17,14 @@ const courseOptions = Object.values(Course).map((value) => ({
 
 const isValid = computed(() => {
   const mat = matricula.value.trim();
-  return /^\d{8}$/.test(mat) && Boolean(curso.value);
+  return /^\d{8}$/.test(mat) && Boolean(course.value);
 });
 
 const submit = async () => {
   if (!isValid.value || !user.value) return;
   const updated = await patchUser(user.value.id, {
     matricula: Number(matricula.value),
-    curso: curso.value!,
+    course: course.value!,
   });
   setUser({ ...user.value, ...updated });
   await navigateTo("/");
@@ -60,7 +60,7 @@ const submit = async () => {
 
         <div class="space-y-1.5">
           <label class="text-sm font-medium text-neutral-700">Curso</label>
-          <SGSelect v-model="curso" placeholder="Selecione seu curso" :options="courseOptions" />
+          <SGSelect v-model="course" placeholder="Selecione seu curso" :options="courseOptions" />
         </div>
 
         <p v-if="error" class="text-center text-sm text-red-500">{{ error }}</p>

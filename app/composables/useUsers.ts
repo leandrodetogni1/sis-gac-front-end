@@ -74,7 +74,7 @@ export const useUsers = () => {
 
   const patchUser = async (
     id: string,
-    payload: { matricula: number; curso: string },
+    payload: { matricula: number; course: string },
   ): Promise<UserResponseDto> => {
     loading.value = true;
     error.value = null;

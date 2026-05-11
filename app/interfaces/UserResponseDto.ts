@@ -5,7 +5,7 @@ export interface UserResponseDto {
   lastName: string;
   role: string | null;
   matricula: number | null;
-  curso: string | null;
+  course: string | null;
   createdAt: string | null;
   updatedAt: string | null;
 }
