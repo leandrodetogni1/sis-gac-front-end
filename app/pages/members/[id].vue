@@ -1,4 +1,7 @@
 <script setup lang="ts">
+import { Course, CourseLabels } from "~/enums/Course";
+import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
+import { Situation, SituationLabels } from "~/enums/Situation";
 import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 
@@ -27,19 +30,30 @@ const initials = computed(() => {
   return `${user.value.firstName[0]}${user.value.lastName[0]}`.toUpperCase();
 });
 
-const roleLabel = computed(() => {
-  const role = user.value?.role;
-  if (!role) return "—";
-  const map: Record<string, string> = {
-    admin: "Administrador",
-    coordinator: "Coordenador",
-    student: "Aluno",
-    coach: "Orientador",
-  };
-  return map[role.toLowerCase()] ?? role;
+const createdAt = computed(() => formatDateTimeBR(user.value?.createdAt));
+
+const matriculaLabel = computed(() => {
+  const value = user.value?.matricula;
+  return value !== null && value !== undefined ? String(value) : "—";
 });
 
-const createdAt = computed(() => formatDateTimeBR(user.value?.createdAt));
+const courseLabel = computed(() => {
+  const value = user.value?.course;
+  if (!value) return "—";
+  return CourseLabels[value as Course] ?? value;
+});
+
+const curriculumLabel = computed(() => {
+  const value = user.value?.curriculumYear;
+  if (!value) return "—";
+  return CurriculumYearLabels[value as CurriculumYear] ?? value;
+});
+
+const situationLabel = computed(() => {
+  const value = user.value?.situation;
+  if (!value) return "—";
+  return SituationLabels[value as Situation] ?? value;
+});
 
 const onSelect = (activity: ActivityResponseDto) => {
   selectedActivity.value = activity;
@@ -104,10 +118,22 @@ onMounted(async () => {
             </div>
           </div>
 
-          <div class="mt-5 grid grid-cols-2 gap-4 border-t border-neutral-100 pt-4 text-sm md:grid-cols-3">
+          <div class="mt-5 grid grid-cols-2 gap-4 border-t border-neutral-100 pt-4 text-sm md:grid-cols-3 lg:grid-cols-5">
             <div>
-              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Perfil</p>
-              <p class="mt-0.5 font-medium text-neutral-900">{{ roleLabel }}</p>
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Matrícula</p>
+              <p class="mt-0.5 font-medium text-neutral-900 tabular-nums">{{ matriculaLabel }}</p>
+            </div>
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Curso</p>
+              <p class="mt-0.5 font-medium text-neutral-900">{{ courseLabel }}</p>
+            </div>
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Currículo</p>
+              <p class="mt-0.5 font-medium text-neutral-900">{{ curriculumLabel }}</p>
+            </div>
+            <div>
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Situação</p>
+              <p class="mt-0.5 font-medium text-neutral-900">{{ situationLabel }}</p>
             </div>
             <div>
               <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Cadastrado em</p>

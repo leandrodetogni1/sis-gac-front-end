@@ -7,12 +7,18 @@ export const useUsers = () => {
   const fetched = ref(false);
   const error = ref<string | null>(null);
 
-  const getUsers = async (filters?: { role?: string }): Promise<UserResponseDto[]> => {
+  const getUsers = async (filters?: {
+    role?: string;
+    course?: string;
+  }): Promise<UserResponseDto[]> => {
     loading.value = true;
     error.value = null;
     try {
+      const query: Record<string, string> = {};
+      if (filters?.role) query.role = filters.role;
+      if (filters?.course) query.course = filters.course;
       const data = await api<UserResponseDto[]>("/api/users", {
-        query: filters?.role ? { role: filters.role } : undefined,
+        query: Object.keys(query).length ? query : undefined,
       });
       users.value = data;
       return data;

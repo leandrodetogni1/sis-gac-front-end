@@ -6,6 +6,6 @@ export enum Situation {
 
 export const SituationLabels: Record<Situation, string> = {
   [Situation.REGULAR]: "Regular",
-  [Situation.FORMANDO]: "Formando",
+  [Situation.FORMANDO]: "Provável Formando",
   [Situation.FORMADO]: "Formado",
 };

@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import { Course, CourseLabels } from "~/enums/Course";
 import type { SGTableColumn } from "~/types/SGTableColumn";
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 
@@ -13,6 +14,24 @@ if (user.value && user.value.role !== "admin" && user.value.role !== "owner") {
 const { users, fetched, error, getUsers } = useUsers();
 
 const search = ref("");
+const courseFilter = ref<Course | "ALL">("ALL");
+
+const courseOptions = [
+  { label: "Todos os cursos", value: "ALL" },
+  ...Object.values(Course).map((value) => ({
+    label: CourseLabels[value],
+    value,
+  })),
+];
+
+const fetchMembers = async () => {
+  await getUsers({
+    role: "member",
+    course: courseFilter.value === "ALL" ? undefined : courseFilter.value,
+  });
+};
+
+watch(courseFilter, fetchMembers);
 
 const columns: SGTableColumn[] = [
   { key: "name", label: "Nome" },
@@ -35,9 +54,12 @@ const handleRowClick = (member: UserResponseDto) => {
   navigateTo(`/members/${member.id}`);
 };
 
-onMounted(async () => {
-  await getUsers({ role: "member" });
-});
+const formatCourse = (value: string | null) => {
+  if (!value) return "—";
+  return CourseLabels[value as Course] ?? value;
+};
+
+onMounted(fetchMembers);
 </script>
 
 <template>
@@ -54,12 +76,22 @@ onMounted(async () => {
         <h2 class="text-base font-semibold text-neutral-900 md:text-lg">Alunos</h2>
       </div>
 
-      <div class="mb-4 w-full sm:max-w-sm">
-        <SGInput
-          v-model="search"
-          placeholder="Buscar por nome ou email"
-          test-id="search-alunos"
-        />
+      <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div class="w-full sm:max-w-sm">
+          <SGInput
+            v-model="search"
+            placeholder="Buscar por nome ou email"
+            test-id="search-alunos"
+          />
+        </div>
+        <div class="w-full sm:max-w-xs">
+          <SGSelect
+            v-model="courseFilter"
+            placeholder="Filtrar por curso"
+            :options="courseOptions"
+            test-id="filter-course"
+          />
+        </div>
       </div>
 
       <SGCard test-id="card-alunos">
@@ -73,7 +105,7 @@ onMounted(async () => {
           empty-icon="lucide:graduation-cap"
           test-id="alunos-table"
           clickable
-          @retry="getUsers({ role: 'member' })"
+          @retry="fetchMembers"
           @row-click="handleRowClick"
         >
           <template #cell-name="{ item: member }">
@@ -94,7 +126,7 @@ onMounted(async () => {
           </template>
 
           <template #cell-course="{ item: member }">
-            <span class="text-neutral-500">{{ member.course ?? "—" }}</span>
+            <span class="text-neutral-500">{{ formatCourse(member.course) }}</span>
           </template>
 
           <template #cell-createdAt="{ item: member }">
@@ -115,7 +147,7 @@ onMounted(async () => {
               <Icon name="lucide:chevron-right" size="1.125rem" class="text-neutral-400" />
             </div>
             <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
-              <span>{{ member.matricula ?? "—" }} · {{ member.course ?? "—" }}</span>
+              <span>{{ member.matricula ?? "—" }} · {{ formatCourse(member.course) }}</span>
               <span>{{ formatDateTimeBR(member.createdAt) }}</span>
             </div>
           </template>
