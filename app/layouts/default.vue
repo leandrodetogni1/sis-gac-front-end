@@ -16,11 +16,14 @@ interface NavItem {
   testId: string;
   children?: NavChild[];
   adminOnly?: boolean;
+  memberOnly?: boolean;
+  staffOnly?: boolean;
 }
 
 const allNavItems: NavItem[] = [
   { label: "Dashboard", icon: "lucide:layout-dashboard", to: "/", testId: "sidebar-link-dashboard" },
-  { label: "Atividades", icon: "lucide:file-text", to: "/activities", testId: "sidebar-link-atividades" },
+  { label: "Minhas Atividades", icon: "lucide:file-text", to: "/activities/me", testId: "sidebar-link-minhas-atividades", memberOnly: true },
+  { label: "Atividades", icon: "lucide:file-text", to: "/activities", testId: "sidebar-link-atividades", staffOnly: true },
   {
     label: "Configurações",
     icon: "lucide:settings",
@@ -38,9 +41,19 @@ const { user } = useAuthState();
 const { signOut } = useGoogleSignIn();
 
 const isAdmin = computed(() => user.value?.role === "admin");
+const isMember = computed(() => user.value?.role === "member");
+const isStaff = computed(() => {
+  const role = user.value?.role;
+  return role === "reviewer" || role === "admin" || role === "owner";
+});
 
 const navItems = computed(() => {
-  return allNavItems.filter((item) => !item.adminOnly || isAdmin.value);
+  return allNavItems.filter((item) => {
+    if (item.adminOnly && !isAdmin.value) return false;
+    if (item.memberOnly && !isMember.value) return false;
+    if (item.staffOnly && !isStaff.value) return false;
+    return true;
+  });
 });
 
 const userInitial = computed(() => (user.value?.firstName?.[0] ?? "U").toUpperCase());

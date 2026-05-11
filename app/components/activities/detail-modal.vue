@@ -9,11 +9,15 @@ const open = defineModel<boolean>("open", { default: false });
 
 const emit = defineEmits(["approved", "verified", "rejected"]);
 
+const { user } = useAuthState();
 const { approveActivity, verifyActivity, rejectActivity } = useActivities();
 const { showToastSuccess, showToastError } = useToastNotification();
 const { confirmAlert } = useAlerts();
 
 const actionLoading = ref(false);
+
+const isReviewer = computed(() => user.value?.role === "reviewer");
+const isAdminOrOwner = computed(() => user.value?.role === "admin" || user.value?.role === "owner");
 
 const label = computed(() => {
   if (!props.activity) return "—";
@@ -26,13 +30,17 @@ const userName = computed(() => {
 });
 
 const canVerify = computed(() => {
+  if (!isReviewer.value) return false;
   const status = props.activity?.status?.toLowerCase();
   return status === "pending" || status === undefined || status === null;
 });
 
 const canApprove = computed(() => {
+  if (!isAdminOrOwner.value) return false;
   return props.activity?.status?.toLowerCase() === "verified";
 });
+
+const canReject = computed(() => canVerify.value || canApprove.value);
 
 const handleApprove = async () => {
   if (!props.activity) return;
@@ -126,7 +134,7 @@ const handleReject = async () => {
         <div class="grid grid-cols-2 gap-3 text-sm">
           <div>
             <p class="text-xs font-medium uppercase text-neutral-500">Categoria</p>
-            <p class="mt-0.5 text-neutral-900">{{ activity.category ?? "—" }}</p>
+            <p class="mt-0.5 text-neutral-900">{{ activity.activity_types?.category ?? "—" }}</p>
           </div>
           <div>
             <p class="text-xs font-medium uppercase text-neutral-500">Horas</p>
@@ -154,7 +162,7 @@ const handleReject = async () => {
 
     <template #footer>
       <div class="flex w-full justify-end gap-2">
-        <span v-show="canVerify || canApprove">
+        <span v-show="canReject">
           <SGButton
             test-id="reject-activity-button"
             variant="danger"

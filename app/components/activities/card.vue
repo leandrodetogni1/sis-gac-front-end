@@ -1,9 +1,13 @@
 <script setup lang="ts">
 import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
 
-const props = defineProps<{
-  activity: ActivityResponseDto;
-}>();
+const props = withDefaults(
+  defineProps<{
+    activity: ActivityResponseDto;
+    showUser?: boolean;
+  }>(),
+  { showUser: true },
+);
 
 const emit = defineEmits(["select"]);
 
@@ -22,7 +26,9 @@ const userName = computed(() => {
     <div class="flex items-start justify-between gap-2">
       <div>
         <p class="font-medium text-neutral-900">{{ label }}</p>
-        <p class="mt-0.5 text-xs text-neutral-500">{{ activity.category ?? "—" }} · {{ userName }}</p>
+        <p class="mt-0.5 text-xs text-neutral-500">
+          {{ activity.activity_types?.category ?? "—" }}<template v-if="showUser"> · {{ userName }}</template>
+        </p>
       </div>
       <SGBadge :status="activity.status || 'pending'" />
     </div>

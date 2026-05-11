@@ -1,10 +1,11 @@
+export type ActivityStatus = "PENDING" | "VERIFIED" | "APPROVED" | "REJECTED";
+export type ActivityClass = "COMPLEMENTAR" | "LIVRE";
+
 export interface ActivityResponseDto {
   id: string;
   authorId: string | null;
-  unity: string | null;
-  status: "approved" | "verified" | "pending" | "rejected" | null;
-  category: string | null;
-  class: string | null;
+  status: ActivityStatus | null;
+  class: ActivityClass | null;
   activityTypeId: string | null;
   event: string | null;
   organization: string | null;
@@ -21,6 +22,8 @@ export interface ActivityTypeSummaryDto {
   id: string;
   cod: string;
   label: string;
+  category: string;
+  unity: string;
 }
 
 export interface ActivityUserSummaryDto {

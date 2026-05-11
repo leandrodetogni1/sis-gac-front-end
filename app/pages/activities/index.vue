@@ -1,12 +1,32 @@
 <script setup lang="ts">
-import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
+import type { ActivityResponseDto, ActivityStatus } from "~/interfaces/ActivityResponseDto";
 
 useHead({ title: "Atividades — SWGAC" });
 
+const { user } = useAuthState();
 const { activities, fetched, error, getActivities } = useActivities();
+
+if (user.value?.role === "member") {
+  await navigateTo("/activities/me");
+}
 
 const selectedActivity = ref<ActivityResponseDto | null>(null);
 const modalOpen = ref(false);
+
+const statusFilter = ref<ActivityStatus | "ALL">("ALL");
+const statusOptions = [
+  { label: "Todos os status", value: "ALL" },
+  { label: "Pendente", value: "PENDING" },
+  { label: "Verificado", value: "VERIFIED" },
+  { label: "Aprovado", value: "APPROVED" },
+  { label: "Rejeitado", value: "REJECTED" },
+];
+
+const fetchActivities = async () => {
+  await getActivities({
+    status: statusFilter.value === "ALL" ? undefined : statusFilter.value,
+  });
+};
 
 const onSelect = (activity: ActivityResponseDto) => {
   selectedActivity.value = activity;
@@ -15,12 +35,12 @@ const onSelect = (activity: ActivityResponseDto) => {
 
 const onStatusChanged = async () => {
   modalOpen.value = false;
-  await getActivities();
+  await fetchActivities();
 };
 
-onMounted(async () => {
-  await getActivities();
-});
+watch(statusFilter, fetchActivities);
+
+onMounted(fetchActivities);
 </script>
 
 <template>
@@ -33,14 +53,25 @@ onMounted(async () => {
     </div>
 
     <div v-else>
-      <div class="mb-4 flex items-center justify-between">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
         <h2 class="text-base font-semibold text-neutral-900 md:text-lg">Atividades Complementares</h2>
         <SGButton test-id="create-activity-button" variant="primary" icon="lucide:plus" @click="navigateTo('/activities/create')">
           Nova Atividade
         </SGButton>
       </div>
 
-      <activities-list :activities="activities" :error="error" @retry="getActivities()" @select="onSelect" />
+      <div class="mb-4 flex flex-wrap items-center gap-3">
+        <div class="w-full sm:w-56">
+          <SGSelect
+            v-model="statusFilter"
+            placeholder="Filtrar por status"
+            :options="statusOptions"
+            test-id="filter-status"
+          />
+        </div>
+      </div>
+
+      <activities-list :activities="activities" :error="error" @retry="fetchActivities" @select="onSelect" />
     </div>
 
     <activities-detail-modal

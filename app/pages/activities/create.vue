@@ -4,8 +4,11 @@ import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
 useHead({ title: "Nova Atividade — SWGAC" });
 
 const router = useRouter();
+const { user } = useAuthState();
 const { createActivity, loading } = useActivities();
 const { showToastSuccess, showToastError } = useToastNotification();
+
+const listPath = computed(() => (user.value?.role === "member" ? "/activities/me" : "/activities"));
 
 const activityClass = ref("");
 const activityTypeId = ref("");
@@ -56,7 +59,7 @@ const handleSubmit = async () => {
   try {
     await createActivity(payload);
     showToastSuccess("Atividade criada com sucesso");
-    router.push("/activities");
+    router.push(listPath.value);
   } catch (e: any) {
     console.error(e?.data?.message ?? e);
     showToastError("Erro ao criar atividade");

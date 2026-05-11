@@ -2,21 +2,28 @@
 import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
 import type { SGTableColumn } from "~/types/SGTableColumn";
 
-defineProps<{
-  activities: ActivityResponseDto[];
-  error: string | null;
-}>();
+const props = withDefaults(
+  defineProps<{
+    activities: ActivityResponseDto[];
+    error: string | null;
+    showUser?: boolean;
+  }>(),
+  { showUser: true },
+);
 
 const emit = defineEmits(["retry", "select"]);
 
-const columns: SGTableColumn[] = [
-  { key: "activity", label: "Atividade" },
-  { key: "category", label: "Categoria" },
-  { key: "hours", label: "Horas" },
-  { key: "startDate", label: "Data Início" },
-  { key: "user", label: "Aluno" },
-  { key: "status", label: "Status" },
-];
+const columns = computed<SGTableColumn[]>(() => {
+  const base: SGTableColumn[] = [
+    { key: "activity", label: "Atividade" },
+    { key: "category", label: "Categoria" },
+    { key: "hours", label: "Horas" },
+    { key: "startDate", label: "Data Início" },
+  ];
+  if (props.showUser) base.push({ key: "user", label: "Aluno" });
+  base.push({ key: "status", label: "Status" });
+  return base;
+});
 
 const getLabel = (activity: ActivityResponseDto) => {
   return activity.activity_types?.label ?? activity.event ?? "—";
@@ -48,7 +55,7 @@ const getUserName = (activity: ActivityResponseDto) => {
       </template>
 
       <template #cell-category="{ item: activity }">
-        <span class="text-neutral-500">{{ activity.category ?? "—" }}</span>
+        <span class="text-neutral-500">{{ activity.activity_types?.category ?? "—" }}</span>
       </template>
 
       <template #cell-hours="{ item: activity }">
@@ -59,7 +66,7 @@ const getUserName = (activity: ActivityResponseDto) => {
         <span class="text-neutral-500">{{ activity.startDate ?? "—" }}</span>
       </template>
 
-      <template #cell-user="{ item: activity }">
+      <template v-if="showUser" #cell-user="{ item: activity }">
         <span
           v-if="activity.users"
           class="cursor-pointer text-primary-700 hover:underline"
@@ -87,7 +94,7 @@ const getUserName = (activity: ActivityResponseDto) => {
       </template>
 
       <template #mobile="{ item: activity }">
-        <activities-card :activity="activity" @select="emit('select', $event)" />
+        <activities-card :activity="activity" :show-user="showUser" @select="emit('select', $event)" />
       </template>
     </SGTable>
   </SGCard>

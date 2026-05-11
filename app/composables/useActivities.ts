@@ -1,5 +1,9 @@
-import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
+import type { ActivityResponseDto, ActivityStatus } from "~/interfaces/ActivityResponseDto";
 import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
+
+export type ActivityFilters = {
+  status?: ActivityStatus;
+};
 
 export const useActivities = () => {
   const api = useApi();
@@ -8,11 +12,37 @@ export const useActivities = () => {
   const fetched = ref(false);
   const error = ref<string | null>(null);
 
-  const getActivities = async (): Promise<ActivityResponseDto[]> => {
+  const buildQuery = (filters?: ActivityFilters) => {
+    const query: Record<string, string> = {};
+    if (filters?.status) query.status = filters.status;
+    return query;
+  };
+
+  const getActivities = async (filters?: ActivityFilters): Promise<ActivityResponseDto[]> => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await api<ActivityResponseDto[]>("/api/activities");
+      const data = await api<ActivityResponseDto[]>("/api/activities", {
+        query: buildQuery(filters),
+      });
+      activities.value = data;
+      return data;
+    } catch (e: any) {
+      error.value = e?.data?.message ?? "Erro ao carregar atividades";
+      return [];
+    } finally {
+      loading.value = false;
+      fetched.value = true;
+    }
+  };
+
+  const getMyActivities = async (filters?: ActivityFilters): Promise<ActivityResponseDto[]> => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await api<ActivityResponseDto[]>("/api/activities/me", {
+        query: buildQuery(filters),
+      });
       activities.value = data;
       return data;
     } catch (e: any) {
@@ -72,7 +102,8 @@ export const useActivities = () => {
   };
 
   const filterByStatus = (status: string): ActivityResponseDto[] => {
-    return activities.value.filter((a) => a.status === status);
+    const target = status.toLowerCase();
+    return activities.value.filter((a) => a.status?.toLowerCase() === target);
   };
 
   return {
@@ -81,6 +112,7 @@ export const useActivities = () => {
     fetched,
     error,
     getActivities,
+    getMyActivities,
     getActivitiesByUser,
     createActivity,
     approveActivity,

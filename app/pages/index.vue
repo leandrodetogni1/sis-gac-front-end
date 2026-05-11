@@ -4,7 +4,7 @@ import type { SGTableColumn } from "~/types/SGTableColumn";
 
 useHead({ title: "Dashboard — SWGAC" });
 
-const { fetched, getActivities, filterByStatus } = useActivities();
+const { fetched, getMyActivities, filterByStatus } = useActivities();
 
 const complementarColumns: SGTableColumn[] = [
   { key: "label", label: "Categoria" },
@@ -18,12 +18,12 @@ const livreColumns: SGTableColumn[] = [
 ];
 
 const complementarCategories = computed(() => {
-  const approved = filterByStatus("approved").filter((a) => a.category?.toLowerCase() === "complementar");
+  const approved = filterByStatus("approved").filter((a) => a.class?.toLowerCase() === "complementar");
 
-  const label = (a: ActivityResponseDto) => a.activity_types?.label?.toLowerCase() ?? "";
-  const ensino = approved.filter((a) => label(a).includes("monitoria") || label(a).includes("ensino"));
-  const pesquisa = approved.filter((a) => label(a).includes("científica") || label(a).includes("artigo") || label(a).includes("pesquisa"));
-  const extensao = approved.filter((a) => label(a).includes("extensão") || label(a).includes("voluntário") || label(a).includes("comunitár"));
+  const category = (a: ActivityResponseDto) => a.activity_types?.category?.toLowerCase() ?? "";
+  const ensino = approved.filter((a) => category(a) === "ensino");
+  const pesquisa = approved.filter((a) => category(a) === "pesquisa");
+  const extensao = approved.filter((a) => category(a) === "extensao" || category(a) === "extensão");
 
   return [
     { label: "Ensino", min: 120, obtained: ensino.reduce((sum, a) => sum + (a.hours ?? 0), 0) },
@@ -44,7 +44,7 @@ const complementarApproved = computed(() => {
 });
 
 const livreHours = computed(() => {
-  const approved = filterByStatus("approved").filter((a) => a.category?.toLowerCase() === "livre");
+  const approved = filterByStatus("approved").filter((a) => a.class?.toLowerCase() === "livre");
   return approved.reduce((sum, a) => sum + (a.hours ?? 0), 0);
 });
 
@@ -85,7 +85,7 @@ const analysisMessages = computed(() => {
 });
 
 onMounted(async () => {
-  await getActivities();
+  await getMyActivities();
 });
 </script>
 
