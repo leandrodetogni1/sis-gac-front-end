@@ -31,12 +31,6 @@ const formatCurriculum = (value: CurriculumYear | null) => {
   return CurriculumYearLabels[value] ?? value;
 };
 
-const initials = (user: AdminDashboardFormandoUser) => {
-  const first = user.firstName?.[0] ?? "";
-  const last = user.lastName?.[0] ?? "";
-  return `${first}${last}`.toUpperCase();
-};
-
 const progressPct = (achieved: number, required: number) => {
   if (required <= 0) return 0;
   return Math.min(100, Math.max(0, (achieved / required) * 100));
@@ -75,9 +69,12 @@ const hasComplementarBreakdown = (formando: AdminDashboardFormando) => {
       >
         <div class="flex items-start justify-between gap-3">
           <div class="flex min-w-0 items-center gap-3">
-            <div class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600">
-              {{ initials(formando.user) }}
-            </div>
+            <SGAvatar
+              :first-name="formando.user.firstName"
+              :last-name="formando.user.lastName"
+              :picture="formando.user.picture"
+              size="lg"
+            />
             <div class="min-w-0">
               <p class="truncate font-medium text-neutral-900">
                 {{ formando.user.firstName }} {{ formando.user.lastName }}

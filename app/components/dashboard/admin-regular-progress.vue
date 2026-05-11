@@ -58,9 +58,12 @@ const handleRowClick = (student: AdminDashboardRegularStudent) => {
     >
       <template #cell-name="{ item: student }">
         <div class="flex items-center gap-2.5">
-          <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600">
-            {{ student.user.firstName.charAt(0) }}{{ student.user.lastName.charAt(0) }}
-          </div>
+          <SGAvatar
+            :first-name="student.user.firstName"
+            :last-name="student.user.lastName"
+            :picture="student.user.picture"
+            size="sm"
+          />
           <span class="font-medium text-neutral-900">{{ student.user.firstName }} {{ student.user.lastName }}</span>
         </div>
       </template>
@@ -98,9 +101,12 @@ const handleRowClick = (student: AdminDashboardRegularStudent) => {
       <template #mobile="{ item: student }">
         <div class="flex items-start justify-between gap-2">
           <div class="flex items-center gap-2.5">
-            <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600">
-              {{ student.user.firstName.charAt(0) }}{{ student.user.lastName.charAt(0) }}
-            </div>
+            <SGAvatar
+              :first-name="student.user.firstName"
+              :last-name="student.user.lastName"
+              :picture="student.user.picture"
+              size="sm"
+            />
             <div>
               <p class="font-medium text-neutral-900">{{ student.user.firstName }} {{ student.user.lastName }}</p>
               <p class="text-xs text-neutral-500">{{ student.user.matricula ?? "—" }} · {{ formatCourse(student.user.course) }}</p>

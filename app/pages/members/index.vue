@@ -174,9 +174,12 @@ onMounted(fetchMembers);
         >
           <template #cell-name="{ item: member }">
             <div class="flex items-center gap-2.5">
-              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600">
-                {{ member.firstName.charAt(0) }}{{ member.lastName.charAt(0) }}
-              </div>
+              <SGAvatar
+                :first-name="member.firstName"
+                :last-name="member.lastName"
+                :picture="member.picture"
+                size="sm"
+              />
               <span class="font-medium text-neutral-900">{{ member.firstName }} {{ member.lastName }}</span>
             </div>
           </template>
@@ -204,9 +207,12 @@ onMounted(fetchMembers);
           <template #mobile="{ item: member }">
             <div class="flex items-start justify-between gap-2">
               <div class="flex items-center gap-2.5">
-                <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600">
-                  {{ member.firstName.charAt(0) }}{{ member.lastName.charAt(0) }}
-                </div>
+                <SGAvatar
+                  :first-name="member.firstName"
+                  :last-name="member.lastName"
+                  :picture="member.picture"
+                  size="sm"
+                />
                 <div>
                   <p class="font-medium text-neutral-900">{{ member.firstName }} {{ member.lastName }}</p>
                   <p class="text-xs text-neutral-500">{{ member.email }}</p>

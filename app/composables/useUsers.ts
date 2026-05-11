@@ -70,6 +70,7 @@ export const useUsers = () => {
       course?: string;
       curriculumYear?: string;
       situation?: string;
+      picture?: string;
     },
   ): Promise<UserResponseDto> => {
     loading.value = true;

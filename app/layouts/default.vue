@@ -60,7 +60,6 @@ const navItems = computed(() => {
   });
 });
 
-const userInitial = computed(() => (user.value?.firstName?.[0] ?? "U").toUpperCase());
 const userFullName = computed(() => {
   if (!user.value) return "Usuário";
   return `${user.value.firstName} ${user.value.lastName}`.trim();
@@ -171,9 +170,12 @@ watch(
 
       <div class="border-t border-neutral-200 p-4">
         <div class="flex items-center gap-3">
-          <div class="flex h-9 w-9 items-center justify-center rounded-full bg-primary-100 text-sm font-semibold text-primary-600">
-            {{ userInitial }}
-          </div>
+          <SGAvatar
+            :first-name="user?.firstName"
+            :last-name="user?.lastName"
+            :picture="user?.picture ?? null"
+            size="md"
+          />
           <div class="flex-1 truncate">
             <p class="text-sm font-medium text-neutral-900" data-testid="sidebar-user-name">{{ userFullName }}</p>
             <p class="truncate text-xs text-neutral-500" data-testid="sidebar-user-email">{{ user?.email ?? "" }}</p>

@@ -37,11 +37,6 @@ const fullName = computed(() => {
   return `${user.value.firstName} ${user.value.lastName}`;
 });
 
-const initials = computed(() => {
-  if (!user.value) return "?";
-  return `${user.value.firstName[0]}${user.value.lastName[0]}`.toUpperCase();
-});
-
 const createdAt = computed(() => formatDateTimeBR(user.value?.createdAt));
 
 const matriculaLabel = computed(() => {
@@ -121,9 +116,12 @@ onMounted(async () => {
       <div v-if="user" class="mb-6">
         <SGCard>
           <div class="flex items-start gap-4">
-            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-primary-100 text-lg font-bold text-primary-700">
-              {{ initials }}
-            </div>
+            <SGAvatar
+              :first-name="user.firstName"
+              :last-name="user.lastName"
+              :picture="user.picture"
+              size="xl"
+            />
             <div class="min-w-0 flex-1">
               <h1 class="text-lg font-semibold text-neutral-900">{{ fullName }}</h1>
               <p class="text-sm text-neutral-500">{{ user.email }}</p>

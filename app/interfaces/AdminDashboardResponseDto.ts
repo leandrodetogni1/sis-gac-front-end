@@ -7,6 +7,7 @@ export interface AdminDashboardFormandoUser {
   firstName: string;
   lastName: string;
   email: string;
+  picture: string | null;
   matricula: string | null;
   course: Course | null;
   curriculumYear: CurriculumYear | null;

@@ -33,4 +33,5 @@ export interface ActivityUserSummaryDto {
   firstName: string;
   lastName: string;
   email: string;
+  picture: string | null;
 }

@@ -5,6 +5,7 @@ export interface ActivityEventActorDto {
   firstName: string;
   lastName: string;
   email: string;
+  picture: string | null;
 }
 
 export interface ActivityEventResponseDto {

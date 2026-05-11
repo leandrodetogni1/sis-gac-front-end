@@ -31,6 +31,7 @@ type StaffRow = {
   role: string | null;
   firstName: string | null;
   lastName: string | null;
+  picture: string | null;
   inviterEmail: string | null;
   createdAt: string | null;
   isOwner: boolean;
@@ -45,6 +46,7 @@ const staffRows = computed<StaffRow[]>(() => {
     role: u.role,
     firstName: u.firstName,
     lastName: u.lastName,
+    picture: u.picture,
     inviterEmail: null,
     createdAt: u.createdAt,
     isOwner: u.role?.toLowerCase() === "owner",
@@ -58,6 +60,7 @@ const staffRows = computed<StaffRow[]>(() => {
     role: i.role,
     firstName: null,
     lastName: null,
+    picture: null,
     inviterEmail: i.inviter?.email ?? null,
     createdAt: i.createdAt,
     isOwner: false,
@@ -182,11 +185,12 @@ onMounted(async () => {
           >
             <template #cell-name="{ item: row }">
               <div v-if="row.kind === 'user'" class="flex items-center gap-2.5">
-                <div
-                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600"
-                >
-                  {{ row.firstName?.charAt(0) }}{{ row.lastName?.charAt(0) }}
-                </div>
+                <SGAvatar
+                  :first-name="row.firstName"
+                  :last-name="row.lastName"
+                  :picture="row.picture"
+                  size="sm"
+                />
                 <span class="font-medium text-neutral-900">{{ row.firstName }} {{ row.lastName }}</span>
               </div>
               <div v-else class="flex items-center gap-2.5">
@@ -269,12 +273,13 @@ onMounted(async () => {
             <template #mobile="{ item: row }">
               <div class="flex items-start justify-between gap-2">
                 <div class="flex items-center gap-2.5">
-                  <div
+                  <SGAvatar
                     v-if="row.kind === 'user'"
-                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-primary-100 text-xs font-semibold text-primary-600"
-                  >
-                    {{ row.firstName?.charAt(0) }}{{ row.lastName?.charAt(0) }}
-                  </div>
+                    :first-name="row.firstName"
+                    :last-name="row.lastName"
+                    :picture="row.picture"
+                    size="sm"
+                  />
                   <div
                     v-else
                     class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400"

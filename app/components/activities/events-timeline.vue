@@ -89,13 +89,19 @@ const dotClass = (status: ActivityStatus): string => {
               {{ formatDateTimeBR(event.createdAt) }}
             </time>
           </div>
-          <p
+          <div
             v-if="event.actor"
-            class="mt-1 text-xs text-toned"
+            class="mt-1 flex items-center gap-1.5 text-xs text-toned"
             :title="event.actor.email"
           >
-            {{ event.actor.firstName }} {{ event.actor.lastName }}
-          </p>
+            <SGAvatar
+              :first-name="event.actor.firstName"
+              :last-name="event.actor.lastName"
+              :picture="event.actor.picture"
+              size="xs"
+            />
+            <span>{{ event.actor.firstName }} {{ event.actor.lastName }}</span>
+          </div>
           <p
             v-if="event.comment"
             class="mt-2 border-l-2 border-accented pl-3 text-xs italic text-toned"

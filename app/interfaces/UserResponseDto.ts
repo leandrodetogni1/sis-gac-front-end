@@ -3,6 +3,7 @@ export interface UserResponseDto {
   email: string;
   firstName: string;
   lastName: string;
+  picture: string | null;
   role: string | null;
   matricula: number | null;
   course: string | null;
