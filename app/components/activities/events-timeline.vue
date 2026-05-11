@@ -38,8 +38,13 @@ const STATUS_LABELS: Record<ActivityStatus, string> = {
   REJECTED: "Rejeitada",
 };
 
+const isStatusChange = (event: ActivityEventResponseDto): boolean => {
+  return event.fromStatus !== event.toStatus;
+};
+
 const eventLabel = (event: ActivityEventResponseDto): string => {
   if (event.fromStatus === null) return "Atividade criada";
+  if (!isStatusChange(event) && event.comment) return event.comment;
   return STATUS_LABELS[event.toStatus] ?? `Status: ${event.toStatus}`;
 };
 
@@ -103,7 +108,7 @@ const dotClass = (status: ActivityStatus): string => {
             <span>{{ event.actor.firstName }} {{ event.actor.lastName }}</span>
           </div>
           <p
-            v-if="event.comment"
+            v-if="event.comment && isStatusChange(event)"
             class="mt-2 border-l-2 border-accented pl-3 text-xs italic text-toned"
           >
             {{ event.comment }}

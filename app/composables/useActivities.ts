@@ -2,6 +2,7 @@ import type { ActivityEventResponseDto } from "~/interfaces/ActivityEventRespons
 import type { ActivityResponseDto, ActivityStatus } from "~/interfaces/ActivityResponseDto";
 import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
 import type { MeSummaryResponseDto } from "~/interfaces/MeSummaryResponseDto";
+import type { UpdateActivityDto } from "~/interfaces/UpdateActivityDto";
 
 export type ActivityFilters = {
   status?: ActivityStatus;
@@ -73,6 +74,23 @@ export const useActivities = () => {
     }
   };
 
+  const updateActivity = async (id: string, payload: UpdateActivityDto): Promise<ActivityResponseDto> => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await api<ActivityResponseDto>(`/api/activities/${id}`, {
+        method: "PATCH",
+        body: payload,
+      });
+      return data;
+    } catch (e: any) {
+      error.value = e?.data?.message ?? "Erro ao atualizar atividade";
+      throw e;
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const approveActivity = async (id: string): Promise<void> => {
     await api(`/api/activities/${id}/approve`, { method: "PATCH" });
   };
@@ -125,6 +143,7 @@ export const useActivities = () => {
     getMyActivities,
     getActivitiesByUser,
     createActivity,
+    updateActivity,
     approveActivity,
     verifyActivity,
     rejectActivity,

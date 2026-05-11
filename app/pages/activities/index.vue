@@ -12,6 +12,7 @@ if (user.value?.role === "member") {
 
 const selectedActivity = ref<ActivityResponseDto | null>(null);
 const modalOpen = ref(false);
+const editModalOpen = ref(false);
 
 const route = useRoute();
 const router = useRouter();
@@ -44,6 +45,16 @@ const onSelect = (activity: ActivityResponseDto) => {
 
 const onStatusChanged = async () => {
   modalOpen.value = false;
+  await fetchActivities();
+};
+
+const onEdit = (activity: ActivityResponseDto) => {
+  selectedActivity.value = activity;
+  editModalOpen.value = true;
+};
+
+const onUpdated = async () => {
+  editModalOpen.value = false;
   await fetchActivities();
 };
 
@@ -100,6 +111,13 @@ onMounted(fetchActivities);
       @approved="onStatusChanged"
       @verified="onStatusChanged"
       @rejected="onStatusChanged"
+      @edit="onEdit"
+    />
+
+    <activities-edit-modal
+      v-model:open="editModalOpen"
+      :activity="selectedActivity"
+      @updated="onUpdated"
     />
   </div>
 </template>

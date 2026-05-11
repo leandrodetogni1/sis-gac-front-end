@@ -11,7 +11,7 @@ const props = withDefaults(
 
 const open = defineModel<boolean>("open", { default: false });
 
-const emit = defineEmits(["approved", "verified", "rejected"]);
+const emit = defineEmits(["approved", "verified", "rejected", "edit"]);
 
 const { user } = useAuthState();
 const { approveActivity, verifyActivity, rejectActivity } = useActivities();
@@ -52,6 +52,18 @@ const canApprove = computed(() => {
 });
 
 const canReject = computed(() => canVerify.value || canApprove.value);
+
+const canEdit = computed(() => {
+  const status = props.activity?.status?.toLowerCase();
+  if (status !== "pending") return false;
+  return isActivityAuthor.value || isReviewer.value || isAdminOrOwner.value;
+});
+
+const handleEdit = () => {
+  if (!props.activity) return;
+  open.value = false;
+  emit("edit", props.activity);
+};
 
 const handleApprove = async () => {
   if (!props.activity) return;
@@ -197,6 +209,18 @@ const handleReject = async () => {
 
     <template #footer>
       <div class="flex w-full justify-end gap-2">
+        <span v-show="canEdit">
+          <SGButton
+            test-id="edit-activity-button"
+            variant="secondary"
+            icon="lucide:pencil"
+            size="sm"
+            :disabled="actionLoading"
+            @click="handleEdit"
+          >
+            Editar
+          </SGButton>
+        </span>
         <span v-show="canReject">
           <SGButton
             test-id="reject-activity-button"
