@@ -66,8 +66,15 @@ const staffRows = computed<StaffRow[]>(() => {
     isOwner: false,
   }));
 
+  const ROLE_ORDER: Record<string, number> = { owner: 0, admin: 1, reviewer: 2 };
+  const roleRank = (role: string | null) =>
+    role && ROLE_ORDER[role.toLowerCase()] !== undefined ? ROLE_ORDER[role.toLowerCase()]! : 99;
+
   return [...fromUsers, ...fromInvitations].sort((a, b) => {
     if (a.kind !== b.kind) return a.kind === "invitation" ? 1 : -1;
+    const ra = roleRank(a.role);
+    const rb = roleRank(b.role);
+    if (ra !== rb) return ra - rb;
     const ta = a.createdAt ? new Date(a.createdAt).getTime() : 0;
     const tb = b.createdAt ? new Date(b.createdAt).getTime() : 0;
     return tb - ta;
