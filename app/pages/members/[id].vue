@@ -163,6 +163,11 @@ onMounted(async () => {
         </SGCard>
       </div>
 
+      <div class="mb-6">
+        <h2 class="mb-3 text-base font-semibold text-neutral-900">Resumo</h2>
+        <dashboard-member-summary :user-id="memberId" />
+      </div>
+
       <div>
         <h2 class="mb-3 text-base font-semibold text-neutral-900">Atividades Complementares</h2>
         <activities-list

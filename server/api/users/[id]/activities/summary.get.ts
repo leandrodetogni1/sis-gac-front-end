@@ -1,7 +1,8 @@
 import type { MeSummaryResponseDto } from "~/interfaces/MeSummaryResponseDto";
 
 export default defineEventHandler(async (event) => {
-  const res = await proxyToBackend<{ data: MeSummaryResponseDto }>(event, "/activities/me/summary", {
+  const id = getRouterParam(event, "id");
+  const res = await proxyToBackend<{ data: MeSummaryResponseDto }>(event, `/users/${id}/activities/summary`, {
     method: "GET",
     query: getQuery(event),
     fallbackMessage: "Não foi possível carregar o resumo",

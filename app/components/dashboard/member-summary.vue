@@ -1,23 +1,39 @@
 <script setup lang="ts">
 import type { MeSummaryResponseDto, SummaryCategory } from "~/interfaces/MeSummaryResponseDto";
 
-const { getMySummary } = useActivities();
+const props = defineProps<{
+  userId?: string;
+}>();
+
+const { getUserSummary } = useActivities();
+const { user } = useAuthState();
 
 const summary = ref<MeSummaryResponseDto | null>(null);
 const loading = ref(false);
 const error = ref<string | null>(null);
 
+const targetUserId = computed(() => props.userId ?? user.value?.id);
+const isSelf = computed(() => !props.userId || props.userId === user.value?.id);
+
 const fetchSummary = async () => {
+  if (!targetUserId.value) {
+    error.value = "Usuário não autenticado";
+    return;
+  }
   loading.value = true;
   error.value = null;
   try {
-    summary.value = await getMySummary();
+    summary.value = await getUserSummary(targetUserId.value);
   } catch (e: any) {
     error.value = e?.data?.message ?? "Erro ao carregar resumo";
   } finally {
     loading.value = false;
   }
 };
+
+watch(targetUserId, async (id, prev) => {
+  if (id && id !== prev) await fetchSummary();
+});
 
 const CATEGORY_LABELS: Record<SummaryCategory, string> = {
   ENSINO: "Ensino",
@@ -59,7 +75,7 @@ onMounted(async () => {
     </div>
 
     <div v-else-if="summary" class="flex flex-col gap-6">
-      <dashboard-curriculum-banner v-if="needsCurriculum" @saved="fetchSummary" />
+      <dashboard-curriculum-banner v-if="needsCurriculum && isSelf" @saved="fetchSummary" />
 
       <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <SGCard

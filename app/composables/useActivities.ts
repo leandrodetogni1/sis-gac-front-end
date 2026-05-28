@@ -103,8 +103,8 @@ export const useActivities = () => {
     await api(`/api/activities/${id}/reject`, { method: "PATCH" });
   };
 
-  const getMySummary = async (): Promise<MeSummaryResponseDto> => {
-    return await api<MeSummaryResponseDto>("/api/activities/me/summary");
+  const getUserSummary = async (userId: string): Promise<MeSummaryResponseDto> => {
+    return await api<MeSummaryResponseDto>(`/api/users/${userId}/activities/summary`);
   };
 
   const getActivityEvents = async (id: string): Promise<ActivityEventResponseDto[]> => {
@@ -147,7 +147,7 @@ export const useActivities = () => {
     approveActivity,
     verifyActivity,
     rejectActivity,
-    getMySummary,
+    getUserSummary,
     getActivityEvents,
     filterByStatus,
   };
