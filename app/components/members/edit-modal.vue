@@ -13,6 +13,7 @@ const emit = defineEmits<{
 }>();
 
 const { patchUser, loading, error } = useUsers();
+const { curricula, getCurricula } = useCurricula();
 const { showToastSuccess, showToastError } = useToastNotification();
 
 const situationOptions = Object.values(Situation).map((value) => ({
@@ -20,18 +21,21 @@ const situationOptions = Object.values(Situation).map((value) => ({
   value,
 }));
 
-const curriculumOptions = Object.values(CurriculumYear).map((value) => ({
-  label: CurriculumYearLabels[value],
-  value,
-}));
+const curriculumOptions = computed(() =>
+  curricula.value.map((c) => ({
+    label: CurriculumYearLabels[c.year as CurriculumYear] ?? c.year,
+    value: c.year,
+  })),
+);
 
 const situation = ref<Situation | undefined>();
 const curriculumYear = ref<CurriculumYear | undefined>();
 
-watch(open, (value) => {
+watch(open, async (value) => {
   if (!value) return;
   situation.value = (props.user.situation as Situation | null) ?? undefined;
   curriculumYear.value = (props.user.curriculumYear as CurriculumYear | null) ?? undefined;
+  await getCurricula();
 });
 
 const hasChanges = computed(() => {

@@ -5,15 +5,19 @@ const emit = defineEmits(["saved"]);
 
 const { user, setUser } = useAuthState();
 const { patchUser, loading, error } = useUsers();
+const { curricula, getCurricula } = useCurricula();
 const { showToastSuccess, showToastError } = useToastNotification();
 
 const open = ref(false);
 const selectedYear = ref<CurriculumYear | undefined>();
+const fetchingCurricula = ref(false);
 
-const options = Object.values(CurriculumYear).map((value) => ({
-  label: CurriculumYearLabels[value],
-  value,
-}));
+const options = computed(() =>
+  curricula.value.map((c) => ({
+    label: CurriculumYearLabels[c.year as CurriculumYear] ?? c.year,
+    value: c.year,
+  })),
+);
 
 const handleSave = async () => {
   if (!selectedYear.value || !user.value) return;
@@ -28,9 +32,15 @@ const handleSave = async () => {
   }
 };
 
-const handleOpen = () => {
+const handleOpen = async () => {
   selectedYear.value = (user.value?.curriculumYear as CurriculumYear | null) ?? undefined;
   open.value = true;
+  fetchingCurricula.value = true;
+  try {
+    await getCurricula();
+  } finally {
+    fetchingCurricula.value = false;
+  }
 };
 </script>
 
@@ -52,7 +62,17 @@ const handleOpen = () => {
 
     <SGModal v-model:open="open" title="Currículo" description="Selecione o ano do seu currículo" test-id="curriculum-modal">
       <template #body>
+        <div v-if="fetchingCurricula" class="flex items-center justify-center py-6">
+          <span class="h-5 w-5 animate-spin rounded-full border-2 border-neutral-200 border-t-primary-500" />
+        </div>
+        <div
+          v-else-if="options.length === 0"
+          class="rounded-lg border border-dashed border-neutral-200 p-4 text-center text-sm text-neutral-500"
+        >
+          Nenhum currículo configurado. Contate o administrador.
+        </div>
         <SGSelect
+          v-else
           v-model="selectedYear"
           :options="options"
           placeholder="Selecione o ano"

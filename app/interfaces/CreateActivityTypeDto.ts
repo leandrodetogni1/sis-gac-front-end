@@ -3,6 +3,4 @@ export interface CreateActivityTypeDto {
   label: string;
   category: string;
   unity: string;
-  maxHoursInComplementarActivities: number;
-  maxHoursPerCertificateOrSemester: number;
 }

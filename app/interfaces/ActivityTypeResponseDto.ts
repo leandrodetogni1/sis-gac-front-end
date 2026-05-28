@@ -2,8 +2,6 @@ export interface ActivityTypeResponseDto {
   id: string;
   cod: string;
   label: string;
-  maxHoursInComplementarActivities: number | null;
-  maxHoursPerCertificateOrSemester: number | null;
   category: string | null;
   unity: string | null;
 }

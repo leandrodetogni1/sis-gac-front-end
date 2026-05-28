@@ -4,10 +4,11 @@ import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 import { Situation, SituationLabels } from "~/enums/Situation";
 
 definePageMeta({ layout: false });
-useHead({ title: "Bem-vindo — SWGAC" });
+useHead({ title: "Bem-vindo — SISGAC" });
 
 const { user, setUser } = useAuthState();
 const { patchUser, loading, error } = useUsers();
+const { curricula, getCurricula } = useCurricula();
 
 const matricula = ref<string>("");
 const course = ref<Course | undefined>();
@@ -19,15 +20,21 @@ const courseOptions = Object.values(Course).map((value) => ({
   value,
 }));
 
-const curriculumYearOptions = Object.values(CurriculumYear).map((value) => ({
-  label: CurriculumYearLabels[value],
-  value,
-}));
+const curriculumYearOptions = computed(() =>
+  curricula.value.map((c) => ({
+    label: CurriculumYearLabels[c.year as CurriculumYear] ?? c.year,
+    value: c.year,
+  })),
+);
 
 const situationOptions = Object.values(Situation).map((value) => ({
   label: SituationLabels[value],
   value,
 }));
+
+onMounted(async () => {
+  await getCurricula();
+});
 
 const isValid = computed(() => {
   const mat = matricula.value.trim();
@@ -82,10 +89,17 @@ const submit = async () => {
         <div class="space-y-1.5">
           <label class="text-sm font-medium text-neutral-700">Currículo</label>
           <SGSelect
+            v-if="curriculumYearOptions.length > 0"
             v-model="curriculumYear"
             placeholder="Selecione o ano do seu currículo"
             :options="curriculumYearOptions"
           />
+          <p
+            v-else
+            class="rounded-md border border-dashed border-neutral-200 px-3 py-2 text-xs text-neutral-500"
+          >
+            Nenhum currículo configurado. Contate o administrador.
+          </p>
         </div>
 
         <div class="space-y-1.5">

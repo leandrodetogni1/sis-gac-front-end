@@ -82,6 +82,8 @@ const isValid = computed(() => {
   return true;
 });
 
+const curriculumError = ref<string | null>(null);
+
 const handleFileChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
   if (input.files && input.files.length > 0) {
@@ -112,13 +114,20 @@ const handleSubmit = async () => {
     ...(trimmedCertificate ? { certificateUrl: trimmedCertificate } : {}),
   };
 
+  curriculumError.value = null;
   try {
     await createActivity(payload);
     showToastSuccess("Atividade criada com sucesso");
     router.push(listPath.value);
   } catch (e: any) {
-    console.error(e?.data?.message ?? e);
-    showToastError("Erro ao criar atividade");
+    const status = e?.statusCode ?? e?.response?.status ?? e?.status;
+    const rawMessage = e?.data?.message ?? e?.response?._data?.message;
+    const message = Array.isArray(rawMessage) ? rawMessage.join(", ") : rawMessage;
+    if (status === 422 && message) {
+      curriculumError.value = message;
+      return;
+    }
+    showToastError(message ?? "Erro ao criar atividade");
   }
 };
 </script>
@@ -136,6 +145,26 @@ const handleSubmit = async () => {
       </button>
       <h1 class="mt-2 text-xl font-bold text-neutral-900 md:text-2xl">Nova Atividade</h1>
       <p class="mt-1 text-sm text-neutral-500">Preencha os dados para registrar uma nova atividade.</p>
+    </div>
+
+    <div
+      v-if="curriculumError"
+      class="mb-5 flex items-start gap-3 rounded-lg border border-error-200 bg-error-50 px-4 py-3"
+      data-testid="curriculum-error-banner"
+      role="alert"
+    >
+      <Icon name="lucide:circle-alert" size="1.25rem" class="mt-0.5 shrink-0 text-error-600" />
+      <div class="flex-1">
+        <p class="text-sm font-semibold text-error-700">Não foi possível criar a atividade</p>
+        <p class="mt-0.5 text-sm text-error-700">{{ curriculumError }}</p>
+      </div>
+      <button
+        class="rounded-md p-1 text-error-500 transition-colors hover:bg-error-100 hover:text-error-700"
+        aria-label="Fechar"
+        @click="curriculumError = null"
+      >
+        <Icon name="lucide:x" size="1rem" />
+      </button>
     </div>
 
     <form data-testid="create-activity-form" @submit.prevent="handleSubmit">

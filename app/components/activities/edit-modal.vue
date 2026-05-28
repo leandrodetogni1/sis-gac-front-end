@@ -32,6 +32,7 @@ const startDate = ref("");
 const endDate = ref("");
 const certificateUrl = ref("");
 const submitting = ref(false);
+const curriculumError = ref<string | null>(null);
 
 const toIsoDate = (value: string | null): string => {
   if (!value) return "";
@@ -54,7 +55,10 @@ const resetForm = () => {
 watch(
   () => [props.activity?.id, open.value] as const,
   ([, isOpen]) => {
-    if (isOpen) resetForm();
+    if (isOpen) {
+      resetForm();
+      curriculumError.value = null;
+    }
   },
   { immediate: true },
 );
@@ -155,14 +159,21 @@ const handleSubmit = async () => {
   }
 
   submitting.value = true;
+  curriculumError.value = null;
   try {
     await updateActivity(props.activity.id, payload);
     showToastSuccess("Atividade atualizada com sucesso");
     open.value = false;
     emit("updated");
   } catch (e: any) {
-    const message = e?.data?.message ?? "Erro ao atualizar atividade";
-    showToastError(message);
+    const status = e?.statusCode ?? e?.response?.status ?? e?.status;
+    const rawMessage = e?.data?.message ?? e?.response?._data?.message;
+    const message = Array.isArray(rawMessage) ? rawMessage.join(", ") : rawMessage;
+    if (status === 422 && message) {
+      curriculumError.value = message;
+      return;
+    }
+    showToastError(message ?? "Erro ao atualizar atividade");
   } finally {
     submitting.value = false;
   }
@@ -177,6 +188,26 @@ const handleSubmit = async () => {
     test-id="activity-edit-modal"
   >
     <template #body>
+      <div
+        v-if="curriculumError"
+        class="mb-4 flex items-start gap-3 rounded-lg border border-error-200 bg-error-50 px-4 py-3"
+        data-testid="edit-curriculum-error-banner"
+        role="alert"
+      >
+        <Icon name="lucide:circle-alert" size="1.25rem" class="mt-0.5 shrink-0 text-error-600" />
+        <div class="flex-1">
+          <p class="text-sm font-semibold text-error-700">Não foi possível atualizar a atividade</p>
+          <p class="mt-0.5 text-sm text-error-700">{{ curriculumError }}</p>
+        </div>
+        <button
+          class="rounded-md p-1 text-error-500 transition-colors hover:bg-error-100 hover:text-error-700"
+          aria-label="Fechar"
+          @click="curriculumError = null"
+        >
+          <Icon name="lucide:x" size="1rem" />
+        </button>
+      </div>
+
       <form class="grid grid-cols-1 gap-4 sm:grid-cols-2" data-testid="edit-activity-form" @submit.prevent="handleSubmit">
         <div class="sm:col-span-2">
           <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Evento <span class="text-error-500">*</span> </label>

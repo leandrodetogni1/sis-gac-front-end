@@ -226,14 +226,16 @@ onMounted(async () => {
             <template #cell-status="{ item: row }">
               <span
                 v-if="row.kind === 'invitation'"
-                class="inline-flex items-center rounded-full border border-[#F9D500]/30 bg-[#F9D500]/10 px-2.5 py-0.5 text-xs font-semibold text-[#A68A00]"
+                class="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700"
               >
+                <span class="h-1.5 w-1.5 rounded-full bg-amber-500" />
                 Pendente
               </span>
               <span
                 v-else
-                class="inline-flex items-center rounded-full border border-[#BCCF00]/30 bg-[#BCCF00]/10 px-2.5 py-0.5 text-xs font-semibold text-[#7A8800]"
+                class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700"
               >
+                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
                 Ativo
               </span>
             </template>
@@ -325,8 +327,9 @@ onMounted(async () => {
                   {{ roleLabel(row.role) }}
                   <span
                     v-if="row.kind === 'invitation'"
-                    class="inline-flex items-center rounded-full border border-[#F9D500]/30 bg-[#F9D500]/10 px-2 py-0.5 text-[10px] font-semibold text-[#A68A00]"
+                    class="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
                   >
+                    <span class="h-1 w-1 rounded-full bg-amber-500" />
                     Pendente
                   </span>
                 </span>

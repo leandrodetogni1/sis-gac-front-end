@@ -34,7 +34,7 @@ const allNavItems: NavItem[] = [
     ownerOnly: true,
     children: [
       { label: "Usuários", icon: "lucide:users", to: "/config/users", testId: "sidebar-link-users" },
-      { label: "Atividades", icon: "lucide:file-text", to: "/config/activity-types", testId: "sidebar-link-activity-types" },
+      { label: "Currículos", icon: "lucide:book-open", to: "/config/curriculos", testId: "sidebar-link-curriculos" },
     ],
   },
 ];
