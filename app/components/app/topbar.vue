@@ -69,9 +69,9 @@ const handleSignOut = async () => {
     class="sticky top-0 z-50 flex h-16 items-stretch"
     data-testid="topbar"
   >
-    <div class="flex shrink-0 items-center gap-3 bg-linear-to-b from-primary-500 to-primary-600 px-4 md:px-6 lg:w-64">
+    <div class="flex shrink-0 items-center gap-3 bg-linear-to-b from-primary-500 to-primary-600 px-4 md:px-6 lg:hidden">
       <button
-        class="-ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10 active:bg-white/20 lg:hidden"
+        class="-ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10 active:bg-white/20"
         data-testid="topbar-menu-button"
         :aria-label="isSidebarOpen ? 'Fechar menu' : 'Abrir menu'"
         :aria-expanded="isSidebarOpen"

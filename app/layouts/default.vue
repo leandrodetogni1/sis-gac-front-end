@@ -95,23 +95,30 @@ watch(
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col bg-neutral-50">
-    <app-topbar :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
+  <div class="flex min-h-screen bg-neutral-50">
+    <Transition name="fade">
+      <div v-if="isSidebarOpen" class="fixed inset-x-0 bottom-0 top-16 z-30 bg-primary-950/60 backdrop-blur-sm lg:hidden" data-testid="sidebar-overlay" @click="isSidebarOpen = false" />
+    </Transition>
 
-    <div class="flex flex-1">
-      <Transition name="fade">
-        <div v-if="isSidebarOpen" class="fixed inset-x-0 bottom-0 top-16 z-30 bg-primary-950/60 backdrop-blur-sm lg:hidden" data-testid="sidebar-overlay" @click="isSidebarOpen = false" />
-      </Transition>
+    <aside
+      :class="[
+        'fixed bottom-0 left-0 top-16 z-40 flex w-64 flex-col overflow-hidden bg-linear-to-b from-primary-600 via-primary-700 to-primary-800 shadow-2xl shadow-primary-950/30 transition-transform duration-300 lg:sticky lg:top-0 lg:bottom-auto lg:h-screen lg:translate-x-0 lg:shadow-none',
+        isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
+      ]"
+      data-testid="sidebar"
+    >
+      <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-secondary-400/10 blur-3xl" aria-hidden="true" />
+      <div class="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-primary-400/10 blur-3xl" aria-hidden="true" />
 
-      <aside
-        :class="[
-          'fixed bottom-0 left-0 top-16 z-40 flex w-64 flex-col overflow-hidden bg-linear-to-b from-primary-600 via-primary-700 to-primary-800 shadow-2xl shadow-primary-950/30 transition-transform duration-300 lg:sticky lg:bottom-auto lg:top-16 lg:h-[calc(100vh-4rem)] lg:translate-x-0 lg:shadow-none',
-          isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
-        ]"
-        data-testid="sidebar"
-      >
-        <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-secondary-400/10 blur-3xl" aria-hidden="true" />
-        <div class="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-primary-400/10 blur-3xl" aria-hidden="true" />
+      <div class="relative hidden h-16 shrink-0 items-center justify-center lg:flex">
+        <NuxtLink
+          to="/"
+          class="select-none text-3xl font-extrabold italic tracking-tighter text-white transition-opacity hover:opacity-80"
+          aria-label="SISGAC"
+        >
+          SISGAC
+        </NuxtLink>
+      </div>
 
         <nav class="relative flex-1 space-y-1 overflow-y-auto px-3 py-5">
           <template v-for="item in navItems" :key="item.to">
@@ -191,6 +198,9 @@ watch(
           </p>
         </div>
       </aside>
+
+    <div class="flex min-w-0 flex-1 flex-col">
+      <app-topbar :is-sidebar-open="isSidebarOpen" @toggle-sidebar="isSidebarOpen = !isSidebarOpen" />
 
       <main class="min-w-0 flex-1 p-4 md:p-6">
         <slot />
