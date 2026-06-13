@@ -157,12 +157,14 @@ onMounted(async () => {
     </div>
 
     <div v-else class="space-y-6">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <h2 class="text-base font-semibold text-neutral-900 md:text-lg">Usuários</h2>
         <SGButton
           test-id="toggle-invitation-form-button"
           variant="primary"
           icon="lucide:user-plus"
+          block
+          class="min-h-11 sm:min-h-0 sm:w-auto"
           @click="openInvitationModal = true"
         >
           Convidar admin/reviewer
@@ -250,6 +252,7 @@ onMounted(async () => {
                 :data-testid="`delete-user-${row.id}`"
                 class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-neutral-400"
                 :disabled="loading || row.isOwner"
+                :aria-label="row.isOwner ? 'Não é possível remover o owner' : 'Remover usuário'"
                 :title="row.isOwner ? 'Não é possível remover o owner' : 'Remover usuário'"
                 @click="handleDelete(row.id, `${row.firstName} ${row.lastName}`)"
               >
@@ -260,6 +263,7 @@ onMounted(async () => {
                 :data-testid="`revoke-invitation-${row.id}`"
                 class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
                 :disabled="invitationsLoading"
+                aria-label="Revogar convite"
                 title="Revogar convite"
                 @click="handleRevoke(row.id, row.email)"
               >
@@ -299,14 +303,15 @@ onMounted(async () => {
                     <p v-if="row.kind === 'user'" class="font-medium text-neutral-900">
                       {{ row.firstName }} {{ row.lastName }}
                     </p>
-                    <p v-else class="text-sm italic text-neutral-400">Aguardando 1º acesso</p>
-                    <p class="text-xs text-neutral-500">{{ row.email }}</p>
+                    <p v-else class="text-sm italic text-neutral-500">Aguardando 1º acesso</p>
+                    <p class="text-sm text-neutral-500">{{ row.email }}</p>
                   </div>
                 </div>
                 <button
                   v-if="row.kind === 'user'"
                   :data-testid="`delete-user-mobile-${row.id}`"
-                  class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 disabled:opacity-40"
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 disabled:opacity-40 sm:h-9 sm:w-9"
+                  aria-label="Remover usuário"
                   :disabled="loading || row.isOwner"
                   @click="handleDelete(row.id, `${row.firstName} ${row.lastName}`)"
                 >
@@ -315,7 +320,8 @@ onMounted(async () => {
                 <button
                   v-else
                   :data-testid="`revoke-invitation-mobile-${row.id}`"
-                  class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
+                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 sm:h-9 sm:w-9"
+                  aria-label="Revogar convite"
                   :disabled="invitationsLoading"
                   @click="handleRevoke(row.id, row.email)"
                 >
@@ -327,7 +333,7 @@ onMounted(async () => {
                   {{ roleLabel(row.role) }}
                   <span
                     v-if="row.kind === 'invitation'"
-                    class="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-[10px] font-semibold text-amber-700"
+                    class="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700"
                   >
                     <span class="h-1 w-1 rounded-full bg-amber-500" />
                     Pendente
