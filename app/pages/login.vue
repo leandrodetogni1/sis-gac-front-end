@@ -27,13 +27,15 @@ onMounted(async () => {
     >
       <div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-secondary-400/15 blur-3xl" aria-hidden="true" />
       <div class="pointer-events-none absolute -bottom-32 -left-24 h-112 w-md rounded-full bg-primary-400/15 blur-3xl" aria-hidden="true" />
-      <div class="pointer-events-none absolute inset-0 opacity-[0.04] mix-blend-overlay" aria-hidden="true" style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px;" />
+      <div
+        class="pointer-events-none absolute inset-0 opacity-[0.04] mix-blend-overlay"
+        aria-hidden="true"
+        style="background-image: radial-gradient(circle at 1px 1px, white 1px, transparent 0); background-size: 24px 24px"
+      />
 
       <div class="relative flex items-center gap-3">
         <div class="h-px w-8 bg-white/40" />
-        <span class="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70">
-          Sistema de Gestão Acadêmica
-        </span>
+        <span class="text-[11px] font-semibold uppercase tracking-[0.22em] text-white/70"> Sistema de Gestão Acadêmica </span>
       </div>
 
       <div class="relative flex flex-col py-5 lg:flex-1 lg:justify-center lg:py-0">
@@ -43,79 +45,68 @@ onMounted(async () => {
         >
           SISGAC
         </h1>
-        <p class="mt-3 max-w-lg text-sm text-white/75 sm:text-lg lg:mt-6 lg:text-xl">
-          Gestão de Atividades Complementares.
-          <span class="block text-white/50">Cadastre, valide e acompanhe o progresso curricular.</span>
-        </p>
+        <p class="mt-3 max-w-lg text-sm text-white/75 sm:text-lg lg:mt-6 lg:text-xl">Gestão de Atividades Complementares.</p>
       </div>
 
-      <div class="relative mt-8 hidden flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-[11px] text-white/50 lg:mt-0 lg:flex">
+      <div
+        class="relative mt-8 hidden flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-[11px] text-white/50 lg:mt-0 lg:flex"
+      >
         <span>© 2026 SISGAC</span>
-        <span class="inline-flex items-center gap-1.5 font-semibold uppercase tracking-wider">
-          <span class="h-1.5 w-1.5 rounded-full bg-emerald-400" />
-          Sistema online
-        </span>
       </div>
     </section>
 
     <section
-      class="flex w-full flex-1 items-center justify-center bg-white px-6 py-10 sm:px-10 lg:w-136 lg:flex-none lg:px-12"
+      class="flex w-full flex-1 flex-col items-center bg-white px-6 py-10 sm:px-10 lg:w-136 lg:flex-none lg:justify-center lg:px-12"
       aria-label="Autenticação"
     >
-      <div class="w-full max-w-sm">
-        <div class="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-primary-600">
-          <span class="h-1 w-1 rounded-full bg-primary-600" />
-          Bem-vindo
+      <div class="flex w-full max-w-sm flex-1 flex-col lg:flex-none">
+        <div>
+          <div class="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-primary-600">Bem-vindo</div>
+
+          <h2 class="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">Acesse sua conta</h2>
+
+          <p class="mt-3 text-sm leading-relaxed text-neutral-500">Use sua conta Google para entrar</p>
         </div>
 
-        <h2 class="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">
-          Acesse sua conta
-        </h2>
+        <div class="flex flex-1 flex-col justify-center lg:mt-8 lg:flex-none lg:justify-start">
+          <div class="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-4">
+            <div class="mb-3 flex items-center gap-2">
+              <Icon name="lucide:shield-check" size="0.875rem" class="text-primary-600" />
+              <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-700"> Autenticação segura </span>
+            </div>
 
-        <p class="mt-3 text-sm leading-relaxed text-neutral-500">
-          Use sua conta Google para entrar. Apenas usuários previamente cadastrados podem acessar.
-        </p>
-
-        <div class="mt-8 rounded-2xl border border-neutral-200 bg-neutral-50/50 p-4">
-          <div class="mb-3 flex items-center gap-2">
-            <Icon name="lucide:shield-check" size="0.875rem" class="text-primary-600" />
-            <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-700">
-              Autenticação segura
-            </span>
+            <div class="flex min-h-11 items-center justify-center">
+              <div ref="buttonRef" data-testid="google-signin-button" />
+            </div>
           </div>
 
-          <div class="flex min-h-11 items-center justify-center">
-            <div ref="buttonRef" data-testid="google-signin-button" />
+          <div
+            v-if="error"
+            class="mt-4 flex items-start gap-3 rounded-lg border border-error-200 bg-error-50 px-3 py-2.5"
+            data-testid="login-error"
+            role="alert"
+          >
+            <Icon name="lucide:circle-alert" size="1rem" class="mt-0.5 shrink-0 text-error-600" />
+            <p class="text-sm text-error-700">{{ error }}</p>
+          </div>
+
+          <div v-else-if="loading" class="mt-4 flex items-center justify-center gap-2 text-xs text-neutral-400">
+            <span class="h-3 w-3 animate-spin rounded-full border-2 border-neutral-300 border-t-primary-500" />
+            Carregando autenticação...
           </div>
         </div>
 
-        <div
-          v-if="error"
-          class="mt-4 flex items-start gap-3 rounded-lg border border-error-200 bg-error-50 px-3 py-2.5"
-          data-testid="login-error"
-          role="alert"
-        >
-          <Icon name="lucide:circle-alert" size="1rem" class="mt-0.5 shrink-0 text-error-600" />
-          <p class="text-sm text-error-700">{{ error }}</p>
-        </div>
+        <div class="mt-8">
+          <div class="flex items-center gap-3">
+            <div class="h-px flex-1 bg-neutral-200" />
+            <span class="text-xs font-medium uppercase tracking-widest text-neutral-400">Suporte</span>
+            <div class="h-px flex-1 bg-neutral-200" />
+          </div>
 
-        <div
-          v-else-if="loading"
-          class="mt-4 flex items-center justify-center gap-2 text-xs text-neutral-400"
-        >
-          <span class="h-3 w-3 animate-spin rounded-full border-2 border-neutral-300 border-t-primary-500" />
-          Carregando autenticação...
+          <p class="mt-4 text-center text-xs leading-relaxed text-neutral-500">
+            Problemas para entrar? Entre em contato com o administrador do sistema.
+          </p>
         </div>
-
-        <div class="mt-8 flex items-center gap-3">
-          <div class="h-px flex-1 bg-neutral-200" />
-          <span class="text-[10px] font-medium uppercase tracking-widest text-neutral-400">Suporte</span>
-          <div class="h-px flex-1 bg-neutral-200" />
-        </div>
-
-        <p class="mt-4 text-center text-xs leading-relaxed text-neutral-400">
-          Problemas para entrar? Entre em contato com o administrador do sistema.
-        </p>
       </div>
     </section>
   </div>
