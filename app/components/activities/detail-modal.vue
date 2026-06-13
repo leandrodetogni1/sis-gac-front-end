@@ -96,7 +96,7 @@ const handleVerify = async () => {
   open.value = false;
   await nextTick();
   const confirmed = await confirmAlert(
-    `A atividade "${label.value}" será verificada e enviada para aprovação da coordenação.`,
+    `A atividade "${label.value}" será verificada e enviada para aprovação da comissão.`,
     "Verificar atividade?",
   );
   if (!confirmed) {
