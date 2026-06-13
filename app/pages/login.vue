@@ -20,9 +20,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <div class="flex min-h-screen flex-col lg:flex-row">
+  <div class="flex min-h-dvh flex-col lg:flex-row">
     <section
-      class="relative flex flex-col overflow-hidden bg-linear-to-br from-primary-600 via-primary-700 to-primary-800 px-6 py-10 sm:px-10 lg:flex-1 lg:px-16 lg:py-16"
+      class="relative flex flex-col overflow-hidden bg-linear-to-br from-primary-600 via-primary-700 to-primary-800 px-6 py-7 sm:px-10 lg:flex-1 lg:px-16 lg:py-16"
       aria-labelledby="brand-wordmark"
     >
       <div class="pointer-events-none absolute -right-24 -top-24 h-96 w-96 rounded-full bg-secondary-400/15 blur-3xl" aria-hidden="true" />
@@ -36,20 +36,20 @@ onMounted(async () => {
         </span>
       </div>
 
-      <div class="relative flex flex-1 flex-col justify-center py-12 lg:py-0">
+      <div class="relative flex flex-col py-5 lg:flex-1 lg:justify-center lg:py-0">
         <h1
           id="brand-wordmark"
-          class="select-none text-6xl font-extrabold italic leading-none tracking-tighter text-white sm:text-7xl lg:text-8xl xl:text-9xl"
+          class="select-none text-5xl font-extrabold italic leading-none tracking-tighter text-white sm:text-6xl lg:text-8xl xl:text-9xl"
         >
           SISGAC
         </h1>
-        <p class="mt-6 max-w-lg text-base text-white/75 sm:text-lg lg:text-xl">
+        <p class="mt-3 max-w-lg text-sm text-white/75 sm:text-lg lg:mt-6 lg:text-xl">
           Gestão de Atividades Complementares.
           <span class="block text-white/50">Cadastre, valide e acompanhe o progresso curricular.</span>
         </p>
       </div>
 
-      <div class="relative mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-[11px] text-white/50 lg:mt-0">
+      <div class="relative mt-8 hidden flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-4 text-[11px] text-white/50 lg:mt-0 lg:flex">
         <span>© 2026 SISGAC</span>
         <span class="inline-flex items-center gap-1.5 font-semibold uppercase tracking-wider">
           <span class="h-1.5 w-1.5 rounded-full bg-emerald-400" />
@@ -59,7 +59,7 @@ onMounted(async () => {
     </section>
 
     <section
-      class="flex w-full items-center justify-center bg-white px-6 py-12 sm:px-10 lg:w-136 lg:px-12"
+      class="flex w-full flex-1 items-center justify-center bg-white px-6 py-10 sm:px-10 lg:w-136 lg:flex-none lg:px-12"
       aria-label="Autenticação"
     >
       <div class="w-full max-w-sm">
