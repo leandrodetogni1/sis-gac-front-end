@@ -102,13 +102,13 @@ watch(
 
     <aside
       :class="[
-        'fixed bottom-0 left-0 top-16 z-40 flex w-64 flex-col overflow-hidden bg-linear-to-b from-primary-600 via-primary-700 to-primary-800 shadow-2xl shadow-primary-950/30 transition-transform duration-300 lg:sticky lg:top-0 lg:bottom-auto lg:h-screen lg:translate-x-0 lg:shadow-none',
+        'fixed bottom-0 left-0 top-16 z-40 flex w-full flex-col overflow-hidden bg-white transition-transform duration-300 lg:sticky lg:top-0 lg:bottom-auto lg:h-screen lg:w-64 lg:translate-x-0 lg:bg-linear-to-b lg:from-primary-600 lg:via-primary-700 lg:to-primary-800 lg:shadow-none',
         isSidebarOpen ? 'translate-x-0' : '-translate-x-full',
       ]"
       data-testid="sidebar"
     >
-      <div class="pointer-events-none absolute -right-16 -top-16 h-64 w-64 rounded-full bg-secondary-400/10 blur-3xl" aria-hidden="true" />
-      <div class="pointer-events-none absolute -bottom-24 -left-16 h-72 w-72 rounded-full bg-primary-400/10 blur-3xl" aria-hidden="true" />
+      <div class="pointer-events-none absolute -right-16 -top-16 hidden h-64 w-64 rounded-full bg-secondary-400/10 blur-3xl lg:block" aria-hidden="true" />
+      <div class="pointer-events-none absolute -bottom-24 -left-16 hidden h-72 w-72 rounded-full bg-primary-400/10 blur-3xl lg:block" aria-hidden="true" />
 
       <div class="relative hidden h-16 shrink-0 items-center justify-center lg:flex">
         <NuxtLink
@@ -120,22 +120,22 @@ watch(
         </NuxtLink>
       </div>
 
-        <nav class="relative flex-1 space-y-1 overflow-y-auto px-3 py-5">
+        <nav class="relative flex-1 space-y-1.5 overflow-y-auto px-4 py-6 lg:space-y-1 lg:px-3 lg:py-5">
           <template v-for="item in navItems" :key="item.to">
             <template v-if="item.children">
               <button
                 :data-testid="item.testId"
                 :class="[
-                  'group relative flex min-h-11 w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200',
+                  'group relative flex min-h-12 w-full items-center justify-between rounded-lg px-3 py-3 text-base font-medium transition-colors duration-200 lg:min-h-11 lg:py-2.5 lg:text-sm',
                   isItemActive(item)
-                    ? 'bg-white/10 text-white'
-                    : 'text-white/70 hover:bg-white/5 hover:text-white',
+                    ? 'bg-primary-50 text-primary-700 lg:bg-white/10 lg:text-white'
+                    : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 lg:text-white/70 lg:hover:bg-white/5 lg:hover:text-white',
                 ]"
                 @click="toggleMenu(item.to)"
               >
                 <span
                   v-if="isItemActive(item)"
-                  class="absolute -left-3 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-white"
+                  class="absolute -left-3 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-primary-600 lg:bg-white"
                   aria-hidden="true"
                 />
                 <span class="flex items-center gap-3">
@@ -145,7 +145,7 @@ watch(
                 <Icon
                   name="lucide:chevron-down"
                   size="1rem"
-                  :class="['text-white/50 transition-transform duration-200', isExpanded(item) ? 'rotate-180' : '']"
+                  :class="['text-neutral-400 transition-transform duration-200 lg:text-white/50', isExpanded(item) ? 'rotate-180' : '']"
                 />
               </button>
 
@@ -156,10 +156,10 @@ watch(
                   :to="child.to"
                   :data-testid="child.testId"
                   :class="[
-                    'flex min-h-11 items-center gap-3 rounded-lg border-l border-white/10 px-3 py-2 text-sm font-medium transition-colors duration-200',
+                    'flex min-h-12 items-center gap-3 rounded-lg border-l border-neutral-200 px-3 py-2.5 text-base font-medium transition-colors duration-200 lg:min-h-11 lg:border-white/10 lg:py-2 lg:text-sm',
                     isChildActive(child)
-                      ? 'border-white bg-white/10 text-white'
-                      : 'text-white/60 hover:border-white/30 hover:bg-white/5 hover:text-white',
+                      ? 'border-primary-600 bg-primary-50 text-primary-700 lg:border-white lg:bg-white/10 lg:text-white'
+                      : 'text-neutral-500 hover:border-neutral-300 hover:bg-neutral-100 hover:text-neutral-900 lg:text-white/60 lg:hover:border-white/30 lg:hover:bg-white/5 lg:hover:text-white',
                   ]"
                   @click="isSidebarOpen = false"
                 >
@@ -174,16 +174,16 @@ watch(
               :to="item.to"
               :data-testid="item.testId"
               :class="[
-                'group relative flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200',
+                'group relative flex min-h-12 items-center gap-3 rounded-lg px-3 py-3 text-base font-medium transition-colors duration-200 lg:min-h-11 lg:py-2.5 lg:text-sm',
                 isItemActive(item)
-                  ? 'bg-white/10 text-white'
-                  : 'text-white/70 hover:bg-white/5 hover:text-white',
+                  ? 'bg-primary-50 text-primary-700 lg:bg-white/10 lg:text-white'
+                  : 'text-neutral-600 hover:bg-neutral-100 hover:text-neutral-900 lg:text-white/70 lg:hover:bg-white/5 lg:hover:text-white',
               ]"
               @click="isSidebarOpen = false"
             >
               <span
                 v-if="isItemActive(item)"
-                class="absolute -left-3 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-white"
+                class="absolute -left-3 top-1/2 h-6 w-1 -translate-y-1/2 rounded-r-full bg-primary-600 lg:bg-white"
                 aria-hidden="true"
               />
               <Icon :name="item.icon" size="1.25rem" />
@@ -193,7 +193,7 @@ watch(
         </nav>
 
         <div class="relative px-6 pb-5 pt-3">
-          <p class="text-xs font-semibold uppercase tracking-widest text-white/50">
+          <p class="text-xs font-semibold uppercase tracking-widest text-neutral-400 lg:text-white/50">
             v1.0
           </p>
         </div>
