@@ -16,7 +16,11 @@ const percentage = computed(() => {
   return pct;
 });
 
-const barColor = computed(() => (props.meetsMinimum ? "bg-success-500" : "bg-primary-500"));
+const barColor = computed(() => {
+  if (props.meetsMinimum) return "bg-success-500";
+  if (percentage.value < 50) return "bg-error-500";
+  return "bg-warning-500";
+});
 </script>
 
 <template>

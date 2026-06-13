@@ -36,6 +36,12 @@ const progressPct = (achieved: number, required: number) => {
   return Math.min(100, Math.max(0, (achieved / required) * 100));
 };
 
+const barColor = (achieved: number, required: number, gap: number) => {
+  if (gap === 0) return "bg-success-500";
+  if (progressPct(achieved, required) < 50) return "bg-error-500";
+  return "bg-warning-500";
+};
+
 const hasComplementarBreakdown = (formando: AdminDashboardFormando) => {
   return formando.complementaryGap > 0 || formando.categoryGaps.some((c) => c.gap > 0);
 };
@@ -151,7 +157,7 @@ const hasComplementarBreakdown = (formando: AdminDashboardFormando) => {
                 <div class="h-1.5 w-full overflow-hidden rounded-full bg-neutral-200">
                   <div
                     class="h-full rounded-full transition-all"
-                    :class="cat.gap === 0 ? 'bg-success-500' : 'bg-error-400'"
+                    :class="barColor(cat.achieved, cat.required, cat.gap)"
                     :style="{ width: `${progressPct(cat.achieved, cat.required)}%` }"
                   />
                 </div>
