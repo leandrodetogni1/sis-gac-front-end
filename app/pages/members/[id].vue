@@ -102,7 +102,7 @@ onMounted(async () => {
     <div v-else>
       <div class="mb-6 flex items-center gap-3">
         <button
-          class="flex items-center gap-1.5 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+          class="-my-1.5 flex min-h-11 items-center gap-1.5 py-1.5 text-sm text-neutral-500 transition-colors hover:text-neutral-900 sm:my-0 sm:min-h-0 sm:py-0"
           data-testid="back-button"
           @click="router.back()"
         >
@@ -134,6 +134,7 @@ onMounted(async () => {
               size="sm"
               icon="lucide:pencil"
               test-id="member-edit-button"
+              class="min-h-11 sm:min-h-0"
               @click="editOpen = true"
             >
               Editar
@@ -142,23 +143,23 @@ onMounted(async () => {
 
           <div class="mt-5 grid grid-cols-2 gap-4 border-t border-neutral-100 pt-4 text-sm md:grid-cols-3 lg:grid-cols-5">
             <div>
-              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Matrícula</p>
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-500">Matrícula</p>
               <p class="mt-0.5 font-medium text-neutral-900 tabular-nums">{{ matriculaLabel }}</p>
             </div>
             <div>
-              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Curso</p>
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-500">Curso</p>
               <p class="mt-0.5 font-medium text-neutral-900">{{ courseLabel }}</p>
             </div>
             <div>
-              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Currículo</p>
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-500">Currículo</p>
               <p class="mt-0.5 font-medium text-neutral-900">{{ curriculumLabel }}</p>
             </div>
             <div>
-              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Situação</p>
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-500">Situação</p>
               <p class="mt-0.5 font-medium text-neutral-900">{{ situationLabel }}</p>
             </div>
             <div>
-              <p class="text-xs font-medium uppercase tracking-wide text-neutral-400">Cadastrado em</p>
+              <p class="text-xs font-medium uppercase tracking-wide text-neutral-500">Cadastrado em</p>
               <p class="mt-0.5 font-medium text-neutral-900">{{ createdAt }}</p>
             </div>
           </div>

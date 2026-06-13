@@ -115,6 +115,15 @@ const formatSituation = (value: string | null) => {
   return SituationLabels[value as Situation] ?? value;
 };
 
+const situationBadgeClass = (value: string | null) => {
+  const map: Record<string, string> = {
+    [Situation.REGULAR]: "border-neutral-200 bg-neutral-100 text-neutral-700",
+    [Situation.FORMANDO]: "border-amber-200 bg-amber-50 text-amber-700",
+    [Situation.FORMADO]: "border-success-200 bg-success-50 text-success-700",
+  };
+  return map[value ?? ""] ?? "border-neutral-200 bg-neutral-100 text-neutral-700";
+};
+
 onMounted(fetchMembers);
 </script>
 
@@ -197,7 +206,11 @@ onMounted(fetchMembers);
           </template>
 
           <template #cell-situation="{ item: member }">
-            <span class="text-neutral-500">{{ formatSituation(member.situation) }}</span>
+            <span
+              :class="['inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold', situationBadgeClass(member.situation)]"
+            >
+              {{ formatSituation(member.situation) }}
+            </span>
           </template>
 
           <template #cell-createdAt="{ item: member }">
@@ -213,16 +226,23 @@ onMounted(fetchMembers);
                   :picture="member.picture"
                   size="sm"
                 />
-                <div>
+                <div class="min-w-0">
                   <p class="font-medium text-neutral-900">{{ member.firstName }} {{ member.lastName }}</p>
-                  <p class="text-xs text-neutral-500">{{ member.email }}</p>
+                  <p class="truncate text-sm text-neutral-500">{{ member.email }}</p>
                 </div>
               </div>
-              <Icon name="lucide:chevron-right" size="1.125rem" class="text-neutral-400" />
+              <Icon name="lucide:chevron-right" size="1.125rem" class="shrink-0 text-neutral-400" />
             </div>
-            <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
-              <span>{{ member.matricula ?? "—" }} · {{ formatCourse(member.course) }} · {{ formatSituation(member.situation) }}</span>
-              <span>{{ formatDateTimeBR(member.createdAt) }}</span>
+            <div class="mt-2 flex flex-col gap-1.5 text-sm text-neutral-500">
+              <span>{{ member.matricula ?? "—" }} · {{ formatCourse(member.course) }}</span>
+              <div class="flex items-center justify-between gap-2">
+                <span
+                  :class="['inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold', situationBadgeClass(member.situation)]"
+                >
+                  {{ formatSituation(member.situation) }}
+                </span>
+                <span class="text-xs text-neutral-500">{{ formatDateTimeBR(member.createdAt) }}</span>
+              </div>
             </div>
           </template>
         </SGTable>
