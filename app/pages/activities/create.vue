@@ -24,6 +24,7 @@ const startDate = ref("");
 const endDate = ref("");
 const certificateUrl = ref("");
 const fileName = ref("");
+const fileInput = ref<HTMLInputElement | null>(null);
 
 const classOptions = [
   { label: "Complementar", value: "COMPLEMENTAR" },
@@ -88,6 +89,13 @@ const handleFileChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
   if (input.files && input.files.length > 0) {
     fileName.value = input.files[0]!.name;
+  }
+};
+
+const handleFileRemove = () => {
+  fileName.value = "";
+  if (fileInput.value) {
+    fileInput.value.value = "";
   }
 };
 
@@ -273,7 +281,17 @@ const handleSubmit = async () => {
               <p v-else class="text-sm text-neutral-600">Clique para enviar um arquivo</p>
               <p class="mt-0.5 text-xs text-neutral-400">PDF, PNG ou JPG até 5MB</p>
             </div>
-            <input type="file" class="hidden" accept=".pdf,.png,.jpg,.jpeg" @change="handleFileChange" />
+            <button
+              v-if="fileName"
+              type="button"
+              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
+              data-testid="file-remove-button"
+              aria-label="Remover arquivo"
+              @click.stop.prevent="handleFileRemove"
+            >
+              <Icon name="lucide:x" size="1.125rem" />
+            </button>
+            <input ref="fileInput" type="file" class="hidden" accept=".pdf,.png,.jpg,.jpeg" @change="handleFileChange" />
           </label>
         </div>
       </div>
