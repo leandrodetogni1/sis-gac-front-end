@@ -144,7 +144,7 @@ const handleSubmit = async () => {
   <div class="mx-auto max-w-2xl py-6">
     <div class="mb-6">
       <button
-        class="flex items-center gap-1 text-sm text-neutral-500 transition-colors hover:text-neutral-900"
+        class="-my-1.5 flex min-h-11 items-center gap-1 py-1.5 text-sm text-neutral-500 transition-colors hover:text-neutral-900 sm:my-0 sm:min-h-0 sm:py-0"
         data-testid="back-button"
         @click="router.back()"
       >
@@ -249,7 +249,7 @@ const handleSubmit = async () => {
 
           <div class="sm:col-span-2">
             <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-              Link de validação do certificado <span class="text-xs text-neutral-400">(opcional)</span>
+              Link de validação do certificado <span class="text-xs text-neutral-500">(opcional)</span>
             </label>
             <SGInput
               v-model="certificateUrl"
@@ -279,12 +279,12 @@ const handleSubmit = async () => {
                 {{ fileName }}
               </p>
               <p v-else class="text-sm text-neutral-600">Clique para enviar um arquivo</p>
-              <p class="mt-0.5 text-xs text-neutral-400">PDF, PNG ou JPG até 5MB</p>
+              <p class="mt-0.5 text-xs text-neutral-500">PDF, PNG ou JPG até 5MB</p>
             </div>
             <button
               v-if="fileName"
               type="button"
-              class="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 sm:h-9 sm:w-9"
               data-testid="file-remove-button"
               aria-label="Remover arquivo"
               @click.stop.prevent="handleFileRemove"
@@ -296,9 +296,9 @@ const handleSubmit = async () => {
         </div>
       </div>
 
-      <div class="mt-8 flex items-center justify-end gap-3 border-t border-neutral-200 pt-6">
-        <SGButton variant="secondary" test-id="cancel-button" type="button" @click="router.back()"> Cancelar </SGButton>
-        <SGButton variant="primary" test-id="submit-button" type="submit" :loading="loading" :disabled="!isValid || loading"> Criar </SGButton>
+      <div class="mt-8 flex flex-col-reverse gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-end">
+        <SGButton variant="secondary" test-id="cancel-button" type="button" block class="min-h-11 sm:min-h-0 sm:w-auto" @click="router.back()"> Cancelar </SGButton>
+        <SGButton variant="primary" test-id="submit-button" type="submit" :loading="loading" :disabled="!isValid || loading" block class="min-h-11 sm:min-h-0 sm:w-auto"> Criar </SGButton>
       </div>
     </form>
   </div>
