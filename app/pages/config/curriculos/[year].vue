@@ -318,7 +318,7 @@ onMounted(async () => {
           </div>
           <button
             v-if="canEdit"
-            class="inline-flex shrink-0 items-center gap-1.5 rounded-md border border-error-200 bg-white px-3 py-1.5 text-xs font-medium text-error-600 transition-colors hover:border-error-300 hover:bg-error-50 disabled:cursor-not-allowed disabled:opacity-40"
+            class="inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-md border border-error-200 bg-white px-3 py-1.5 text-xs font-medium text-error-600 transition-colors hover:border-error-300 hover:bg-error-50 disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-8"
             data-testid="delete-curriculum-button"
             :disabled="loading || anyEditing"
             title="Remove o currículo inteiro e todas as suas regras"
@@ -342,7 +342,7 @@ onMounted(async () => {
 
           <button
             v-if="canEdit"
-            class="inline-flex items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-medium text-neutral-700 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-40"
+            class="inline-flex min-h-11 items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2.5 py-1.5 text-xs font-medium text-neutral-700 transition-colors hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 disabled:cursor-not-allowed disabled:opacity-40 sm:min-h-8"
             data-testid="edit-global-button"
             :disabled="anyEditing"
             @click="startEditGlobal"
@@ -403,11 +403,11 @@ onMounted(async () => {
           <div
             v-for="course in Object.values(Course)"
             :key="course"
-            class="grid grid-cols-[1fr_auto_auto] items-center gap-4 py-3 first:pt-0 last:pb-0"
+            class="flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0 sm:grid sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-4"
             :data-testid="`course-row-${course}`"
           >
             <div class="min-w-0">
-              <p class="truncate text-sm font-medium text-neutral-900">
+              <p class="text-sm font-medium text-neutral-900 sm:truncate" :title="CourseLabels[course]">
                 {{ CourseLabels[course] }}
               </p>
               <p v-if="!hasCourseRule(course)" class="mt-0.5 text-xs text-neutral-400">
@@ -415,27 +415,29 @@ onMounted(async () => {
               </p>
             </div>
 
-            <div class="w-44 shrink-0">
-              <div v-if="hasCourseRule(course)" class="text-right text-sm tabular-nums">
-                <span class="font-semibold text-neutral-900">{{ courseRulesState[course]?.totalMin }}</span>
-                <span class="mx-1 text-neutral-300">/</span>
-                <span class="font-semibold text-neutral-900">{{ courseRulesState[course]?.totalMax }}</span>
-                <span class="ml-0.5 text-neutral-400">h</span>
+            <div class="flex items-center justify-between gap-3 sm:contents">
+              <div class="w-auto sm:w-44 sm:shrink-0">
+                <div v-if="hasCourseRule(course)" class="text-left text-sm tabular-nums sm:text-right">
+                  <span class="font-semibold text-neutral-900">{{ courseRulesState[course]?.totalMin }}</span>
+                  <span class="mx-1 text-neutral-300">/</span>
+                  <span class="font-semibold text-neutral-900">{{ courseRulesState[course]?.totalMax }}</span>
+                  <span class="ml-0.5 text-neutral-400">h</span>
+                </div>
+                <div v-else class="text-left text-sm text-neutral-300 sm:text-right">—</div>
               </div>
-              <div v-else class="text-right text-sm text-neutral-300">—</div>
-            </div>
 
-            <div v-if="canEdit" class="flex shrink-0 items-center gap-1">
-              <button
-                class="rounded-md p-1.5 text-neutral-500 transition-colors hover:bg-primary-50 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-40"
-                :data-testid="`edit-course-${course}`"
-                :disabled="anyEditing"
-                :title="hasCourseRule(course) ? 'Editar' : 'Configurar'"
-                :aria-label="hasCourseRule(course) ? 'Editar' : 'Configurar'"
-                @click="startEditCourse(course)"
-              >
-                <Icon :name="hasCourseRule(course) ? 'lucide:pencil' : 'lucide:plus'" size="1rem" />
-              </button>
+              <div v-if="canEdit" class="flex shrink-0 items-center gap-1">
+                <button
+                  class="flex h-11 w-11 items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-primary-50 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-40 sm:h-8 sm:w-8"
+                  :data-testid="`edit-course-${course}`"
+                  :disabled="anyEditing"
+                  :title="hasCourseRule(course) ? 'Editar' : 'Configurar'"
+                  :aria-label="hasCourseRule(course) ? 'Editar' : 'Configurar'"
+                  @click="startEditCourse(course)"
+                >
+                  <Icon :name="hasCourseRule(course) ? 'lucide:pencil' : 'lucide:plus'" size="1rem" />
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -456,7 +458,7 @@ onMounted(async () => {
         <div v-else class="space-y-5">
           <section v-for="cat in groupKeys" :key="cat">
             <div class="mb-1 flex items-center gap-3">
-              <h3 class="text-[10px] font-bold uppercase tracking-[0.15em] text-neutral-500">
+              <h3 class="text-[11px] font-bold uppercase tracking-[0.15em] text-neutral-500 sm:text-[10px]">
                 {{ categoryLabels[cat] ?? cat }}
               </h3>
               <div class="h-px flex-1 bg-neutral-200" />
@@ -466,7 +468,7 @@ onMounted(async () => {
               <div
                 v-for="type in groupedActivityTypes[cat]"
                 :key="type.cod"
-                class="grid grid-cols-[1fr_auto_auto] items-center gap-4 py-2.5"
+                class="flex flex-col gap-1.5 py-2.5 sm:grid sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-4"
                 :data-testid="`activity-type-row-${type.cod}`"
               >
                 <div class="flex min-w-0 items-center gap-2.5">
@@ -474,35 +476,37 @@ onMounted(async () => {
                     {{ type.cod }}
                   </span>
                   <div class="min-w-0">
-                    <p class="truncate text-sm font-medium text-neutral-900">{{ type.label }}</p>
+                    <p class="text-sm font-medium text-neutral-900 sm:truncate" :title="type.label">{{ type.label }}</p>
                     <p v-if="!hasActivityTypeRule(type.cod)" class="mt-0.5 text-xs text-neutral-400">
                       Não configurado
                     </p>
                   </div>
                 </div>
 
-                <div class="w-44 shrink-0">
-                  <div v-if="hasActivityTypeRule(type.cod)" class="text-right text-sm tabular-nums">
-                    <span class="font-semibold text-neutral-900">{{ activityTypeRulesState[type.cod]?.maxHoursTotal }}</span>
-                    <span class="ml-0.5 text-neutral-400">h</span>
-                    <span class="mx-1 text-neutral-300">·</span>
-                    <span class="font-semibold text-neutral-900">{{ activityTypeRulesState[type.cod]?.maxHoursPerCertificateOrSemester }}</span>
-                    <span class="ml-0.5 text-neutral-400">/un</span>
+                <div class="flex items-center justify-between gap-3 pl-9 sm:contents sm:pl-0">
+                  <div class="w-auto sm:w-44 sm:shrink-0">
+                    <div v-if="hasActivityTypeRule(type.cod)" class="text-left text-sm tabular-nums sm:text-right">
+                      <span class="font-semibold text-neutral-900">{{ activityTypeRulesState[type.cod]?.maxHoursTotal }}</span>
+                      <span class="ml-0.5 text-neutral-400">h</span>
+                      <span class="mx-1 text-neutral-300">·</span>
+                      <span class="font-semibold text-neutral-900">{{ activityTypeRulesState[type.cod]?.maxHoursPerCertificateOrSemester }}</span>
+                      <span class="ml-0.5 text-neutral-400">/un</span>
+                    </div>
+                    <div v-else class="text-left text-sm text-neutral-300 sm:text-right">—</div>
                   </div>
-                  <div v-else class="text-right text-sm text-neutral-300">—</div>
-                </div>
 
-                <div v-if="canEdit" class="flex shrink-0 items-center gap-1">
-                  <button
-                    class="rounded-md p-1.5 text-neutral-500 transition-colors hover:bg-primary-50 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-40"
-                    :data-testid="`edit-activity-type-${type.cod}`"
-                    :disabled="anyEditing"
-                    :title="hasActivityTypeRule(type.cod) ? 'Editar' : 'Configurar'"
-                    :aria-label="hasActivityTypeRule(type.cod) ? 'Editar' : 'Configurar'"
-                    @click="startEditActivityType(type.cod)"
-                  >
-                    <Icon :name="hasActivityTypeRule(type.cod) ? 'lucide:pencil' : 'lucide:plus'" size="1rem" />
-                  </button>
+                  <div v-if="canEdit" class="flex shrink-0 items-center gap-1">
+                    <button
+                      class="flex h-11 w-11 items-center justify-center rounded-md text-neutral-500 transition-colors hover:bg-primary-50 hover:text-primary-600 disabled:cursor-not-allowed disabled:opacity-40 sm:h-8 sm:w-8"
+                      :data-testid="`edit-activity-type-${type.cod}`"
+                      :disabled="anyEditing"
+                      :title="hasActivityTypeRule(type.cod) ? 'Editar' : 'Configurar'"
+                      :aria-label="hasActivityTypeRule(type.cod) ? 'Editar' : 'Configurar'"
+                      @click="startEditActivityType(type.cod)"
+                    >
+                      <Icon :name="hasActivityTypeRule(type.cod) ? 'lucide:pencil' : 'lucide:plus'" size="1rem" />
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
