@@ -35,6 +35,8 @@ watch(targetUserId, async (id, prev) => {
   if (id && id !== prev) await fetchSummary();
 });
 
+defineExpose({ refresh: fetchSummary });
+
 const CATEGORY_LABELS: Record<SummaryCategory, string> = {
   ENSINO: "Ensino",
   PESQUISA: "Pesquisa",

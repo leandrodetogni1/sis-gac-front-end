@@ -28,6 +28,8 @@ const modalOpen = ref(false);
 
 const editOpen = ref(false);
 
+const summaryRef = ref<{ refresh: () => Promise<void> } | null>(null);
+
 const onUserUpdated = (updated: UserResponseDto) => {
   user.value = updated;
 };
@@ -69,7 +71,7 @@ const onSelect = (activity: ActivityResponseDto) => {
 
 const onStatusChanged = async () => {
   modalOpen.value = false;
-  await getActivitiesByUser(memberId.value);
+  await Promise.all([getActivitiesByUser(memberId.value), summaryRef.value?.refresh()]);
 };
 
 onMounted(async () => {
@@ -165,7 +167,7 @@ onMounted(async () => {
 
       <div class="mb-6">
         <h2 class="mb-3 text-base font-semibold text-neutral-900">Resumo</h2>
-        <dashboard-member-summary :user-id="memberId" />
+        <dashboard-member-summary ref="summaryRef" :user-id="memberId" />
       </div>
 
       <div>
