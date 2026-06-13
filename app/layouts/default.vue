@@ -126,7 +126,7 @@ watch(
               <button
                 :data-testid="item.testId"
                 :class="[
-                  'group relative flex w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200',
+                  'group relative flex min-h-11 w-full items-center justify-between rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200',
                   isItemActive(item)
                     ? 'bg-white/10 text-white'
                     : 'text-white/70 hover:bg-white/5 hover:text-white',
@@ -156,7 +156,7 @@ watch(
                   :to="child.to"
                   :data-testid="child.testId"
                   :class="[
-                    'flex items-center gap-3 rounded-lg border-l border-white/10 px-3 py-2 text-sm font-medium transition-colors duration-200',
+                    'flex min-h-11 items-center gap-3 rounded-lg border-l border-white/10 px-3 py-2 text-sm font-medium transition-colors duration-200',
                     isChildActive(child)
                       ? 'border-white bg-white/10 text-white'
                       : 'text-white/60 hover:border-white/30 hover:bg-white/5 hover:text-white',
@@ -174,7 +174,7 @@ watch(
               :to="item.to"
               :data-testid="item.testId"
               :class="[
-                'group relative flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200',
+                'group relative flex min-h-11 items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors duration-200',
                 isItemActive(item)
                   ? 'bg-white/10 text-white'
                   : 'text-white/70 hover:bg-white/5 hover:text-white',
@@ -193,7 +193,7 @@ watch(
         </nav>
 
         <div class="relative px-6 pb-5 pt-3">
-          <p class="text-[10px] font-semibold uppercase tracking-widest text-white/40">
+          <p class="text-xs font-semibold uppercase tracking-widest text-white/50">
             v1.0
           </p>
         </div>

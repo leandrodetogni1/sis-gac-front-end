@@ -71,7 +71,7 @@ const handleSignOut = async () => {
   >
     <div class="flex shrink-0 items-center gap-3 bg-linear-to-b from-primary-500 to-primary-600 px-4 md:px-6 lg:hidden">
       <button
-        class="-ml-1 flex h-10 w-10 shrink-0 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10 active:bg-white/20"
+        class="-ml-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-white transition-colors hover:bg-white/10 active:bg-white/20"
         data-testid="topbar-menu-button"
         :aria-label="isSidebarOpen ? 'Fechar menu' : 'Abrir menu'"
         :aria-expanded="isSidebarOpen"
@@ -93,7 +93,7 @@ const handleSignOut = async () => {
       <div ref="menuRef" class="relative">
       <button
         :class="[
-          'flex items-center gap-2.5 rounded-full border p-1 transition-all duration-200 md:pr-3',
+          'flex min-h-11 min-w-11 items-center justify-center gap-2.5 rounded-full border p-1 transition-all duration-200 md:min-h-0 md:min-w-0 md:justify-start md:pr-3',
           isMenuOpen
             ? 'border-primary-200 bg-primary-50 shadow-sm'
             : 'border-transparent hover:border-neutral-200 hover:bg-neutral-50',
@@ -113,7 +113,7 @@ const handleSignOut = async () => {
           <span class="max-w-40 truncate text-sm font-semibold text-neutral-900">
             {{ userFirstName }}
           </span>
-          <span v-if="roleLabel" class="text-[10px] font-medium uppercase tracking-wider text-neutral-500">
+          <span v-if="roleLabel" class="text-xs font-medium uppercase tracking-wider text-neutral-500">
             {{ roleLabel }}
           </span>
         </div>
@@ -160,7 +160,7 @@ const handleSignOut = async () => {
                 </p>
                 <span
                   v-if="roleLabel"
-                  class="mt-2 inline-flex items-center rounded-full bg-white/15 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white backdrop-blur-sm"
+                  class="mt-2 inline-flex items-center rounded-full bg-white/15 px-2 py-0.5 text-xs font-bold uppercase tracking-wider text-white backdrop-blur-sm"
                 >
                   {{ roleLabel }}
                 </span>
