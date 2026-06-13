@@ -22,6 +22,7 @@ const emit = defineEmits(["update:modelValue"]);
     class="w-full"
     value-key="value"
     label-key="label"
+    :ui="{ base: 'min-h-11 text-base sm:min-h-8 sm:text-sm', item: 'min-h-11 text-base sm:min-h-8 sm:text-sm' }"
     @update:model-value="emit('update:modelValue', $event)"
   />
 </template>

@@ -42,7 +42,7 @@ const displayText = computed(() => {
       type="button"
       :disabled="disabled"
       :data-testid="testId"
-      class="flex w-full items-center gap-2 rounded-md border border-accented bg-default px-2.5 py-1.5 text-sm transition-colors hover:border-inverted focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50"
+      class="flex min-h-11 w-full items-center gap-2 rounded-md border border-accented bg-default px-2.5 py-1.5 text-base transition-colors hover:border-inverted focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-8 sm:text-sm"
     >
       <Icon name="lucide:calendar" size="1rem" class="shrink-0 text-dimmed" />
       <span :class="calendarValue ? 'text-default' : 'text-dimmed'">

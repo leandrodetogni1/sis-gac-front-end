@@ -22,6 +22,7 @@ const emit = defineEmits(["update:modelValue"]);
     :data-testid="testId"
     color="primary"
     class="w-full"
+    :ui="{ base: 'min-h-11 text-base sm:min-h-8 sm:text-sm' }"
     @update:model-value="emit('update:modelValue', $event)"
   />
 </template>

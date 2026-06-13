@@ -9,7 +9,13 @@ const open = defineModel<boolean>("open", { default: false });
 </script>
 
 <template>
-  <UModal v-model:open="open" :title="props.title" :description="props.description" :data-testid="testId">
+  <UModal
+    v-model:open="open"
+    :title="props.title"
+    :description="props.description"
+    :data-testid="testId"
+    :ui="{ close: 'size-11 sm:size-8 inline-flex items-center justify-center' }"
+  >
     <template v-if="$slots.header" #header>
       <slot name="header" />
     </template>
