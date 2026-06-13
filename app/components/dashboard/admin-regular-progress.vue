@@ -44,7 +44,7 @@ const handleRowClick = (student: AdminDashboardRegularStudent) => {
       </div>
       <NuxtLink
         :to="{ path: '/members', query: { situation: Situation.REGULAR } }"
-        class="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-primary-600 transition-colors hover:text-primary-700"
+        class="-m-2 inline-flex shrink-0 items-center gap-1 p-2 text-xs font-medium text-primary-600 transition-colors hover:text-primary-700"
         data-testid="regular-ver-todos"
       >
         Ver todos

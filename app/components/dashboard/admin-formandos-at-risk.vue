@@ -41,7 +41,7 @@ const handleRowClick = (formando: AdminDashboardFormando) => {
       </div>
       <NuxtLink
         :to="{ path: '/members', query: { situation: Situation.FORMANDO } }"
-        class="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-primary-600 transition-colors hover:text-primary-700"
+        class="-m-2 inline-flex shrink-0 items-center gap-1 p-2 text-xs font-medium text-primary-600 transition-colors hover:text-primary-700"
         data-testid="formandos-ver-todos"
       >
         Ver todos
