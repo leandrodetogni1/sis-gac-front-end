@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { Course, CourseLabels } from "~/enums/Course";
 import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
+import { Situation } from "~/enums/Situation";
 import type { AdminDashboardRegularStudent } from "~/interfaces/AdminDashboardResponseDto";
 import type { SGTableColumn } from "~/types/SGTableColumn";
 
@@ -39,11 +40,16 @@ const handleRowClick = (student: AdminDashboardRegularStudent) => {
     <div class="mb-4 flex items-start justify-between gap-3">
       <div>
         <h3 class="text-base font-semibold text-neutral-900 md:text-lg">Alunos em andamento</h3>
-        <p class="mt-1 text-xs text-neutral-500">
-          Panorama dos alunos regulares — quem está mais perto de virar formando
-        </p>
+        <p class="mt-1 text-xs text-neutral-500">Panorama dos alunos regulares</p>
       </div>
-      <Icon name="lucide:trending-up" size="1.5rem" class="text-primary-500" />
+      <NuxtLink
+        :to="{ path: '/members', query: { situation: Situation.REGULAR } }"
+        class="inline-flex shrink-0 items-center gap-1 text-xs font-medium text-primary-600 transition-colors hover:text-primary-700"
+        data-testid="regular-ver-todos"
+      >
+        Ver todos
+        <Icon name="lucide:chevron-right" size="0.875rem" />
+      </NuxtLink>
     </div>
 
     <SGTable
@@ -58,12 +64,7 @@ const handleRowClick = (student: AdminDashboardRegularStudent) => {
     >
       <template #cell-name="{ item: student }">
         <div class="flex items-center gap-2.5">
-          <SGAvatar
-            :first-name="student.user.firstName"
-            :last-name="student.user.lastName"
-            :picture="student.user.picture"
-            size="sm"
-          />
+          <SGAvatar :first-name="student.user.firstName" :last-name="student.user.lastName" :picture="student.user.picture" size="sm" />
           <span class="font-medium text-neutral-900">{{ student.user.firstName }} {{ student.user.lastName }}</span>
         </div>
       </template>
@@ -101,12 +102,7 @@ const handleRowClick = (student: AdminDashboardRegularStudent) => {
       <template #mobile="{ item: student }">
         <div class="flex items-start justify-between gap-2">
           <div class="flex items-center gap-2.5">
-            <SGAvatar
-              :first-name="student.user.firstName"
-              :last-name="student.user.lastName"
-              :picture="student.user.picture"
-              size="sm"
-            />
+            <SGAvatar :first-name="student.user.firstName" :last-name="student.user.lastName" :picture="student.user.picture" size="sm" />
             <div>
               <p class="font-medium text-neutral-900">{{ student.user.firstName }} {{ student.user.lastName }}</p>
               <p class="text-xs text-neutral-500">{{ student.user.matricula ?? "—" }} · {{ formatCourse(student.user.course) }}</p>
