@@ -6,55 +6,70 @@ const props = defineProps<{
   verifiedCount: number;
 }>();
 
+const { user } = useAuthState();
+
+const isAdminOrOwner = computed(() => {
+  const role = user.value?.role;
+  return role === "admin" || role === "owner";
+});
+
 type Tile = {
   value: number;
   label: string;
   icon: string;
   testId: string;
   to: string;
+  adminOnly?: boolean;
 };
 
-const tiles = computed<Tile[]>(() => [
-  {
-    value: props.stats.totalUsers,
-    label: "Total de alunos",
-    icon: "lucide:users",
-    testId: "stat-total-users",
-    to: "/members",
-  },
-  {
-    value: props.stats.totalFormandos,
-    label: "Formandos",
-    icon: "lucide:graduation-cap",
-    testId: "stat-total-formandos",
-    to: "/members?situation=FORMANDO",
-  },
-  {
-    value: props.stats.activitiesApprovedLast30Days,
-    label: "Aprovadas (30 dias)",
-    icon: "lucide:check-circle-2",
-    testId: "stat-approved-30d",
-    to: "/activities?status=APPROVED",
-  },
-  {
-    value: props.stats.totalActivitiesPending,
-    label: "Pendentes",
-    icon: "lucide:clock",
-    testId: "stat-total-pending",
-    to: "/activities?status=PENDING",
-  },
-  {
-    value: props.verifiedCount,
-    label: "Verificadas",
-    icon: "lucide:badge-check",
-    testId: "stat-total-verified",
-    to: "/activities?status=VERIFIED",
-  },
-]);
+const tiles = computed<Tile[]>(() => {
+  const all: Tile[] = [
+    {
+      value: props.stats.totalUsers,
+      label: "Total de alunos",
+      icon: "lucide:users",
+      testId: "stat-total-users",
+      to: "/members",
+      adminOnly: true,
+    },
+    {
+      value: props.stats.totalFormandos,
+      label: "Formandos",
+      icon: "lucide:graduation-cap",
+      testId: "stat-total-formandos",
+      to: "/members?situation=FORMANDO",
+      adminOnly: true,
+    },
+    {
+      value: props.stats.activitiesApprovedLast30Days,
+      label: "Aprovadas (30 dias)",
+      icon: "lucide:check-circle-2",
+      testId: "stat-approved-30d",
+      to: "/activities?status=APPROVED",
+    },
+    {
+      value: props.stats.totalActivitiesPending,
+      label: "Pendentes",
+      icon: "lucide:clock",
+      testId: "stat-total-pending",
+      to: "/activities?status=PENDING",
+    },
+    {
+      value: props.verifiedCount,
+      label: "Verificadas",
+      icon: "lucide:badge-check",
+      testId: "stat-total-verified",
+      to: "/activities?status=VERIFIED",
+    },
+  ];
+  return all.filter((tile) => !tile.adminOnly || isAdminOrOwner.value);
+});
+
+const gridColsClass = computed(() => (tiles.value.length >= 5 ? "lg:grid-cols-5" : "lg:grid-cols-3"));
 </script>
 
 <template>
-  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-5" data-testid="admin-stats">
+  <div :class="['grid gap-4 sm:grid-cols-2', gridColsClass]" data-testid="admin-stats">
     <NuxtLink
       v-for="tile in tiles"
       :key="tile.testId"
