@@ -59,7 +59,22 @@ const dotClass = (status: ActivityStatus): string => {
     case "PENDING":
       return "bg-warning-500";
     default:
-      return "bg-accented";
+      return "bg-neutral-400";
+  }
+};
+
+const haloClass = (status: ActivityStatus): string => {
+  switch (status) {
+    case "APPROVED":
+      return "bg-success-500/15";
+    case "REJECTED":
+      return "bg-error-500/15";
+    case "VERIFIED":
+      return "bg-primary-500/15";
+    case "PENDING":
+      return "bg-warning-500/15";
+    default:
+      return "bg-neutral-400/15";
   }
 };
 </script>
@@ -78,13 +93,15 @@ const dotClass = (status: ActivityStatus): string => {
       Nenhum evento registrado.
     </p>
 
-    <ol v-else class="mt-4 space-y-5">
-      <li v-for="(event, index) in events" :key="event.id" class="flex gap-3.5">
+    <ol v-else class="mt-5 space-y-1">
+      <li v-for="(event, index) in events" :key="event.id" class="flex gap-3.5 pb-5 last:pb-0">
         <div class="flex flex-col items-center">
-          <span class="mt-1.5 h-2 w-2 shrink-0 rounded-full" :class="dotClass(event.toStatus)" />
-          <span v-if="index < events.length - 1" class="mt-2 w-px flex-1 bg-accented" />
+          <span class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full" :class="haloClass(event.toStatus)">
+            <span class="h-1.5 w-1.5 rounded-full" :class="dotClass(event.toStatus)" />
+          </span>
+          <span v-if="index < events.length - 1" class="mt-1.5 w-px flex-1 bg-accented" aria-hidden="true" />
         </div>
-        <div class="flex-1 pb-1">
+        <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
             <p class="text-sm font-medium text-highlighted">{{ eventLabel(event) }}</p>
             <time
@@ -96,7 +113,7 @@ const dotClass = (status: ActivityStatus): string => {
           </div>
           <div
             v-if="event.actor"
-            class="mt-1 flex items-center gap-1.5 text-xs text-toned"
+            class="mt-1.5 flex items-center gap-1.5 text-xs text-toned"
             :title="event.actor.email"
           >
             <SGAvatar
@@ -109,7 +126,7 @@ const dotClass = (status: ActivityStatus): string => {
           </div>
           <p
             v-if="event.comment && isStatusChange(event)"
-            class="mt-2 border-l-2 border-accented pl-3 text-xs italic text-toned"
+            class="mt-2 rounded-r-md border-l-2 border-accented bg-elevated px-3 py-2 text-xs italic text-toned"
           >
             {{ event.comment }}
           </p>
