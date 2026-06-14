@@ -56,7 +56,7 @@ const getUserName = (activity: ActivityResponseDto) => {
       </template>
 
       <template #cell-category="{ item: activity }">
-        <span class="text-neutral-500">{{ activity.activity_types?.category ?? "—" }}</span>
+        <span class="text-neutral-500">{{ formatCategory(activity.activity_types?.category) }}</span>
       </template>
 
       <template #cell-hours="{ item: activity }">
@@ -64,7 +64,7 @@ const getUserName = (activity: ActivityResponseDto) => {
       </template>
 
       <template #cell-startDate="{ item: activity }">
-        <span class="text-neutral-500">{{ formatDateTimeBR(activity.startDate) }}</span>
+        <span class="text-neutral-500">{{ formatDateBR(activity.startDate) }}</span>
       </template>
 
       <template v-if="showUser" #cell-user="{ item: activity }">

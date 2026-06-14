@@ -27,14 +27,14 @@ const userName = computed(() => {
       <div>
         <p class="font-medium text-highlighted">{{ label }}</p>
         <p class="mt-0.5 text-xs text-muted">
-          {{ activity.activity_types?.category ?? "—" }}<template v-if="showUser"> · {{ userName }}</template>
+          {{ formatCategory(activity.activity_types?.category) }}<template v-if="showUser"> · {{ userName }}</template>
         </p>
       </div>
       <SGBadge :status="activity.status || 'pending'" />
     </div>
     <div class="mt-2 flex items-center justify-between text-xs text-muted">
       <span class="font-medium text-toned">{{ activity.hoursEquivalent ?? activity.hours ?? 0 }}h</span>
-      <span>{{ formatDateTimeBR(activity.startDate) }}</span>
+      <span>{{ formatDateBR(activity.startDate) }}</span>
     </div>
   </div>
 </template>

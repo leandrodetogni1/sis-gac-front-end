@@ -157,7 +157,7 @@ const handleReject = async () => {
         <div class="grid grid-cols-2 gap-3 text-sm">
           <div>
             <p class="text-xs font-medium uppercase text-muted">Categoria</p>
-            <p class="mt-0.5 text-highlighted">{{ activity.activity_types?.category ?? "—" }}</p>
+            <p class="mt-0.5 text-highlighted">{{ formatCategory(activity.activity_types?.category) }}</p>
           </div>
           <div>
             <p class="text-xs font-medium uppercase text-muted">Horas reconhecidas</p>
@@ -173,11 +173,11 @@ const handleReject = async () => {
           </div>
           <div>
             <p class="text-xs font-medium uppercase text-muted">Data Início</p>
-            <p class="mt-0.5 text-highlighted">{{ formatDateTimeBR(activity.startDate) }}</p>
+            <p class="mt-0.5 text-highlighted">{{ formatDateBR(activity.startDate) }}</p>
           </div>
           <div>
             <p class="text-xs font-medium uppercase text-muted">Data Fim</p>
-            <p class="mt-0.5 text-highlighted">{{ formatDateTimeBR(activity.endDate) }}</p>
+            <p class="mt-0.5 text-highlighted">{{ formatDateBR(activity.endDate) }}</p>
           </div>
           <div v-if="showUser">
             <p class="text-xs font-medium uppercase text-muted">Aluno</p>
