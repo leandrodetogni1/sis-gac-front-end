@@ -35,6 +35,7 @@ const allNavItems: NavItem[] = [
     children: [
       { label: "Usuários", icon: "lucide:users", to: "/config/users", testId: "sidebar-link-users" },
       { label: "Currículos", icon: "lucide:book-open", to: "/config/curriculos", testId: "sidebar-link-curriculos" },
+      { label: "Auditoria", icon: "lucide:scroll-text", to: "/config/audit", testId: "sidebar-link-audit" },
     ],
   },
 ];
