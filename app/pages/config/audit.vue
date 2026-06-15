@@ -5,6 +5,7 @@ useHead({ title: "Auditoria — Configurações — SWGAC" });
 
 const { logs, total, page, limit, loading, fetched, error, getLogs } = useAudit();
 
+const actorId = ref("");
 const from = ref("");
 const to = ref("");
 const pageSize = ref("50");
@@ -25,6 +26,7 @@ const columns: SGTableColumn[] = [
 ];
 
 const buildFilters = () => ({
+  actorId: actorId.value || undefined,
   from: from.value ? `${from.value}T00:00:00` : undefined,
   to: to.value ? `${to.value}T23:59:59.999` : undefined,
   limit: Number(pageSize.value),
@@ -39,6 +41,7 @@ const applyFilters = () => {
 };
 
 const clearFilters = () => {
+  actorId.value = "";
   from.value = "";
   to.value = "";
   currentPage.value = 1;
@@ -57,7 +60,7 @@ const goToPage = (target: number) => {
 
 const actorName = (row: (typeof logs.value)[number]) => {
   if (row.actor) return `${row.actor.firstName} ${row.actor.lastName}`.trim();
-  return row.actorEmail ?? "Sistema";
+  return "Sistema";
 };
 
 const statusBadge = (code: number | null) => {
@@ -68,7 +71,7 @@ const statusBadge = (code: number | null) => {
   return { label: String(code), cls: "border-red-300 bg-red-50 text-red-700" };
 };
 
-watch(pageSize, () => {
+watch([pageSize, actorId], () => {
   applyFilters();
 });
 
@@ -98,6 +101,10 @@ onMounted(() => {
 
       <SGCard test-id="audit-filters">
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <label class="mb-1 block text-xs font-medium text-neutral-600">Ator</label>
+            <audit-actor-filter v-model="actorId" test-id="audit-filter-actor" />
+          </div>
           <div>
             <label class="mb-1 block text-xs font-medium text-neutral-600">De</label>
             <SGDatePicker v-model="from" placeholder="Data inicial" test-id="audit-filter-from" />
@@ -143,14 +150,29 @@ onMounted(() => {
           </template>
 
           <template #cell-actor="{ item: row }">
-            <div class="flex flex-col">
-              <span class="font-medium text-neutral-900">{{ actorName(row) }}</span>
-              <span v-if="row.actor && row.actorEmail" class="text-xs text-neutral-400">{{ row.actorEmail }}</span>
+            <div class="flex items-center gap-2.5">
+              <SGAvatar
+                v-if="row.actor"
+                :first-name="row.actor.firstName"
+                :last-name="row.actor.lastName"
+                :picture="row.actor.picture"
+                size="sm"
+              />
+              <div
+                v-else
+                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400"
+              >
+                <Icon name="lucide:server" size="1rem" />
+              </div>
+              <div class="flex flex-col">
+                <span class="font-medium text-neutral-900">{{ actorName(row) }}</span>
+                <span v-if="row.actor" class="text-xs text-neutral-400">{{ row.actor.email }}</span>
+              </div>
             </div>
           </template>
 
           <template #cell-action="{ item: row }">
-            <span class="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-xs text-neutral-700">{{ row.action }}</span>
+            <span class="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700" :title="row.action">{{ formatAuditAction(row.action) }}</span>
           </template>
 
           <template #cell-status="{ item: row }">
@@ -170,12 +192,27 @@ onMounted(() => {
 
           <template #mobile="{ item: row }">
             <div class="flex items-start justify-between gap-2">
-              <div class="min-w-0">
-                <p class="truncate font-medium text-neutral-900">{{ actorName(row) }}</p>
-                <p v-if="row.actor && row.actorEmail" class="truncate text-xs text-neutral-400">{{ row.actorEmail }}</p>
-                <p class="mt-1">
-                  <span class="rounded bg-neutral-100 px-1.5 py-0.5 font-mono text-xs text-neutral-700">{{ row.action }}</span>
-                </p>
+              <div class="flex min-w-0 items-start gap-2.5">
+                <SGAvatar
+                  v-if="row.actor"
+                  :first-name="row.actor.firstName"
+                  :last-name="row.actor.lastName"
+                  :picture="row.actor.picture"
+                  size="sm"
+                />
+                <div
+                  v-else
+                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400"
+                >
+                  <Icon name="lucide:server" size="1rem" />
+                </div>
+                <div class="min-w-0">
+                  <p class="truncate font-medium text-neutral-900">{{ actorName(row) }}</p>
+                  <p v-if="row.actor" class="truncate text-xs text-neutral-400">{{ row.actor.email }}</p>
+                  <p class="mt-1">
+                    <span class="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700" :title="row.action">{{ formatAuditAction(row.action) }}</span>
+                  </p>
+                </div>
               </div>
               <span
                 :class="['shrink-0 inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold', statusBadge(row.statusCode).cls]"

@@ -3,12 +3,11 @@ export interface AuditActorDto {
   email: string;
   firstName: string;
   lastName: string;
+  picture: string | null;
 }
 
 export interface AuditLogResponseDto {
   id: string;
-  actorId: string | null;
-  actorEmail: string | null;
   action: string;
   entityType: string | null;
   entityId: string | null;
