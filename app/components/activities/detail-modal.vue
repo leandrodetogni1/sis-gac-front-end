@@ -215,20 +215,25 @@ const handleReject = async () => {
               </button>
             </div>
 
+            <p v-else class="mt-0.5 text-muted">—</p>
+          </div>
+
+          <div>
+            <p class="text-xs font-medium uppercase text-muted">Link</p>
+
             <a
               v-if="activity.certificateUrl"
               :href="activity.certificateUrl"
               target="_blank"
               rel="noopener noreferrer"
               class="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
-              :class="{ 'mt-2': activity.file }"
               data-testid="certificate-link"
             >
               <Icon name="lucide:external-link" size="0.875rem" />
               Abrir link
             </a>
 
-            <p v-if="!activity.file && !activity.certificateUrl" class="mt-0.5 text-muted">—</p>
+            <p v-else class="mt-0.5 text-muted">—</p>
           </div>
         </div>
 
