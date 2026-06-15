@@ -11,9 +11,11 @@ const props = withDefaults(
 
 const emit = defineEmits(["select"]);
 
-const label = computed(() => {
-  return props.activity.activity_types?.label ?? props.activity.event ?? "—";
+const title = computed(() => {
+  return props.activity.event ?? props.activity.activity_types?.label ?? "—";
 });
+
+const typeLabel = computed(() => props.activity.activity_types?.label ?? null);
 
 const userName = computed(() => {
   if (!props.activity.users) return "—";
@@ -25,9 +27,9 @@ const userName = computed(() => {
   <div class="cursor-pointer rounded-lg border border-default p-3 transition-colors hover:bg-elevated" :data-testid="`activity-card-${activity.id}`" @click="emit('select', activity)">
     <div class="flex items-start justify-between gap-2">
       <div>
-        <p class="font-medium text-highlighted">{{ label }}</p>
+        <p class="font-medium text-highlighted">{{ title }}</p>
         <p class="mt-0.5 text-xs text-muted">
-          {{ formatCategory(activity.activity_types?.category) }}<template v-if="showUser"> · {{ userName }}</template>
+          <template v-if="typeLabel && activity.event">{{ typeLabel }} · </template>{{ formatCategory(activity.activity_types?.category) }}<template v-if="showUser"> · {{ userName }}</template>
         </p>
       </div>
       <SGBadge :status="activity.status || 'pending'" />

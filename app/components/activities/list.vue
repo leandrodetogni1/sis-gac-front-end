@@ -16,6 +16,7 @@ const emit = defineEmits(["retry", "select"]);
 
 const columns = computed<SGTableColumn[]>(() => {
   const base: SGTableColumn[] = [
+    { key: "event", label: "Evento" },
     { key: "activity", label: "Atividade" },
     { key: "category", label: "Categoria" },
     { key: "hours", label: "Horas" },
@@ -51,8 +52,12 @@ const getUserName = (activity: ActivityResponseDto) => {
       @retry="emit('retry')"
       @row-click="emit('select', $event)"
     >
+      <template #cell-event="{ item: activity }">
+        <span class="font-medium text-neutral-900">{{ activity.event ?? "—" }}</span>
+      </template>
+
       <template #cell-activity="{ item: activity }">
-        <span class="font-medium text-neutral-900">{{ getLabel(activity) }}</span>
+        <span class="text-neutral-500">{{ getLabel(activity) }}</span>
       </template>
 
       <template #cell-category="{ item: activity }">
