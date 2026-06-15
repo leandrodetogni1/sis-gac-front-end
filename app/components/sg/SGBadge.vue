@@ -9,27 +9,27 @@ const badgeConfig = computed(() => {
   const configs: Record<string, { label: string; bg: string; text: string; border: string }> = {
     approved: {
       label: "Aprovado",
-      bg: "bg-[#BCCF00]/10",
-      text: "text-[#BCCF00]",
-      border: "border-[#BCCF00]/30",
+      bg: "bg-[#16A34A]/12",
+      text: "text-[#15803D]",
+      border: "border-[#16A34A]/30",
     },
     pending: {
       label: "Pendente",
-      bg: "bg-[#F9D500]/10",
-      text: "text-[#F9D500]",
-      border: "border-[#F9D500]/30",
+      bg: "bg-[#F59E0B]/15",
+      text: "text-[#B45309]",
+      border: "border-[#F59E0B]/35",
     },
     verified: {
       label: "Verificado",
-      bg: "bg-[#1E88E5]/10",
-      text: "text-[#1E88E5]",
-      border: "border-[#1E88E5]/30",
+      bg: "bg-[#2563EB]/12",
+      text: "text-[#1D4ED8]",
+      border: "border-[#2563EB]/30",
     },
     rejected: {
       label: "Rejeitado",
-      bg: "bg-[#C00D0D]/10",
-      text: "text-[#C00D0D]",
-      border: "border-[#C00D0D]/30",
+      bg: "bg-[#DC2626]/12",
+      text: "text-[#B91C1C]",
+      border: "border-[#DC2626]/30",
     },
   };
   return configs[normalizedStatus] ?? configs.pending;

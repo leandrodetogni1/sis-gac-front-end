@@ -51,13 +51,13 @@ const eventLabel = (event: ActivityEventResponseDto): string => {
 const dotClass = (status: ActivityStatus): string => {
   switch (status) {
     case "APPROVED":
-      return "bg-success-500";
+      return "bg-[#16A34A]";
     case "REJECTED":
-      return "bg-error-500";
+      return "bg-[#DC2626]";
     case "VERIFIED":
-      return "bg-primary-500";
+      return "bg-[#2563EB]";
     case "PENDING":
-      return "bg-warning-500";
+      return "bg-[#F59E0B]";
     default:
       return "bg-neutral-400";
   }
@@ -66,13 +66,13 @@ const dotClass = (status: ActivityStatus): string => {
 const haloClass = (status: ActivityStatus): string => {
   switch (status) {
     case "APPROVED":
-      return "bg-success-500/15";
+      return "bg-[#16A34A]/15";
     case "REJECTED":
-      return "bg-error-500/15";
+      return "bg-[#DC2626]/15";
     case "VERIFIED":
-      return "bg-primary-500/15";
+      return "bg-[#2563EB]/15";
     case "PENDING":
-      return "bg-warning-500/15";
+      return "bg-[#F59E0B]/15";
     default:
       return "bg-neutral-400/15";
   }
@@ -93,13 +93,17 @@ const haloClass = (status: ActivityStatus): string => {
       Nenhum evento registrado.
     </p>
 
-    <ol v-else class="mt-5 space-y-1">
-      <li v-for="(event, index) in events" :key="event.id" class="flex gap-3.5 pb-5 last:pb-0">
+    <ol v-else class="relative mt-5">
+      <li v-for="(event, index) in events" :key="event.id" class="relative flex gap-3.5 pb-6 last:pb-0">
+        <span
+          v-if="index < events.length - 1"
+          class="absolute left-[7.5px] top-5 -bottom-2.5 w-px bg-accented"
+          aria-hidden="true"
+        />
         <div class="flex flex-col items-center">
-          <span class="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full" :class="haloClass(event.toStatus)">
+          <span class="relative z-10 mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-full" :class="haloClass(event.toStatus)">
             <span class="h-1.5 w-1.5 rounded-full" :class="dotClass(event.toStatus)" />
           </span>
-          <span v-if="index < events.length - 1" class="mt-1.5 w-px flex-1 bg-accented" aria-hidden="true" />
         </div>
         <div class="min-w-0 flex-1">
           <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
