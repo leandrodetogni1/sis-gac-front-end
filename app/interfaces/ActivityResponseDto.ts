@@ -18,6 +18,19 @@ export interface ActivityResponseDto {
   updatedAt: string | null;
   users: ActivityUserSummaryDto | null;
   activity_types: ActivityTypeSummaryDto | null;
+  file: ActivityFileDto | null;
+}
+
+export interface ActivityFileDto {
+  filename: string;
+  mimeType: string;
+  size: number;
+  createdAt: string;
+}
+
+export interface CreateActivityResponseDto {
+  message: string;
+  activity: ActivityResponseDto;
 }
 
 export interface ActivityTypeSummaryDto {

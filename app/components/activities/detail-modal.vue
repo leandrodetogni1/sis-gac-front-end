@@ -14,11 +14,27 @@ const open = defineModel<boolean>("open", { default: false });
 const emit = defineEmits(["approved", "verified", "rejected", "edit"]);
 
 const { user } = useAuthState();
-const { approveActivity, verifyActivity, rejectActivity } = useActivities();
+const { approveActivity, verifyActivity, rejectActivity, getActivityFile } = useActivities();
 const { showToastSuccess, showToastError } = useToastNotification();
 const { confirmAlert } = useAlerts();
 
 const actionLoading = ref(false);
+const fileLoading = ref(false);
+
+const openCertificateFile = async () => {
+  if (!props.activity?.id || fileLoading.value) return;
+  fileLoading.value = true;
+  try {
+    const blob = await getActivityFile(props.activity.id);
+    const url = URL.createObjectURL(blob);
+    window.open(url, "_blank");
+    setTimeout(() => URL.revokeObjectURL(url), 60000);
+  } catch {
+    showToastError("Não foi possível abrir o certificado");
+  } finally {
+    fileLoading.value = false;
+  }
+};
 
 const isReviewer = computed(() => user.value?.role === "reviewer");
 const isAdminOrOwner = computed(() => user.value?.role === "admin" || user.value?.role === "owner");
@@ -185,18 +201,34 @@ const handleReject = async () => {
           </div>
           <div>
             <p class="text-xs font-medium uppercase text-muted">Certificado</p>
+
+            <div v-if="activity.file" class="mt-1">
+              <button
+                type="button"
+                class="inline-flex w-fit items-center gap-1.5 rounded-md border border-default bg-elevated px-2.5 py-1.5 text-sm text-highlighted transition-colors hover:border-primary-300 hover:text-primary disabled:opacity-50"
+                data-testid="certificate-file-button"
+                :disabled="fileLoading"
+                @click="openCertificateFile"
+              >
+                <Icon :name="fileLoading ? 'lucide:loader-circle' : 'lucide:file-text'" size="0.95rem" :class="fileLoading ? 'animate-spin' : ''" />
+                Ver certificado
+              </button>
+            </div>
+
             <a
               v-if="activity.certificateUrl"
               :href="activity.certificateUrl"
               target="_blank"
               rel="noopener noreferrer"
-              class="mt-0.5 inline-flex items-center gap-1 text-primary hover:underline"
+              class="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
+              :class="{ 'mt-2': activity.file }"
               data-testid="certificate-link"
             >
               <Icon name="lucide:external-link" size="0.875rem" />
               Abrir link
             </a>
-            <p v-else class="mt-0.5 text-muted">—</p>
+
+            <p v-if="!activity.file && !activity.certificateUrl" class="mt-0.5 text-muted">—</p>
           </div>
         </div>
 

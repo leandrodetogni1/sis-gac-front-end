@@ -1,5 +1,5 @@
 import type { ActivityEventResponseDto } from "~/interfaces/ActivityEventResponseDto";
-import type { ActivityResponseDto, ActivityStatus } from "~/interfaces/ActivityResponseDto";
+import type { ActivityResponseDto, ActivityStatus, CreateActivityResponseDto } from "~/interfaces/ActivityResponseDto";
 import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
 import type { MeSummaryResponseDto } from "~/interfaces/MeSummaryResponseDto";
 import type { UpdateActivityDto } from "~/interfaces/UpdateActivityDto";
@@ -57,21 +57,39 @@ export const useActivities = () => {
     }
   };
 
-  const createActivity = async (payload: CreateActivityDto): Promise<ActivityResponseDto> => {
+  const createActivity = async (
+    payload: CreateActivityDto,
+    file?: File | null,
+  ): Promise<ActivityResponseDto> => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await api<ActivityResponseDto>("/api/activities", {
+      const fd = new FormData();
+      fd.append("activityTypeId", payload.activityTypeId);
+      fd.append("class", payload.class);
+      fd.append("event", payload.event);
+      fd.append("startDate", payload.startDate);
+      fd.append("endDate", payload.endDate);
+      if (payload.organization) fd.append("organization", payload.organization);
+      if (payload.hours !== undefined && payload.hours !== null) fd.append("hours", String(payload.hours));
+      if (payload.certificateUrl) fd.append("certificateUrl", payload.certificateUrl);
+      if (file) fd.append("file", file);
+
+      const data = await api<CreateActivityResponseDto>("/api/activities", {
         method: "POST",
-        body: payload,
+        body: fd,
       });
-      return data;
+      return data.activity;
     } catch (e: any) {
       error.value = e?.data?.message ?? "Erro ao criar atividade";
       throw e;
     } finally {
       loading.value = false;
     }
+  };
+
+  const getActivityFile = async (activityId: string): Promise<Blob> => {
+    return await api<Blob>(`/api/activities/${activityId}/file`, { responseType: "blob" });
   };
 
   const updateActivity = async (id: string, payload: UpdateActivityDto): Promise<ActivityResponseDto> => {
@@ -143,6 +161,7 @@ export const useActivities = () => {
     getMyActivities,
     getActivitiesByUser,
     createActivity,
+    getActivityFile,
     updateActivity,
     approveActivity,
     verifyActivity,

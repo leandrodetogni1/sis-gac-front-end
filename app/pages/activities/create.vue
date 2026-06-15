@@ -23,8 +23,13 @@ const hours = ref<number | undefined>();
 const startDate = ref("");
 const endDate = ref("");
 const certificateUrl = ref("");
+const file = ref<File | null>(null);
 const fileName = ref("");
+const fileError = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
+
+const ACCEPTED_FILE_TYPES = ["application/pdf", "image/png", "image/jpeg"];
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
 
 const classOptions = [
   { label: "Complementar", value: "COMPLEMENTAR" },
@@ -87,13 +92,29 @@ const curriculumError = ref<string | null>(null);
 
 const handleFileChange = (e: Event) => {
   const input = e.target as HTMLInputElement;
-  if (input.files && input.files.length > 0) {
-    fileName.value = input.files[0]!.name;
+  fileError.value = null;
+  const selected = input.files?.[0];
+  if (!selected) return;
+
+  if (!ACCEPTED_FILE_TYPES.includes(selected.type)) {
+    fileError.value = "Formato inválido. Envie um arquivo PDF, PNG ou JPEG.";
+    input.value = "";
+    return;
   }
+  if (selected.size > MAX_FILE_SIZE) {
+    fileError.value = "O arquivo excede o tamanho máximo de 5MB.";
+    input.value = "";
+    return;
+  }
+
+  file.value = selected;
+  fileName.value = selected.name;
 };
 
 const handleFileRemove = () => {
+  file.value = null;
   fileName.value = "";
+  fileError.value = null;
   if (fileInput.value) {
     fileInput.value.value = "";
   }
@@ -124,7 +145,7 @@ const handleSubmit = async () => {
 
   curriculumError.value = null;
   try {
-    await createActivity(payload);
+    await createActivity(payload, file.value);
     showToastSuccess("Atividade criada com sucesso");
     router.push(listPath.value);
   } catch (e: any) {
@@ -133,6 +154,12 @@ const handleSubmit = async () => {
     const message = Array.isArray(rawMessage) ? rawMessage.join(", ") : rawMessage;
     if (status === 422 && message) {
       curriculumError.value = message;
+      return;
+    }
+    if (status === 413) {
+      const sizeMessage = message ?? "O arquivo excede o tamanho máximo de 5MB.";
+      fileError.value = sizeMessage;
+      showToastError(sizeMessage);
       return;
     }
     showToastError(message ?? "Erro ao criar atividade");
@@ -279,7 +306,9 @@ const handleSubmit = async () => {
                 {{ fileName }}
               </p>
               <p v-else class="text-sm text-neutral-600">Clique para enviar um arquivo</p>
-              <p class="mt-0.5 text-xs text-neutral-500">PDF, PNG ou JPG até 5MB</p>
+              <p class="mt-0.5 text-xs text-neutral-500">
+                {{ file ? formatBytes(file.size) : "PDF, PNG ou JPG até 5MB" }}
+              </p>
             </div>
             <button
               v-if="fileName"
@@ -291,8 +320,9 @@ const handleSubmit = async () => {
             >
               <Icon name="lucide:x" size="1.125rem" />
             </button>
-            <input ref="fileInput" type="file" class="hidden" accept=".pdf,.png,.jpg,.jpeg" @change="handleFileChange" />
+            <input ref="fileInput" type="file" class="hidden" accept="application/pdf,image/png,image/jpeg" @change="handleFileChange" />
           </label>
+          <p v-if="fileError" class="mt-1.5 text-xs text-error-500" data-testid="file-error">{{ fileError }}</p>
         </div>
       </div>
 
