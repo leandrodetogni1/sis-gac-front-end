@@ -13,3 +13,11 @@ export const formatDateBR = (value: string | Date | null | undefined): string =>
   if (Number.isNaN(date.getTime())) return "—";
   return date.toLocaleDateString("pt-BR");
 };
+
+export const todayISODate = (): string => {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
+};

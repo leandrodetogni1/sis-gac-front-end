@@ -35,7 +35,7 @@ const userName = computed(() => {
       <SGBadge :status="activity.status || 'pending'" />
     </div>
     <div class="mt-2 flex items-center justify-between text-xs text-muted">
-      <span class="font-medium text-toned">{{ activity.hoursEquivalent ?? activity.hours ?? 0 }}h</span>
+      <span class="font-medium text-toned">{{ formatHours(activity.hoursEquivalent ?? activity.hours) }}</span>
       <span>{{ formatDateBR(activity.startDate) }}</span>
     </div>
   </div>

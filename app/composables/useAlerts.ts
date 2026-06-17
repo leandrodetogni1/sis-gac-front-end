@@ -50,6 +50,36 @@ const confirmAlert = async (message: string, newTitle: string, icon?: SweetAlert
   });
 };
 
+const promptAlert = async (
+  title: string,
+  message: string,
+  options?: {
+    placeholder?: string;
+    confirmText?: string;
+    icon?: SweetAlertIcon;
+    required?: boolean;
+  },
+): Promise<string | null> => {
+  const result = await Swal.fire({
+    title,
+    text: message,
+    icon: options?.icon,
+    input: "textarea",
+    inputPlaceholder: options?.placeholder ?? "",
+    confirmButtonText: options?.confirmText ?? "Confirmar",
+    confirmButtonColor: "#111",
+    focusConfirm: false,
+    showCancelButton: true,
+    cancelButtonText: "Cancelar",
+    inputValidator: options?.required
+      ? (value) => (!value || !value.trim() ? "Campo obrigatório" : null)
+      : undefined,
+  });
+
+  if (!result.isConfirmed) return null;
+  return (result.value ?? "").trim();
+};
+
 export const useAlerts = () => {
-  return { errorAlert, confirmAlert, successAlert, loadingAlert, closeAlert };
+  return { errorAlert, confirmAlert, promptAlert, successAlert, loadingAlert, closeAlert };
 };

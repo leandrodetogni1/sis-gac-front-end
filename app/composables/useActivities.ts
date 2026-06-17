@@ -92,13 +92,29 @@ export const useActivities = () => {
     return await api<Blob>(`/api/activities/${activityId}/file`, { responseType: "blob" });
   };
 
-  const updateActivity = async (id: string, payload: UpdateActivityDto): Promise<ActivityResponseDto> => {
+  const updateActivity = async (
+    id: string,
+    payload: UpdateActivityDto,
+    options?: { file?: File | null; removeFile?: boolean },
+  ): Promise<ActivityResponseDto> => {
     loading.value = true;
     error.value = null;
     try {
+      let body: FormData | (UpdateActivityDto & { removeFile?: boolean }) = payload;
+      if (options?.file) {
+        const fd = new FormData();
+        for (const [key, value] of Object.entries(payload)) {
+          if (value !== undefined && value !== null) fd.append(key, String(value));
+        }
+        fd.append("file", options.file);
+        body = fd;
+      } else if (options?.removeFile) {
+        body = { ...payload, removeFile: true };
+      }
+
       const data = await api<ActivityResponseDto>(`/api/activities/${id}`, {
         method: "PATCH",
-        body: payload,
+        body,
       });
       return data;
     } catch (e: any) {
@@ -109,6 +125,10 @@ export const useActivities = () => {
     }
   };
 
+  const deleteActivity = async (id: string): Promise<void> => {
+    await api(`/api/activities/${id}`, { method: "DELETE" });
+  };
+
   const approveActivity = async (id: string): Promise<void> => {
     await api(`/api/activities/${id}/approve`, { method: "PATCH" });
   };
@@ -117,8 +137,11 @@ export const useActivities = () => {
     await api(`/api/activities/${id}/verify`, { method: "PATCH" });
   };
 
-  const rejectActivity = async (id: string): Promise<void> => {
-    await api(`/api/activities/${id}/reject`, { method: "PATCH" });
+  const rejectActivity = async (id: string, comment?: string): Promise<void> => {
+    await api(`/api/activities/${id}/reject`, {
+      method: "PATCH",
+      body: comment ? { comment } : {},
+    });
   };
 
   const getUserSummary = async (userId: string): Promise<MeSummaryResponseDto> => {
@@ -163,6 +186,7 @@ export const useActivities = () => {
     createActivity,
     getActivityFile,
     updateActivity,
+    deleteActivity,
     approveActivity,
     verifyActivity,
     rejectActivity,

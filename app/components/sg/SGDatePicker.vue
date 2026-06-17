@@ -5,6 +5,8 @@ const props = defineProps<{
   modelValue?: string;
   placeholder?: string;
   disabled?: boolean;
+  minDate?: string;
+  maxDate?: string;
   testId?: string;
 }>();
 
@@ -12,11 +14,19 @@ const emit = defineEmits(["update:modelValue"]);
 
 const df = new DateFormatter("pt-BR", { dateStyle: "medium" });
 
+const toCalendarDate = (value?: string | null): CalendarDate | undefined => {
+  if (!value) return undefined;
+  const [year, month, day] = value.split("-").map(Number);
+  if (!year || !month || !day) return undefined;
+  return new CalendarDate(year, month, day);
+};
+
+const minCalendarValue = computed(() => toCalendarDate(props.minDate));
+const maxCalendarValue = computed(() => toCalendarDate(props.maxDate));
+
 const calendarValue = computed({
   get() {
-    if (!props.modelValue) return undefined;
-    const [year, month, day] = props.modelValue.split("-").map(Number);
-    return new CalendarDate(year, month, day);
+    return toCalendarDate(props.modelValue);
   },
   set(val: CalendarDate | undefined) {
     if (val) {
@@ -51,7 +61,13 @@ const displayText = computed(() => {
     </button>
 
     <template #content>
-      <UCalendar v-model="calendarValue" class="p-2" />
+      <UCalendar
+        v-model="calendarValue"
+        locale="pt-BR"
+        :min-value="minCalendarValue"
+        :max-value="maxCalendarValue"
+        class="p-2"
+      />
     </template>
   </UPopover>
 </template>

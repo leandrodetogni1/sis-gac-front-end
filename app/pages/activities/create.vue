@@ -24,6 +24,14 @@ const startDate = ref("");
 const endDate = ref("");
 const certificateUrl = ref("");
 const file = ref<File | null>(null);
+
+const todayIso = todayISODate();
+
+watch(startDate, (value) => {
+  if (value && endDate.value && endDate.value < value) {
+    endDate.value = "";
+  }
+});
 const fileName = ref("");
 const fileError = ref<string | null>(null);
 const fileInput = ref<HTMLInputElement | null>(null);
@@ -266,12 +274,20 @@ const handleSubmit = async () => {
 
           <div>
             <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Data Inicial <span class="text-error-500">*</span> </label>
-            <SGDatePicker v-model="startDate" placeholder="Selecione uma data" test-id="input-start-date" />
+            <SGDatePicker v-model="startDate" :max-date="todayIso" placeholder="Selecione uma data" test-id="input-start-date" />
           </div>
 
           <div>
             <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Data Final <span class="text-error-500">*</span> </label>
-            <SGDatePicker v-model="endDate" placeholder="Selecione uma data" test-id="input-end-date" />
+            <SGDatePicker
+              v-model="endDate"
+              :min-date="startDate || undefined"
+              :max-date="todayIso"
+              :disabled="!startDate"
+              placeholder="Selecione uma data"
+              test-id="input-end-date"
+            />
+            <p v-if="!startDate" class="mt-1 text-xs text-neutral-400">Selecione a data inicial primeiro.</p>
           </div>
 
           <div class="sm:col-span-2">

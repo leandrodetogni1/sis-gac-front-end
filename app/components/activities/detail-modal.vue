@@ -11,12 +11,12 @@ const props = withDefaults(
 
 const open = defineModel<boolean>("open", { default: false });
 
-const emit = defineEmits(["approved", "verified", "rejected", "edit"]);
+const emit = defineEmits(["approved", "verified", "rejected", "deleted", "edit"]);
 
 const { user } = useAuthState();
-const { approveActivity, verifyActivity, rejectActivity, getActivityFile } = useActivities();
+const { approveActivity, verifyActivity, rejectActivity, deleteActivity, getActivityFile } = useActivities();
 const { showToastSuccess, showToastError } = useToastNotification();
-const { confirmAlert } = useAlerts();
+const { confirmAlert, promptAlert } = useAlerts();
 
 const actionLoading = ref(false);
 const fileLoading = ref(false);
@@ -73,6 +73,11 @@ const canEdit = computed(() => {
   const status = props.activity?.status?.toLowerCase();
   if (status !== "pending") return false;
   return isActivityAuthor.value || isReviewer.value || isAdminOrOwner.value;
+});
+
+const canDelete = computed(() => {
+  const status = props.activity?.status?.toLowerCase();
+  return status === "pending" && isActivityAuthor.value;
 });
 
 const handleEdit = () => {
@@ -137,9 +142,36 @@ const handleReject = async () => {
   if (!props.activity) return;
   open.value = false;
   await nextTick();
-  const confirmed = await confirmAlert(
-    `A atividade "${label.value}" será rejeitada.`,
+  const observation = await promptAlert(
     "Rejeitar atividade?",
+    `A atividade "${label.value}" será rejeitada. Adicione uma observação para o aluno (opcional).`,
+    { placeholder: "Motivo da reprovação...", confirmText: "Rejeitar", icon: "warning" },
+  );
+  if (observation === null) {
+    open.value = true;
+    return;
+  }
+
+  actionLoading.value = true;
+  try {
+    await rejectActivity(props.activity.id, observation || undefined);
+    showToastSuccess("Atividade rejeitada");
+    emit("rejected");
+  } catch {
+    showToastError("Erro ao rejeitar atividade");
+    open.value = true;
+  } finally {
+    actionLoading.value = false;
+  }
+};
+
+const handleDelete = async () => {
+  if (!props.activity) return;
+  open.value = false;
+  await nextTick();
+  const confirmed = await confirmAlert(
+    `A atividade "${label.value}" será excluída permanentemente.`,
+    "Excluir atividade?",
     "warning",
   );
   if (!confirmed) {
@@ -149,11 +181,11 @@ const handleReject = async () => {
 
   actionLoading.value = true;
   try {
-    await rejectActivity(props.activity.id);
-    showToastSuccess("Atividade rejeitada");
-    emit("rejected");
+    await deleteActivity(props.activity.id);
+    showToastSuccess("Atividade excluída");
+    emit("deleted");
   } catch {
-    showToastError("Erro ao rejeitar atividade");
+    showToastError("Erro ao excluir atividade");
     open.value = true;
   } finally {
     actionLoading.value = false;
@@ -177,11 +209,11 @@ const handleReject = async () => {
           </div>
           <div>
             <p class="text-xs font-medium uppercase text-muted">Horas reconhecidas</p>
-            <p class="mt-0.5 text-highlighted">{{ activity.hoursEquivalent ?? 0 }}h</p>
+            <p class="mt-0.5 text-highlighted">{{ formatHours(activity.hoursEquivalent) }}</p>
           </div>
           <div>
             <p class="text-xs font-medium uppercase text-muted">Horas informadas</p>
-            <p class="mt-0.5 text-highlighted">{{ activity.hours ?? "—" }}<span v-if="activity.hours !== null">h</span></p>
+            <p class="mt-0.5 text-highlighted">{{ activity.hours !== null ? formatHours(activity.hours) : "—" }}</p>
           </div>
           <div>
             <p class="text-xs font-medium uppercase text-muted">Organização</p>
@@ -246,6 +278,18 @@ const handleReject = async () => {
 
     <template #footer>
       <div class="flex w-full justify-end gap-2">
+        <span v-show="canDelete">
+          <SGButton
+            test-id="delete-activity-button"
+            variant="danger"
+            icon="lucide:trash-2"
+            size="sm"
+            :disabled="actionLoading"
+            @click="handleDelete"
+          >
+            Excluir
+          </SGButton>
+        </span>
         <span v-show="canEdit">
           <SGButton
             test-id="edit-activity-button"

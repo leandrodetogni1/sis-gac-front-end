@@ -51,7 +51,7 @@ const complementaryExcess = computed(() => {
   return Math.max(0, c.totalRawHours - c.totalCountedHours);
 });
 
-const fmtHours = (n: number) => `${Number.isInteger(n) ? n : n.toFixed(1)}h`;
+const fmtHours = (n: number) => formatHours(n);
 const fmtTarget = (n: number | null) => (n === null ? "—" : fmtHours(n));
 
 onMounted(async () => {

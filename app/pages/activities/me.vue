@@ -92,6 +92,7 @@ onMounted(fetchActivities);
       @approved="onStatusChanged"
       @verified="onStatusChanged"
       @rejected="onStatusChanged"
+      @deleted="onStatusChanged"
       @edit="onEdit"
     />
 

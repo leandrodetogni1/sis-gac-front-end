@@ -65,7 +65,7 @@ const getUserName = (activity: ActivityResponseDto) => {
       </template>
 
       <template #cell-hours="{ item: activity }">
-        <span class="text-neutral-500">{{ activity.hoursEquivalent ?? activity.hours ?? 0 }}h</span>
+        <span class="text-neutral-500">{{ formatHours(activity.hoursEquivalent ?? activity.hours) }}</span>
       </template>
 
       <template #cell-startDate="{ item: activity }">

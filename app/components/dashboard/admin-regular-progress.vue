@@ -82,20 +82,20 @@ const handleRowClick = (student: AdminDashboardRegularStudent) => {
       </template>
 
       <template #cell-totalHoursApproved="{ item: student }">
-        <span class="font-semibold text-neutral-900">{{ student.totalHoursApproved }}h</span>
+        <span class="font-semibold text-neutral-900">{{ formatHours(student.totalHoursApproved) }}</span>
       </template>
 
       <template #cell-complementaryHours="{ item: student }">
-        <span class="text-neutral-500">{{ student.complementaryHours }}h</span>
+        <span class="text-neutral-500">{{ formatHours(student.complementaryHours) }}</span>
       </template>
 
       <template #cell-freeHours="{ item: student }">
-        <span class="text-neutral-500">{{ student.freeHours }}h</span>
+        <span class="text-neutral-500">{{ formatHours(student.freeHours) }}</span>
       </template>
 
       <template #cell-categoryHours="{ item: student }">
         <span class="text-neutral-500">
-          {{ student.categoryHours.ENSINO }} / {{ student.categoryHours.PESQUISA }} / {{ student.categoryHours.EXTENSAO }}
+          {{ roundHours(student.categoryHours.ENSINO) }} / {{ roundHours(student.categoryHours.PESQUISA) }} / {{ roundHours(student.categoryHours.EXTENSAO) }}
         </span>
       </template>
 
@@ -113,19 +113,19 @@ const handleRowClick = (student: AdminDashboardRegularStudent) => {
         <div class="mt-3 grid grid-cols-3 gap-2 text-xs">
           <div>
             <p class="font-medium uppercase tracking-wide text-neutral-500">Total</p>
-            <p class="mt-0.5 text-sm font-semibold text-neutral-900">{{ student.totalHoursApproved }}h</p>
+            <p class="mt-0.5 text-sm font-semibold text-neutral-900">{{ formatHours(student.totalHoursApproved) }}</p>
           </div>
           <div>
             <p class="font-medium uppercase tracking-wide text-neutral-500">Complementar</p>
-            <p class="mt-0.5 text-sm font-semibold text-neutral-900">{{ student.complementaryHours }}h</p>
+            <p class="mt-0.5 text-sm font-semibold text-neutral-900">{{ formatHours(student.complementaryHours) }}</p>
           </div>
           <div>
             <p class="font-medium uppercase tracking-wide text-neutral-500">Livre</p>
-            <p class="mt-0.5 text-sm font-semibold text-neutral-900">{{ student.freeHours }}h</p>
+            <p class="mt-0.5 text-sm font-semibold text-neutral-900">{{ formatHours(student.freeHours) }}</p>
           </div>
         </div>
         <p class="mt-2 text-xs text-neutral-500">
-          Ens {{ student.categoryHours.ENSINO }}h · Pesq {{ student.categoryHours.PESQUISA }}h · Ext {{ student.categoryHours.EXTENSAO }}h
+          Ens {{ formatHours(student.categoryHours.ENSINO) }} · Pesq {{ formatHours(student.categoryHours.PESQUISA) }} · Ext {{ formatHours(student.categoryHours.EXTENSAO) }}
         </p>
       </template>
     </SGTable>

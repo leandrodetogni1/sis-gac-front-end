@@ -93,7 +93,7 @@ const handleRowClick = (formando: AdminDashboardFormando) => {
           :data-testid="`formando-total-gap-${formando.user.id}`"
         >
           <Icon name="lucide:clock" size="0.875rem" />
-          Faltam {{ formando.totalGap }}h
+          Faltam {{ formatHours(formando.totalGap) }}
         </span>
       </template>
 
@@ -118,7 +118,7 @@ const handleRowClick = (formando: AdminDashboardFormando) => {
             class="inline-flex shrink-0 items-center gap-1 rounded-full border border-error-200 bg-error-50 px-2.5 py-1 text-xs font-semibold text-error-600"
           >
             <Icon name="lucide:clock" size="0.875rem" />
-            Faltam {{ formando.totalGap }}h
+            Faltam {{ formatHours(formando.totalGap) }}
           </span>
         </div>
       </template>

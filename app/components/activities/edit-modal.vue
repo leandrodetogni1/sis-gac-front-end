@@ -17,6 +17,9 @@ const { showToastSuccess, showToastError } = useToastNotification();
 const UNIT_FIXED_CODS = ["I1", "I2", "I3", "K"];
 const UNIT_EVENT_CODS = ["H1", "H2", "H3"];
 
+const ACCEPTED_FILE_TYPES = ["application/pdf", "image/png", "image/jpeg"];
+const MAX_FILE_SIZE = 5 * 1024 * 1024;
+
 const classOptions = [
   { label: "Complementar", value: "COMPLEMENTAR" },
   { label: "Livre", value: "LIVRE" },
@@ -34,6 +37,25 @@ const certificateUrl = ref("");
 const submitting = ref(false);
 const curriculumError = ref<string | null>(null);
 
+const newFile = ref<File | null>(null);
+const newFileName = ref("");
+const fileError = ref<string | null>(null);
+const fileInput = ref<HTMLInputElement | null>(null);
+const existingFileCleared = ref(false);
+
+const hasExistingFile = computed(() => Boolean(props.activity?.file));
+const showExistingFile = computed(
+  () => hasExistingFile.value && !existingFileCleared.value && !newFile.value,
+);
+
+const todayIso = todayISODate();
+
+watch(startDate, (value) => {
+  if (value && endDate.value && endDate.value < value) {
+    endDate.value = "";
+  }
+});
+
 const toIsoDate = (value: string | null): string => {
   if (!value) return "";
   return value.slice(0, 10);
@@ -50,6 +72,44 @@ const resetForm = () => {
   startDate.value = toIsoDate(a?.startDate ?? null);
   endDate.value = toIsoDate(a?.endDate ?? null);
   certificateUrl.value = a?.certificateUrl ?? "";
+  newFile.value = null;
+  newFileName.value = "";
+  fileError.value = null;
+  existingFileCleared.value = false;
+  if (fileInput.value) fileInput.value.value = "";
+};
+
+const handleFileChange = (e: Event) => {
+  const input = e.target as HTMLInputElement;
+  fileError.value = null;
+  const selected = input.files?.[0];
+  if (!selected) return;
+
+  if (!ACCEPTED_FILE_TYPES.includes(selected.type)) {
+    fileError.value = "Formato inválido. Envie um arquivo PDF, PNG ou JPEG.";
+    input.value = "";
+    return;
+  }
+  if (selected.size > MAX_FILE_SIZE) {
+    fileError.value = "O arquivo excede o tamanho máximo de 5MB.";
+    input.value = "";
+    return;
+  }
+
+  newFile.value = selected;
+  newFileName.value = selected.name;
+};
+
+const handleFileRemove = () => {
+  newFile.value = null;
+  newFileName.value = "";
+  fileError.value = null;
+  if (fileInput.value) fileInput.value.value = "";
+};
+
+const handleExistingFileRemove = () => {
+  existingFileCleared.value = true;
+  fileError.value = null;
 };
 
 watch(
@@ -152,8 +212,10 @@ const handleSubmit = async () => {
   if (!props.activity || !isValid.value || submitting.value) return;
 
   const payload = buildDiff();
+  const hasNewFile = Boolean(newFile.value);
+  const removeFile = !hasNewFile && hasExistingFile.value && existingFileCleared.value;
 
-  if (Object.keys(payload).length === 0) {
+  if (Object.keys(payload).length === 0 && !hasNewFile && !removeFile) {
     open.value = false;
     return;
   }
@@ -161,7 +223,7 @@ const handleSubmit = async () => {
   submitting.value = true;
   curriculumError.value = null;
   try {
-    await updateActivity(props.activity.id, payload);
+    await updateActivity(props.activity.id, payload, { file: newFile.value, removeFile });
     showToastSuccess("Atividade atualizada com sucesso");
     open.value = false;
     emit("updated");
@@ -171,6 +233,12 @@ const handleSubmit = async () => {
     const message = Array.isArray(rawMessage) ? rawMessage.join(", ") : rawMessage;
     if (status === 422 && message) {
       curriculumError.value = message;
+      return;
+    }
+    if (status === 413) {
+      const sizeMessage = message ?? "O arquivo excede o tamanho máximo de 5MB.";
+      fileError.value = sizeMessage;
+      showToastError(sizeMessage);
       return;
     }
     showToastError(message ?? "Erro ao atualizar atividade");
@@ -267,13 +335,21 @@ const handleSubmit = async () => {
 
         <div>
           <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Data Inicial <span class="text-error-500">*</span> </label>
-          <SGDatePicker v-model="startDate" placeholder="Selecione uma data" test-id="edit-input-start-date" />
+          <SGDatePicker v-model="startDate" :max-date="todayIso" placeholder="Selecione uma data" test-id="edit-input-start-date" />
         </div>
 
         <div>
           <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Data Final <span class="text-error-500">*</span> </label>
-          <SGDatePicker v-model="endDate" placeholder="Selecione uma data" test-id="edit-input-end-date" />
-          <p v-if="!isDateRangeValid" class="mt-1 text-xs text-error-500">
+          <SGDatePicker
+            v-model="endDate"
+            :min-date="startDate || undefined"
+            :max-date="todayIso"
+            :disabled="!startDate"
+            placeholder="Selecione uma data"
+            test-id="edit-input-end-date"
+          />
+          <p v-if="!startDate" class="mt-1 text-xs text-neutral-400">Selecione a data inicial primeiro.</p>
+          <p v-else-if="!isDateRangeValid" class="mt-1 text-xs text-error-500">
             A data final deve ser maior ou igual à data inicial.
           </p>
         </div>
@@ -291,6 +367,61 @@ const handleSubmit = async () => {
           <p v-if="!isCertificateUrlValid" class="mt-1 text-xs text-error-500">
             O link deve ter no máximo 500 caracteres.
           </p>
+        </div>
+
+        <div class="sm:col-span-2">
+          <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Comprovante </label>
+
+          <div
+            v-if="showExistingFile"
+            class="flex items-center gap-3 rounded-lg border border-default bg-elevated px-3 py-2.5"
+          >
+            <div class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+              <Icon name="lucide:file-text" size="1.05rem" class="text-primary" />
+            </div>
+            <div class="min-w-0 flex-1">
+              <p class="truncate text-sm font-medium text-neutral-900">{{ activity?.file?.filename }}</p>
+              <p class="mt-0.5 text-xs text-neutral-500">{{ formatBytes(activity?.file?.size) }} · enviado</p>
+            </div>
+            <button
+              type="button"
+              class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
+              data-testid="edit-existing-file-remove-button"
+              aria-label="Remover arquivo"
+              @click="handleExistingFileRemove"
+            >
+              <Icon name="lucide:x" size="1.125rem" />
+            </button>
+          </div>
+
+          <label
+            v-else
+            class="group flex cursor-pointer items-center gap-4 rounded-lg border border-dashed border-accented p-4 transition-all duration-200 hover:border-primary hover:bg-primary/5"
+            data-testid="edit-file-upload"
+          >
+            <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-primary/10 transition-colors group-hover:bg-primary/15">
+              <Icon name="lucide:upload-cloud" size="1.25rem" class="text-primary" />
+            </div>
+            <div class="min-w-0 flex-1">
+              <p v-if="newFileName" class="truncate text-sm font-medium text-neutral-900">{{ newFileName }}</p>
+              <p v-else class="text-sm text-neutral-600">Clique para enviar um arquivo</p>
+              <p class="mt-0.5 text-xs text-neutral-500">
+                {{ newFile ? formatBytes(newFile.size) : "PDF, PNG ou JPG até 5MB" }}
+              </p>
+            </div>
+            <button
+              v-if="newFileName"
+              type="button"
+              class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 sm:h-9 sm:w-9"
+              data-testid="edit-file-remove-button"
+              aria-label="Remover arquivo"
+              @click.stop.prevent="handleFileRemove"
+            >
+              <Icon name="lucide:x" size="1.125rem" />
+            </button>
+            <input ref="fileInput" type="file" class="hidden" accept="application/pdf,image/png,image/jpeg" @change="handleFileChange" />
+          </label>
+          <p v-if="fileError" class="mt-1.5 text-xs text-error-500" data-testid="edit-file-error">{{ fileError }}</p>
         </div>
       </form>
     </template>
