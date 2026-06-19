@@ -76,6 +76,10 @@ onMounted(async () => {
             </div>
 
             <div class="flex min-h-11 items-center justify-center">
+              <div v-show="loading" class="flex items-center justify-center gap-2 text-xs text-neutral-400">
+                <span class="h-3 w-3 animate-spin rounded-full border-2 border-neutral-300 border-t-primary-500" />
+                Carregando autenticação...
+              </div>
               <div ref="buttonRef" data-testid="google-signin-button" />
             </div>
           </div>
@@ -88,11 +92,6 @@ onMounted(async () => {
           >
             <Icon name="lucide:circle-alert" size="1rem" class="mt-0.5 shrink-0 text-error-600" />
             <p class="text-sm text-error-700">{{ error }}</p>
-          </div>
-
-          <div v-else-if="loading" class="mt-4 flex items-center justify-center gap-2 text-xs text-neutral-400">
-            <span class="h-3 w-3 animate-spin rounded-full border-2 border-neutral-300 border-t-primary-500" />
-            Carregando autenticação...
           </div>
         </div>
 
