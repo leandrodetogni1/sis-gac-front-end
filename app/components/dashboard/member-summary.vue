@@ -1,14 +1,16 @@
 <script setup lang="ts">
+import type { ActivityResponseDto, ActivityStatus } from "~/interfaces/ActivityResponseDto";
 import type { MeSummaryResponseDto, SummaryCategory } from "~/interfaces/MeSummaryResponseDto";
 
 const props = defineProps<{
   userId?: string;
 }>();
 
-const { getUserSummary } = useActivities();
+const { getUserSummary, getMyActivities, getActivitiesByUser } = useActivities();
 const { user } = useAuthState();
 
 const summary = ref<MeSummaryResponseDto | null>(null);
+const userActivities = ref<ActivityResponseDto[]>([]);
 const loading = ref(false);
 const error = ref<string | null>(null);
 
@@ -23,7 +25,12 @@ const fetchSummary = async () => {
   loading.value = true;
   error.value = null;
   try {
-    summary.value = await getUserSummary(targetUserId.value);
+    const [summaryData, activitiesData] = await Promise.all([
+      getUserSummary(targetUserId.value),
+      isSelf.value ? getMyActivities() : getActivitiesByUser(targetUserId.value),
+    ]);
+    summary.value = summaryData;
+    userActivities.value = activitiesData;
   } catch (e: any) {
     error.value = e?.data?.message ?? "Erro ao carregar resumo";
   } finally {
@@ -49,6 +56,31 @@ const complementaryExcess = computed(() => {
   const c = summary.value?.complementaryProgress;
   if (!c) return 0;
   return Math.max(0, c.totalRawHours - c.totalCountedHours);
+});
+
+const IN_REVIEW_STATUSES: ActivityStatus[] = ["PENDING", "VERIFIED"];
+
+const inReviewActivities = computed(() =>
+  userActivities.value.filter((a) => a.status && IN_REVIEW_STATUSES.includes(a.status)),
+);
+
+const activityHours = (a: ActivityResponseDto) => a.hoursEquivalent ?? a.hours ?? 0;
+
+const pendingByCategory = computed<Record<SummaryCategory, number>>(() => {
+  const acc: Record<SummaryCategory, number> = { ENSINO: 0, PESQUISA: 0, EXTENSAO: 0 };
+  for (const a of inReviewActivities.value) {
+    const category = a.activity_types?.category as SummaryCategory | undefined;
+    if (category && category in acc) acc[category] += activityHours(a);
+  }
+  return acc;
+});
+
+const pendingByClass = computed(() => {
+  const acc = { COMPLEMENTAR: 0, LIVRE: 0 };
+  for (const a of inReviewActivities.value) {
+    if (a.class && a.class in acc) acc[a.class] += activityHours(a);
+  }
+  return acc;
 });
 
 const fmtHours = (n: number) => formatHours(n);
@@ -100,9 +132,9 @@ onMounted(async () => {
           <p class="text-xs text-muted">de {{ fmtTarget(entry.minRequired) }} mínimas</p>
           <div class="mt-3">
             <dashboard-progress-bar
-              :achieved="entry.hoursAchieved"
+              :approved="entry.hoursAchieved"
+              :pending="pendingByCategory[entry.category]"
               :target="entry.minRequired"
-              :meets-minimum="entry.meetsMinimum"
             />
           </div>
         </SGCard>
@@ -127,9 +159,9 @@ onMounted(async () => {
           </p>
           <div class="mt-3">
             <dashboard-progress-bar
-              :achieved="summary.complementaryProgress.totalCountedHours"
+              :approved="summary.complementaryProgress.totalCountedHours"
+              :pending="pendingByClass.COMPLEMENTAR"
               :target="summary.complementaryProgress.minRequired"
-              :meets-minimum="summary.complementaryProgress.meetsMinimum"
             />
           </div>
           <p
@@ -156,9 +188,9 @@ onMounted(async () => {
           <p class="text-xs text-muted">de {{ fmtTarget(summary.freeProgress.minRequired) }} mínimas</p>
           <div class="mt-3">
             <dashboard-progress-bar
-              :achieved="summary.freeProgress.totalHours"
+              :approved="summary.freeProgress.totalHours"
+              :pending="pendingByClass.LIVRE"
               :target="summary.freeProgress.minRequired"
-              :meets-minimum="summary.freeProgress.meetsMinimum"
             />
           </div>
           <div class="mt-3 grid grid-cols-2 gap-3 text-xs text-muted">
