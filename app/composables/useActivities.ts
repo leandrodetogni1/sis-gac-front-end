@@ -88,10 +88,6 @@ export const useActivities = () => {
     }
   };
 
-  const getActivityFile = async (activityId: string): Promise<Blob> => {
-    return await api<Blob>(`/api/activities/${activityId}/file`, { responseType: "blob" });
-  };
-
   const updateActivity = async (
     id: string,
     payload: UpdateActivityDto,
@@ -184,7 +180,6 @@ export const useActivities = () => {
     getMyActivities,
     getActivitiesByUser,
     createActivity,
-    getActivityFile,
     updateActivity,
     deleteActivity,
     approveActivity,

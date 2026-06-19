@@ -14,27 +14,15 @@ const open = defineModel<boolean>("open", { default: false });
 const emit = defineEmits(["approved", "verified", "rejected", "deleted", "edit"]);
 
 const { user } = useAuthState();
-const { approveActivity, verifyActivity, rejectActivity, deleteActivity, getActivityFile } = useActivities();
+const { approveActivity, verifyActivity, rejectActivity, deleteActivity } = useActivities();
 const { showToastSuccess, showToastError } = useToastNotification();
 const { confirmAlert, promptAlert } = useAlerts();
 
 const actionLoading = ref(false);
-const fileLoading = ref(false);
 
-const openCertificateFile = async () => {
-  if (!props.activity?.id || fileLoading.value) return;
-  fileLoading.value = true;
-  try {
-    const blob = await getActivityFile(props.activity.id);
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-  } catch {
-    showToastError("Não foi possível abrir o certificado");
-  } finally {
-    fileLoading.value = false;
-  }
-};
+const certificateFileUrl = computed(() =>
+  props.activity?.id ? `/api/activities/${props.activity.id}/file` : undefined,
+);
 
 const isReviewer = computed(() => user.value?.role === "reviewer");
 const isAdminOrOwner = computed(() => user.value?.role === "admin" || user.value?.role === "owner");
@@ -234,17 +222,17 @@ const handleDelete = async () => {
           <div>
             <p class="text-xs font-medium uppercase text-muted">Certificado</p>
 
-            <div v-if="activity.file" class="mt-1">
-              <button
-                type="button"
-                class="inline-flex w-fit items-center gap-1.5 rounded-md border border-default bg-elevated px-2.5 py-1.5 text-sm text-highlighted transition-colors hover:border-primary-300 hover:text-primary disabled:opacity-50"
+            <div v-if="activity.file && certificateFileUrl" class="mt-1">
+              <a
+                :href="certificateFileUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="inline-flex w-fit items-center gap-1.5 rounded-md border border-default bg-elevated px-2.5 py-1.5 text-sm text-highlighted transition-colors hover:border-primary-300 hover:text-primary"
                 data-testid="certificate-file-button"
-                :disabled="fileLoading"
-                @click="openCertificateFile"
               >
-                <Icon :name="fileLoading ? 'lucide:loader-circle' : 'lucide:file-text'" size="0.95rem" :class="fileLoading ? 'animate-spin' : ''" />
+                <Icon name="lucide:file-text" size="0.95rem" />
                 Ver certificado
-              </button>
+              </a>
             </div>
 
             <p v-else class="mt-0.5 text-muted">—</p>
