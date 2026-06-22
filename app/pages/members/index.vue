@@ -47,6 +47,16 @@ const situationOptions = [
   })),
 ];
 
+const hasActiveFilters = computed(() => {
+  return Boolean(search.value.trim()) || courseFilter.value !== "ALL" || situationFilter.value !== "ALL";
+});
+
+const clearFilters = () => {
+  search.value = "";
+  courseFilter.value = "ALL";
+  situationFilter.value = "ALL";
+};
+
 const fetchMembers = async () => {
   await getUsers({
     role: "member",
@@ -165,6 +175,16 @@ onMounted(fetchMembers);
             test-id="filter-situation"
           />
         </div>
+        <SGButton
+          variant="primary"
+          icon="lucide:filter-x"
+          :disabled="!hasActiveFilters"
+          test-id="clear-filters"
+          class="min-h-11 sm:min-h-8"
+          @click="clearFilters"
+        >
+          Limpar filtros
+        </SGButton>
       </div>
 
       <SGCard test-id="card-alunos">
