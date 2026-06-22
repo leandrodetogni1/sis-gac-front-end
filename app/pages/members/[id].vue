@@ -176,6 +176,7 @@ onMounted(async () => {
         <activities-list
           :activities="activities"
           :error="activitiesError"
+          :show-user="false"
           @retry="getActivitiesByUser(memberId)"
           @select="onSelect"
         />
