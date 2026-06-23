@@ -9,13 +9,14 @@ const props = defineProps<{
 
 const emit = defineEmits(["update:modelValue"]);
 
-const { users, loading, getUsers } = useUsers();
+const { users, loading, getUsers, getUser } = useUsers();
 
 const SELECTABLE_ROLES = new Set(["member", "reviewer", "admin"]);
 
 const open = ref(false);
 const search = ref("");
 const loaded = ref(false);
+const selectedUser = ref<UserResponseDto | null>(null);
 
 const fullName = (user: UserResponseDto) => `${user.firstName} ${user.lastName}`.trim();
 
@@ -33,29 +34,35 @@ const actors = computed(() =>
     .sort((a, b) => fullName(a).localeCompare(fullName(b), "pt-BR")),
 );
 
-const filteredActors = computed(() => {
-  const term = search.value.trim().toLowerCase();
-  if (!term) return actors.value;
-  return actors.value.filter(
-    (user) => fullName(user).toLowerCase().includes(term) || user.email.toLowerCase().includes(term),
-  );
-});
+const selected = computed(
+  () => selectedUser.value ?? actors.value.find((user) => user.id === props.modelValue) ?? null,
+);
 
-const selected = computed(() => actors.value.find((user) => user.id === props.modelValue) ?? null);
+const fetchActors = () => getUsers({ search: search.value.trim() || undefined, pageSize: 100 });
 
 const ensureUsers = async () => {
   if (loaded.value) return;
   loaded.value = true;
-  await getUsers();
+  await fetchActors();
 };
 
+let searchTimer: ReturnType<typeof setTimeout> | undefined;
+
+watch(search, () => {
+  if (!open.value) return;
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(fetchActors, 300);
+});
+
 const select = (user: UserResponseDto) => {
+  selectedUser.value = user;
   emit("update:modelValue", user.id);
   open.value = false;
   search.value = "";
 };
 
 const clear = () => {
+  selectedUser.value = null;
   emit("update:modelValue", "");
 };
 
@@ -63,8 +70,14 @@ watch(open, (isOpen) => {
   if (isOpen) ensureUsers();
 });
 
-onMounted(() => {
-  if (props.modelValue) ensureUsers();
+onMounted(async () => {
+  if (props.modelValue) {
+    selectedUser.value = await getUser(props.modelValue);
+  }
+});
+
+onUnmounted(() => {
+  if (searchTimer) clearTimeout(searchTimer);
 });
 </script>
 
@@ -114,7 +127,7 @@ onMounted(() => {
           </div>
           <template v-else>
             <button
-              v-for="user in filteredActors"
+              v-for="user in actors"
               :key="user.id"
               type="button"
               class="flex w-full items-center gap-2.5 rounded-md px-2 py-1.5 text-left transition-colors hover:bg-neutral-50"
@@ -128,7 +141,7 @@ onMounted(() => {
               </span>
               <span class="shrink-0 rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-500">{{ roleLabel(user.role) }}</span>
             </button>
-            <div v-if="!filteredActors.length" class="py-6 text-center text-sm text-neutral-400">
+            <div v-if="!actors.length" class="py-6 text-center text-sm text-neutral-400">
               Nenhum usuário encontrado
             </div>
           </template>

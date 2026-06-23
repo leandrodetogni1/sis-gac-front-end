@@ -1,9 +1,10 @@
 <script setup lang="ts">
 import type { SGTableColumn } from "~/types/SGTableColumn";
+import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 
 useHead({ title: "Usuários — Configurações — SWGAC" });
 
-const { users, fetched, loading, error, getUsers, deleteUser } = useUsers();
+const { fetched, loading, error, getUsers, deleteUser } = useUsers();
 const {
   invitations,
   fetched: invitationsFetched,
@@ -12,15 +13,30 @@ const {
   getInvitations,
   deleteInvitation,
 } = useInvitations();
-const { showToastSuccess } = useToastNotification();
+const { showToastSuccess, showToastError } = useToastNotification();
 const { confirmAlert } = useAlerts();
 
 const openInvitationModal = ref(false);
 
-const staffRoles = new Set(["owner", "admin", "reviewer"]);
+const STAFF_ROLES = ["owner", "admin", "reviewer"];
+
+const staff = ref<UserResponseDto[]>([]);
+const staffError = ref<string | null>(null);
+
+const fetchStaff = async () => {
+  const collected: UserResponseDto[] = [];
+  let failed = false;
+  for (const role of STAFF_ROLES) {
+    const { items } = await getUsers({ role, pageSize: 100 });
+    if (error.value) failed = true;
+    collected.push(...items);
+  }
+  staff.value = collected;
+  staffError.value = failed ? "Falha ao carregar administradores" : null;
+};
 
 const staffUsers = computed(() =>
-  users.value.filter((u) => u.role && staffRoles.has(u.role.toLowerCase())),
+  staff.value.filter((u) => u.role && STAFF_ROLES.includes(u.role.toLowerCase())),
 );
 
 type StaffRow = {
@@ -133,13 +149,14 @@ const handleDelete = async (id: string, name: string) => {
   try {
     await deleteUser(id);
     showToastSuccess("Usuário removido com sucesso");
+    await fetchStaff();
   } catch {
-    // error handled by composable
+    showToastError("Erro ao remover usuário");
   }
 };
 
 onMounted(async () => {
-  await Promise.all([getUsers(), getInvitations()]);
+  await Promise.all([fetchStaff(), getInvitations()]);
 });
 </script>
 
@@ -184,13 +201,13 @@ onMounted(async () => {
             :columns="staffColumns"
             :items="staffRows"
             item-key="rowKey"
-            :error="error ?? invitationsError"
+            :error="staffError ?? invitationsError"
             error-text="Falha ao carregar administradores"
             empty-text="Nenhum administrador cadastrado"
             empty-description="Convide um admin ou reviewer para começar."
             empty-icon="lucide:shield"
             test-id="staff-table"
-            @retry="getUsers(); getInvitations()"
+            @retry="fetchStaff(); getInvitations()"
           >
             <template #cell-name="{ item: row }">
               <div v-if="row.kind === 'user'" class="flex items-center gap-2.5">

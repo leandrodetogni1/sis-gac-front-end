@@ -3,6 +3,7 @@ import { Course, CourseLabels } from "~/enums/Course";
 import { Situation, SituationLabels } from "~/enums/Situation";
 import type { SGTableColumn } from "~/types/SGTableColumn";
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
+import type { UserFilters } from "~/composables/useUsers";
 
 useHead({ title: "Alunos — SWGAC" });
 
@@ -12,10 +13,12 @@ if (user.value && user.value.role !== "admin" && user.value.role !== "owner") {
   await navigateTo("/");
 }
 
-const { users, fetched, error, getUsers } = useUsers();
+const { users, total, page, pageSize, totalPages, loading, fetched, error, getUsers } = useUsers();
 
 const route = useRoute();
 const router = useRouter();
+
+const PAGE_SIZE = 20;
 
 const readCourseFromQuery = (): Course | "ALL" => {
   const raw = Array.isArray(route.query.course) ? route.query.course[0] : route.query.course;
@@ -30,6 +33,30 @@ const readSituationFromQuery = (): Situation | "ALL" => {
 const search = ref("");
 const courseFilter = ref<Course | "ALL">(readCourseFromQuery());
 const situationFilter = ref<Situation | "ALL">(readSituationFromQuery());
+const currentPage = ref(1);
+const sortBy = ref<NonNullable<UserFilters["sortBy"]>>("firstName");
+const sortOrder = ref<NonNullable<UserFilters["sortOrder"]>>("asc");
+
+const sortOptions = [
+  { label: "Nome (A–Z)", value: "firstName:asc" },
+  { label: "Nome (Z–A)", value: "firstName:desc" },
+  { label: "Mais recentes", value: "createdAt:desc" },
+  { label: "Mais antigos", value: "createdAt:asc" },
+  { label: "Email (A–Z)", value: "email:asc" },
+  { label: "Matrícula (crescente)", value: "matricula:asc" },
+  { label: "Formandos primeiro", value: "situation:asc" },
+  { label: "Formados primeiro", value: "situation:desc" },
+];
+
+const sortValue = computed({
+  get: () => `${sortBy.value}:${sortOrder.value}`,
+  set: (value: string) => {
+    const [field, order] = value.split(":");
+    sortBy.value = field as NonNullable<UserFilters["sortBy"]>;
+    sortOrder.value = order as NonNullable<UserFilters["sortOrder"]>;
+    fetchMembers();
+  },
+});
 
 const courseOptions = [
   { label: "Todos os cursos", value: "ALL" },
@@ -51,18 +78,36 @@ const hasActiveFilters = computed(() => {
   return Boolean(search.value.trim()) || courseFilter.value !== "ALL" || situationFilter.value !== "ALL";
 });
 
+let lastKey = "";
+
+const fetchMembers = (force = false) => {
+  const filters = {
+    role: "member",
+    search: search.value.trim() || undefined,
+    course: courseFilter.value === "ALL" ? undefined : courseFilter.value,
+    situation: situationFilter.value === "ALL" ? undefined : situationFilter.value,
+    sortBy: sortBy.value,
+    sortOrder: sortOrder.value,
+    page: currentPage.value,
+    pageSize: PAGE_SIZE,
+  };
+  const key = JSON.stringify(filters);
+  if (!force && key === lastKey && !error.value) return Promise.resolve();
+  lastKey = key;
+  return getUsers(filters);
+};
+
+const applyFilters = () => {
+  currentPage.value = 1;
+  return fetchMembers();
+};
+
 const clearFilters = () => {
+  if (searchTimer) clearTimeout(searchTimer);
   search.value = "";
   courseFilter.value = "ALL";
   situationFilter.value = "ALL";
-};
-
-const fetchMembers = async () => {
-  await getUsers({
-    role: "member",
-    course: courseFilter.value === "ALL" ? undefined : courseFilter.value,
-    situation: situationFilter.value === "ALL" ? undefined : situationFilter.value,
-  });
+  applyFilters();
 };
 
 const syncQuery = async () => {
@@ -78,9 +123,18 @@ const syncQuery = async () => {
   });
 };
 
+let searchTimer: ReturnType<typeof setTimeout> | undefined;
+
+watch(search, () => {
+  if (searchTimer) clearTimeout(searchTimer);
+  searchTimer = setTimeout(() => {
+    applyFilters();
+  }, 300);
+});
+
 watch([courseFilter, situationFilter], async () => {
   await syncQuery();
-  await fetchMembers();
+  await applyFilters();
 });
 
 watch(
@@ -93,23 +147,38 @@ watch(
   },
 );
 
+onUnmounted(() => {
+  if (searchTimer) clearTimeout(searchTimer);
+});
+
 const columns: SGTableColumn[] = [
-  { key: "name", label: "Nome" },
-  { key: "email", label: "Email" },
-  { key: "matricula", label: "Matrícula" },
+  { key: "name", label: "Nome", sortKey: "firstName" },
+  { key: "email", label: "Email", sortKey: "email" },
+  { key: "matricula", label: "Matrícula", sortKey: "matricula" },
   { key: "course", label: "Curso" },
-  { key: "situation", label: "Situação" },
-  { key: "createdAt", label: "Cadastrado em" },
+  { key: "situation", label: "Situação", sortKey: "situation" },
+  { key: "createdAt", label: "Cadastrado em", sortKey: "createdAt" },
 ];
 
-const filteredUsers = computed(() => {
-  const term = search.value.trim().toLowerCase();
-  if (!term) return users.value;
-  return users.value.filter((u) => {
-    const fullName = `${u.firstName} ${u.lastName}`.toLowerCase();
-    return fullName.includes(term) || u.email.toLowerCase().includes(term);
-  });
-});
+const rangeStart = computed(() => (total.value === 0 ? 0 : (page.value - 1) * pageSize.value + 1));
+const rangeEnd = computed(() => Math.min(page.value * pageSize.value, total.value));
+
+const goToPage = (target: number) => {
+  if (target < 1 || target > totalPages.value || target === page.value) return;
+  currentPage.value = target;
+  fetchMembers();
+};
+
+const handleSort = (key: string) => {
+  const sortKey = key as NonNullable<UserFilters["sortBy"]>;
+  if (sortBy.value === sortKey) {
+    sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
+  } else {
+    sortBy.value = sortKey;
+    sortOrder.value = "asc";
+  }
+  fetchMembers();
+};
 
 const handleRowClick = (member: UserResponseDto) => {
   navigateTo(`/members/${member.id}`);
@@ -155,7 +224,7 @@ onMounted(fetchMembers);
         <div class="w-full sm:max-w-sm">
           <SGInput
             v-model="search"
-            placeholder="Buscar por nome ou email"
+            placeholder="Buscar por nome, email ou matrícula"
             test-id="search-alunos"
           />
         </div>
@@ -175,6 +244,14 @@ onMounted(fetchMembers);
             test-id="filter-situation"
           />
         </div>
+        <div class="w-full sm:max-w-xs md:hidden">
+          <SGSelect
+            v-model="sortValue"
+            placeholder="Ordenar por"
+            :options="sortOptions"
+            test-id="sort-mobile"
+          />
+        </div>
         <SGButton
           variant="primary"
           icon="lucide:filter-x"
@@ -190,16 +267,21 @@ onMounted(fetchMembers);
       <SGCard test-id="card-alunos">
         <SGTable
           :columns="columns"
-          :items="filteredUsers"
+          :items="users"
+          :loading="loading"
           :error="error"
+          :sort-by="sortBy"
+          :sort-order="sortOrder"
+          loading-text="Carregando alunos..."
           error-text="Falha ao carregar alunos"
           empty-text="Nenhum aluno encontrado"
           empty-description="Não há alunos cadastrados ainda."
           empty-icon="lucide:graduation-cap"
           test-id="alunos-table"
           clickable
-          @retry="fetchMembers"
+          @retry="fetchMembers(true)"
           @row-click="handleRowClick"
+          @sort="handleSort"
         >
           <template #cell-name="{ item: member }">
             <div class="flex items-center gap-2.5">
@@ -266,6 +348,38 @@ onMounted(fetchMembers);
             </div>
           </template>
         </SGTable>
+
+        <div
+          v-if="!loading && !error && users.length > 0"
+          class="mt-4 flex flex-col gap-3 border-t border-neutral-100 pt-4 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <p class="text-center text-xs text-neutral-500 sm:text-left">
+            Mostrando {{ rangeStart }}–{{ rangeEnd }} de {{ total }} alunos
+          </p>
+          <div class="flex items-center justify-between gap-2 sm:justify-end">
+            <SGButton
+              variant="secondary"
+              icon="lucide:chevron-left"
+              size="sm"
+              test-id="alunos-prev"
+              :disabled="page <= 1"
+              @click="goToPage(page - 1)"
+            >
+              Anterior
+            </SGButton>
+            <span class="shrink-0 text-xs text-neutral-500">Página {{ page }} de {{ totalPages }}</span>
+            <SGButton
+              variant="secondary"
+              icon="lucide:chevron-right"
+              size="sm"
+              test-id="alunos-next"
+              :disabled="page >= totalPages"
+              @click="goToPage(page + 1)"
+            >
+              Próxima
+            </SGButton>
+          </div>
+        </div>
       </SGCard>
     </div>
   </div>

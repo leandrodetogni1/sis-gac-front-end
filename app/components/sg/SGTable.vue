@@ -14,10 +14,12 @@ const props = defineProps<{
   emptyIcon?: string;
   clickable?: boolean;
   hoverable?: boolean;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
   testId?: string;
 }>();
 
-const emit = defineEmits(["row-click", "retry"]);
+const emit = defineEmits(["row-click", "retry", "sort"]);
 
 const slots = defineSlots<{
   [key: `cell-${string}`]: (props: { item: any; index: number }) => any;
@@ -52,6 +54,11 @@ const tdClass = (col: SGTableColumn, isLast: boolean) => {
 };
 
 const hasMobileSlot = computed(() => !!slots.mobile);
+
+const sortIcon = (col: SGTableColumn) => {
+  if (col.sortKey !== props.sortBy) return "lucide:chevrons-up-down";
+  return props.sortOrder === "desc" ? "lucide:chevron-down" : "lucide:chevron-up";
+};
 </script>
 
 <template>
@@ -90,7 +97,22 @@ const hasMobileSlot = computed(() => !!slots.mobile);
         <thead>
           <tr class="border-b border-neutral-200 text-xs font-medium uppercase text-neutral-500">
             <th v-for="(col, i) in columns" :key="col.key" :class="thClass(col, i === columns.length - 1)">
-              {{ col.label }}
+              <button
+                v-if="col.sortKey"
+                type="button"
+                class="inline-flex cursor-pointer items-center gap-1 uppercase transition-colors hover:text-neutral-700"
+                :class="col.align === 'right' ? 'flex-row-reverse' : ''"
+                :data-testid="testId ? `${testId}-sort-${col.key}` : undefined"
+                @click="emit('sort', col.sortKey)"
+              >
+                <span>{{ col.label }}</span>
+                <Icon
+                  :name="sortIcon(col)"
+                  size="0.875rem"
+                  :class="col.sortKey === sortBy ? 'text-neutral-700' : 'text-neutral-300'"
+                />
+              </button>
+              <template v-else>{{ col.label }}</template>
             </th>
           </tr>
         </thead>
