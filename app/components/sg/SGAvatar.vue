@@ -52,6 +52,30 @@ const initials = computed(() => {
   return value ? value.toUpperCase() : "?";
 });
 
+const palette = [
+  "bg-rose-100 text-rose-700",
+  "bg-orange-100 text-orange-700",
+  "bg-amber-100 text-amber-700",
+  "bg-emerald-100 text-emerald-700",
+  "bg-teal-100 text-teal-700",
+  "bg-cyan-100 text-cyan-700",
+  "bg-sky-100 text-sky-700",
+  "bg-indigo-100 text-indigo-700",
+  "bg-violet-100 text-violet-700",
+  "bg-fuchsia-100 text-fuchsia-700",
+  "bg-pink-100 text-pink-700",
+];
+
+const colorClass = computed(() => {
+  const key = `${props.firstName ?? ""} ${props.lastName ?? ""}`.trim();
+  if (!key) return "bg-primary-100 text-primary-600";
+  let hash = 0;
+  for (let i = 0; i < key.length; i++) {
+    hash = (hash * 31 + key.charCodeAt(i)) >>> 0;
+  }
+  return palette[hash % palette.length];
+});
+
 const altText = computed(() => {
   if (props.alt) return props.alt;
   const full = `${props.firstName ?? ""} ${props.lastName ?? ""}`.trim();
@@ -96,7 +120,8 @@ const spinnerClasses = computed(() => {
     :class="sizeClasses"
   >
     <div
-      class="flex h-full w-full items-center justify-center bg-primary-100 font-semibold text-primary-600"
+      class="flex h-full w-full items-center justify-center font-semibold"
+      :class="colorClass"
     >
       <span
         v-if="isLoadingImage"
