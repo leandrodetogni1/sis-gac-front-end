@@ -26,7 +26,7 @@ const userName = computed(() => {
     <td class="py-3 pr-4 font-medium text-neutral-900">{{ label }}</td>
     <td class="py-3 pr-4 text-neutral-500">{{ formatCategory(activity.activity_types?.category) }}</td>
     <td class="py-3 pr-4 text-neutral-500">{{ formatHours(activity.hours) }}</td>
-    <td class="py-3 pr-4 text-neutral-500">{{ formatDateBR(activity.startDate) }}</td>
+    <td class="py-3 pr-4 text-neutral-500">{{ formatDateBR(activity.createdAt) }}</td>
     <td class="py-3 pr-4 text-neutral-500">{{ userName }}</td>
     <td class="py-3">
       <SGBadge :status="activity.status || 'pending'" :test-id="`badge-${activity.id}`" />

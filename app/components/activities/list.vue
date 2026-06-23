@@ -8,22 +8,25 @@ const props = withDefaults(
     error: string | null;
     showUser?: boolean;
     canCreate?: boolean;
+    sortable?: boolean;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
   }>(),
-  { showUser: true, canCreate: true },
+  { showUser: true, canCreate: true, sortable: false },
 );
 
-const emit = defineEmits(["retry", "select"]);
+const emit = defineEmits(["retry", "select", "sort"]);
 
 const columns = computed<SGTableColumn[]>(() => {
   const base: SGTableColumn[] = [
     { key: "event", label: "Evento" },
     { key: "activity", label: "Atividade" },
     { key: "category", label: "Categoria" },
-    { key: "hours", label: "Horas" },
-    { key: "startDate", label: "Data Início" },
+    { key: "hours", label: "Horas", sortKey: props.sortable ? "hoursEquivalent" : undefined },
+    { key: "createdAt", label: "Data de criação", sortKey: props.sortable ? "createdAt" : undefined },
   ];
   if (props.showUser) base.push({ key: "user", label: "Aluno" });
-  base.push({ key: "status", label: "Status" });
+  base.push({ key: "status", label: "Status", sortKey: props.sortable ? "status" : undefined });
   return base;
 });
 
@@ -43,6 +46,8 @@ const getUserName = (activity: ActivityResponseDto) => {
       :columns="columns"
       :items="activities"
       :error="error"
+      :sort-by="sortBy"
+      :sort-order="sortOrder"
       clickable
       error-text="Falha ao carregar atividades"
       empty-text="Nenhuma atividade encontrada"
@@ -51,6 +56,7 @@ const getUserName = (activity: ActivityResponseDto) => {
       test-id="activities-table"
       @retry="emit('retry')"
       @row-click="emit('select', $event)"
+      @sort="emit('sort', $event)"
     >
       <template #cell-event="{ item: activity }">
         <span class="font-medium text-neutral-900">{{ activity.event ?? "—" }}</span>
@@ -68,8 +74,8 @@ const getUserName = (activity: ActivityResponseDto) => {
         <span class="text-neutral-500">{{ formatHours(activity.hoursEquivalent ?? activity.hours) }}</span>
       </template>
 
-      <template #cell-startDate="{ item: activity }">
-        <span class="text-neutral-500">{{ formatDateBR(activity.startDate) }}</span>
+      <template #cell-createdAt="{ item: activity }">
+        <span class="text-neutral-500">{{ formatDateBR(activity.createdAt) }}</span>
       </template>
 
       <template v-if="showUser" #cell-user="{ item: activity }">

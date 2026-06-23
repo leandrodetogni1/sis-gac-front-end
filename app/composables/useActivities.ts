@@ -2,55 +2,115 @@ import type { ActivityEventResponseDto } from "~/interfaces/ActivityEventRespons
 import type { ActivityResponseDto, ActivityStatus, CreateActivityResponseDto } from "~/interfaces/ActivityResponseDto";
 import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
 import type { MeSummaryResponseDto } from "~/interfaces/MeSummaryResponseDto";
+import type { PaginatedActivities } from "~/interfaces/PaginatedActivities";
 import type { UpdateActivityDto } from "~/interfaces/UpdateActivityDto";
 
+export type ActivitySortBy = "createdAt" | "status" | "hoursEquivalent";
+
 export type ActivityFilters = {
+  category?: string;
   status?: ActivityStatus;
+  authorId?: string;
+  page?: number;
+  pageSize?: number;
+  sortBy?: ActivitySortBy;
+  sortOrder?: "asc" | "desc";
 };
 
 export const useActivities = () => {
   const api = useApi();
   const activities = ref<ActivityResponseDto[]>([]);
+  const total = ref(0);
+  const page = ref(1);
+  const pageSize = ref(20);
+  const totalPages = ref(1);
   const loading = ref(false);
   const fetched = ref(false);
   const error = ref<string | null>(null);
 
   const buildQuery = (filters?: ActivityFilters) => {
     const query: Record<string, string> = {};
+    if (filters?.category) query.category = filters.category;
     if (filters?.status) query.status = filters.status;
+    if (filters?.authorId) query.authorId = filters.authorId;
+    if (filters?.sortBy) query.sortBy = filters.sortBy;
+    if (filters?.sortOrder) query.sortOrder = filters.sortOrder;
+    if (filters?.page) query.page = String(filters.page);
+    if (filters?.pageSize) query.pageSize = String(filters.pageSize);
     return query;
   };
 
-  const getActivities = async (filters?: ActivityFilters): Promise<ActivityResponseDto[]> => {
+  const toPage = (data: unknown, filters?: ActivityFilters): PaginatedActivities => {
+    if (Array.isArray(data)) {
+      return {
+        items: data as ActivityResponseDto[],
+        total: data.length,
+        page: 1,
+        pageSize: filters?.pageSize ?? (data.length || pageSize.value),
+        totalPages: 1,
+      };
+    }
+    const obj = (data ?? {}) as Partial<PaginatedActivities>;
+    const items = Array.isArray(obj.items) ? obj.items : [];
+    return {
+      items,
+      total: typeof obj.total === "number" ? obj.total : items.length,
+      page: typeof obj.page === "number" ? obj.page : filters?.page ?? 1,
+      pageSize: typeof obj.pageSize === "number" ? obj.pageSize : filters?.pageSize ?? pageSize.value,
+      totalPages: typeof obj.totalPages === "number" ? obj.totalPages : 1,
+    };
+  };
+
+  const applyPage = (result: PaginatedActivities) => {
+    activities.value = result.items;
+    total.value = result.total;
+    page.value = result.page;
+    pageSize.value = result.pageSize;
+    totalPages.value = result.totalPages;
+  };
+
+  const emptyPage = (filters?: ActivityFilters): PaginatedActivities => ({
+    items: [],
+    total: 0,
+    page: filters?.page ?? 1,
+    pageSize: filters?.pageSize ?? pageSize.value,
+    totalPages: 1,
+  });
+
+  const getActivities = async (filters?: ActivityFilters): Promise<PaginatedActivities> => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await api<ActivityResponseDto[]>("/api/activities", {
+      const data = await api<unknown>("/api/activities", {
         query: buildQuery(filters),
       });
-      activities.value = data;
-      return data;
+      const result = toPage(data, filters);
+      applyPage(result);
+      return result;
     } catch (e: any) {
       error.value = e?.data?.message ?? "Erro ao carregar atividades";
-      return [];
+      activities.value = [];
+      return emptyPage(filters);
     } finally {
       loading.value = false;
       fetched.value = true;
     }
   };
 
-  const getMyActivities = async (filters?: ActivityFilters): Promise<ActivityResponseDto[]> => {
+  const getMyActivities = async (filters?: ActivityFilters): Promise<PaginatedActivities> => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await api<ActivityResponseDto[]>("/api/activities/me", {
+      const data = await api<unknown>("/api/activities/me", {
         query: buildQuery(filters),
       });
-      activities.value = data;
-      return data;
+      const result = toPage(data, filters);
+      applyPage(result);
+      return result;
     } catch (e: any) {
       error.value = e?.data?.message ?? "Erro ao carregar atividades";
-      return [];
+      activities.value = [];
+      return emptyPage(filters);
     } finally {
       loading.value = false;
       fetched.value = true;
@@ -148,18 +208,23 @@ export const useActivities = () => {
     return await api<ActivityEventResponseDto[]>(`/api/activities/${id}/events`);
   };
 
-  const getActivitiesByUser = async (userId: string): Promise<ActivityResponseDto[]> => {
+  const getActivitiesByUser = async (
+    userId: string,
+    filters?: ActivityFilters,
+  ): Promise<PaginatedActivities> => {
     loading.value = true;
     error.value = null;
     try {
-      const data = await api<ActivityResponseDto[]>("/api/activities", {
-        query: { authorId: userId },
+      const data = await api<unknown>("/api/activities", {
+        query: buildQuery({ ...filters, authorId: userId }),
       });
-      activities.value = data;
-      return data;
+      const result = toPage(data, filters);
+      applyPage(result);
+      return result;
     } catch (e: any) {
       error.value = e?.data?.message ?? "Erro ao carregar atividades";
-      return [];
+      activities.value = [];
+      return emptyPage(filters);
     } finally {
       loading.value = false;
       fetched.value = true;
@@ -173,6 +238,10 @@ export const useActivities = () => {
 
   return {
     activities,
+    total,
+    page,
+    pageSize,
+    totalPages,
     loading,
     fetched,
     error,

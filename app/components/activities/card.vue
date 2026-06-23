@@ -36,7 +36,7 @@ const userName = computed(() => {
     </div>
     <div class="mt-2 flex items-center justify-between text-xs text-muted">
       <span class="font-medium text-toned">{{ formatHours(activity.hoursEquivalent ?? activity.hours) }}</span>
-      <span>{{ formatDateBR(activity.startDate) }}</span>
+      <span>{{ formatDateBR(activity.createdAt) }}</span>
     </div>
   </div>
 </template>
