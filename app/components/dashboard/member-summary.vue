@@ -27,10 +27,12 @@ const fetchSummary = async () => {
   try {
     const [summaryData, activitiesData] = await Promise.all([
       getUserSummary(targetUserId.value),
-      isSelf.value ? getMyActivities() : getActivitiesByUser(targetUserId.value),
+      isSelf.value
+        ? getMyActivities({ pageSize: 100 })
+        : getActivitiesByUser(targetUserId.value, { pageSize: 100 }),
     ]);
     summary.value = summaryData;
-    userActivities.value = activitiesData;
+    userActivities.value = activitiesData.items;
   } catch (e: any) {
     error.value = e?.data?.message ?? "Erro ao carregar resumo";
   } finally {

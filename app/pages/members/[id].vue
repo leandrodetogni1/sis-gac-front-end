@@ -14,6 +14,8 @@ const { getUser } = useUsers();
 const { activities, error: activitiesError, fetched, getActivitiesByUser } = useActivities();
 const { user: currentUser } = useAuthState();
 
+const fetchActivities = () => getActivitiesByUser(memberId.value, { pageSize: 100 });
+
 const canEdit = computed(() => {
   const role = currentUser.value?.role;
   return role === "admin" || role === "owner";
@@ -71,14 +73,14 @@ const onSelect = (activity: ActivityResponseDto) => {
 
 const onStatusChanged = async () => {
   modalOpen.value = false;
-  await Promise.all([getActivitiesByUser(memberId.value), summaryRef.value?.refresh()]);
+  await Promise.all([fetchActivities(), summaryRef.value?.refresh()]);
 };
 
 onMounted(async () => {
   pageLoading.value = true;
   const [fetchedUser] = await Promise.all([
     getUser(memberId.value),
-    getActivitiesByUser(memberId.value),
+    fetchActivities(),
   ]);
   if (!fetchedUser) {
     userError.value = "Usuário não encontrado";
@@ -177,7 +179,7 @@ onMounted(async () => {
           :activities="activities"
           :error="activitiesError"
           :show-user="false"
-          @retry="getActivitiesByUser(memberId)"
+          @retry="fetchActivities"
           @select="onSelect"
         />
       </div>
