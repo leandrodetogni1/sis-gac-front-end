@@ -38,6 +38,10 @@ const getUserName = (activity: ActivityResponseDto) => {
   if (!activity.users) return "—";
   return `${activity.users.firstName} ${activity.users.lastName}`;
 };
+
+const emptyDescription = computed(() => {
+  return props.canCreate ? "Comece adicionando sua primeira atividade complementar." : "Nenhuma atividade cadastrada ainda.";
+});
 </script>
 
 <template>
@@ -51,7 +55,7 @@ const getUserName = (activity: ActivityResponseDto) => {
       clickable
       error-text="Falha ao carregar atividades"
       empty-text="Nenhuma atividade encontrada"
-      empty-description="Comece adicionando sua primeira atividade complementar."
+      :empty-description="emptyDescription"
       empty-icon="lucide:inbox"
       test-id="activities-table"
       @retry="emit('retry')"

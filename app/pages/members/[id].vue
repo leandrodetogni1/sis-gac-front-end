@@ -21,6 +21,8 @@ const canEdit = computed(() => {
   return role === "admin" || role === "owner";
 });
 
+const isSelf = computed(() => Boolean(currentUser.value) && currentUser.value?.id === memberId.value);
+
 const user = ref<UserResponseDto | null>(null);
 const userError = ref<string | null>(null);
 const pageLoading = ref(true);
@@ -167,7 +169,7 @@ onMounted(async () => {
 
       <div>
         <h2 class="mb-3 text-base font-semibold text-neutral-900">Atividades Complementares</h2>
-        <activities-list :activities="activities" :error="activitiesError" :show-user="false" @retry="fetchActivities" @select="onSelect" />
+        <activities-list :activities="activities" :error="activitiesError" :show-user="false" :can-create="isSelf" @retry="fetchActivities" @select="onSelect" />
       </div>
     </div>
 
