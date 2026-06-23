@@ -3,21 +3,12 @@ import { Course, CourseLabels } from "~/enums/Course";
 import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 import type { ActivityTypeResponseDto } from "~/interfaces/ActivityTypeResponseDto";
 
-useHead({ title: "Currículo — Configurações — SWGAC" });
+useHead({ title: "Currículo — Configurações — SISGAC" });
 
 const route = useRoute();
 const router = useRouter();
 const { user } = useAuthState();
-const {
-  curriculum,
-  loading,
-  error,
-  getCurriculum,
-  updateCurriculum,
-  deleteCurriculum,
-  upsertCourseRule,
-  upsertActivityTypeRule,
-} = useCurricula();
+const { curriculum, loading, error, getCurriculum, updateCurriculum, deleteCurriculum, upsertCourseRule, upsertActivityTypeRule } = useCurricula();
 const { activityTypes, getActivityTypes } = useActivityTypes();
 const { showToastSuccess, showToastError } = useToastNotification();
 const { confirmAlert } = useAlerts();
@@ -39,9 +30,7 @@ const editingGlobal = ref(false);
 const editingCourse = ref<string | null>(null);
 const editingActivityType = ref<string | null>(null);
 
-const anyEditing = computed(
-  () => editingGlobal.value || editingCourse.value !== null || editingActivityType.value !== null,
-);
+const anyEditing = computed(() => editingGlobal.value || editingCourse.value !== null || editingActivityType.value !== null);
 
 const globalModalOpen = computed({
   get: () => editingGlobal.value,
@@ -328,9 +317,7 @@ onMounted(async () => {
             Remover currículo
           </button>
         </div>
-        <p v-if="!canEdit" class="mt-2 text-xs text-neutral-500">
-          Modo somente leitura — apenas o proprietário pode editar.
-        </p>
+        <p v-if="!canEdit" class="mt-2 text-xs text-neutral-500">Modo somente leitura — apenas o proprietário pode editar.</p>
       </div>
 
       <SGCard test-id="card-global-rules">
@@ -354,39 +341,29 @@ onMounted(async () => {
 
         <dl class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
           <div>
-            <dt class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
-              Min. horas / categoria
-            </dt>
+            <dt class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">Min. horas / categoria</dt>
             <dd class="mt-1 text-base font-semibold tabular-nums text-neutral-900">
               {{ minHoursPerCategory || "—" }}
             </dd>
           </div>
 
           <div>
-            <dt class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
-              Min. categorias
-            </dt>
+            <dt class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">Min. categorias</dt>
             <dd class="mt-1 text-base font-semibold tabular-nums text-neutral-900">
               {{ minCategoriesRequired || "—" }}
             </dd>
           </div>
 
           <div>
-            <dt class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
-              Mult. excedente
-            </dt>
+            <dt class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">Mult. excedente</dt>
             <dd class="mt-1 text-base font-semibold tabular-nums text-neutral-900">
               {{ excessToFreeMultiplier }}<span class="text-neutral-400">×</span>
             </dd>
           </div>
 
           <div>
-            <dt class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">
-              Min. horas livres
-            </dt>
-            <dd class="mt-1 text-base font-semibold tabular-nums text-neutral-900">
-              {{ minFreeHours }}<span class="text-neutral-400">h</span>
-            </dd>
+            <dt class="text-[11px] font-medium uppercase tracking-wider text-neutral-500">Min. horas livres</dt>
+            <dd class="mt-1 text-base font-semibold tabular-nums text-neutral-900">{{ minFreeHours }}<span class="text-neutral-400">h</span></dd>
           </div>
         </dl>
       </SGCard>
@@ -410,9 +387,7 @@ onMounted(async () => {
               <p class="text-sm font-medium text-neutral-900 sm:truncate" :title="CourseLabels[course]">
                 {{ CourseLabels[course] }}
               </p>
-              <p v-if="!hasCourseRule(course)" class="mt-0.5 text-xs text-neutral-400">
-                Não configurado
-              </p>
+              <p v-if="!hasCourseRule(course)" class="mt-0.5 text-xs text-neutral-400">Não configurado</p>
             </div>
 
             <div class="flex items-center justify-between gap-3 sm:contents">
@@ -472,14 +447,14 @@ onMounted(async () => {
                 :data-testid="`activity-type-row-${type.cod}`"
               >
                 <div class="flex min-w-0 items-center gap-2.5">
-                  <span class="inline-flex h-6 w-7 shrink-0 items-center justify-center rounded-md bg-primary-50 text-[11px] font-bold text-primary-700">
+                  <span
+                    class="inline-flex h-6 w-7 shrink-0 items-center justify-center rounded-md bg-primary-50 text-[11px] font-bold text-primary-700"
+                  >
                     {{ type.cod }}
                   </span>
                   <div class="min-w-0">
                     <p class="text-sm font-medium text-neutral-900 sm:truncate" :title="type.label">{{ type.label }}</p>
-                    <p v-if="!hasActivityTypeRule(type.cod)" class="mt-0.5 text-xs text-neutral-400">
-                      Não configurado
-                    </p>
+                    <p v-if="!hasActivityTypeRule(type.cod)" class="mt-0.5 text-xs text-neutral-400">Não configurado</p>
                   </div>
                 </div>
 
@@ -524,12 +499,7 @@ onMounted(async () => {
           <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
               <label class="mb-1.5 block text-sm font-medium text-neutral-700">Min. horas por categoria</label>
-              <SGInput
-                v-model="minHoursPerCategory"
-                type="number"
-                placeholder="Ex: 120"
-                test-id="modal-input-min-hours-per-category"
-              />
+              <SGInput v-model="minHoursPerCategory" type="number" placeholder="Ex: 120" test-id="modal-input-min-hours-per-category" />
             </div>
             <div>
               <label class="mb-1.5 block text-sm font-medium text-neutral-700">
@@ -544,35 +514,18 @@ onMounted(async () => {
               />
             </div>
             <div>
-              <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-                Mult. excedente <span class="text-error-500">*</span>
-              </label>
-              <SGInput
-                v-model="excessToFreeMultiplier"
-                type="number"
-                step="0.1"
-                placeholder="Ex: 1"
-                test-id="modal-input-multiplier"
-              />
+              <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Mult. excedente <span class="text-error-500">*</span> </label>
+              <SGInput v-model="excessToFreeMultiplier" type="number" step="0.1" placeholder="Ex: 1" test-id="modal-input-multiplier" />
             </div>
             <div>
-              <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-                Min. horas livres <span class="text-error-500">*</span>
-              </label>
-              <SGInput
-                v-model="minFreeHours"
-                type="number"
-                placeholder="Ex: 217"
-                test-id="modal-input-min-free-hours"
-              />
+              <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Min. horas livres <span class="text-error-500">*</span> </label>
+              <SGInput v-model="minFreeHours" type="number" placeholder="Ex: 217" test-id="modal-input-min-free-hours" />
             </div>
           </div>
         </template>
         <template #footer="{ close }">
           <div class="flex w-full justify-end gap-2">
-            <SGButton variant="secondary" test-id="modal-cancel-global" @click="close">
-              Cancelar
-            </SGButton>
+            <SGButton variant="secondary" test-id="modal-cancel-global" @click="close"> Cancelar </SGButton>
             <SGButton
               variant="primary"
               icon="lucide:save"
@@ -596,34 +549,18 @@ onMounted(async () => {
         <template #body>
           <div v-if="editingCourse" class="grid grid-cols-2 gap-4">
             <div>
-              <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-                Total mínimo <span class="text-error-500">*</span>
-              </label>
-              <SGInput
-                v-model="courseRulesState[editingCourse].totalMin"
-                type="number"
-                placeholder="0"
-                test-id="modal-input-total-min"
-              />
+              <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Total mínimo <span class="text-error-500">*</span> </label>
+              <SGInput v-model="courseRulesState[editingCourse].totalMin" type="number" placeholder="0" test-id="modal-input-total-min" />
             </div>
             <div>
-              <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-                Total máximo <span class="text-error-500">*</span>
-              </label>
-              <SGInput
-                v-model="courseRulesState[editingCourse].totalMax"
-                type="number"
-                placeholder="0"
-                test-id="modal-input-total-max"
-              />
+              <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Total máximo <span class="text-error-500">*</span> </label>
+              <SGInput v-model="courseRulesState[editingCourse].totalMax" type="number" placeholder="0" test-id="modal-input-total-max" />
             </div>
           </div>
         </template>
         <template #footer="{ close }">
           <div class="flex w-full justify-end gap-2">
-            <SGButton variant="secondary" test-id="modal-cancel-course" @click="close">
-              Cancelar
-            </SGButton>
+            <SGButton variant="secondary" test-id="modal-cancel-course" @click="close"> Cancelar </SGButton>
             <SGButton
               v-if="editingCourse"
               variant="primary"
@@ -652,14 +589,15 @@ onMounted(async () => {
                 {{ editingActivityTypeData.cod }}
               </span>
               <p class="text-sm text-neutral-600">
-                Categoria: <span class="font-medium text-neutral-900">{{ categoryLabels[editingActivityTypeData.category ?? ""] ?? editingActivityTypeData.category ?? "—" }}</span>
+                Categoria:
+                <span class="font-medium text-neutral-900">{{
+                  categoryLabels[editingActivityTypeData.category ?? ""] ?? editingActivityTypeData.category ?? "—"
+                }}</span>
               </p>
             </div>
             <div class="grid grid-cols-2 gap-4">
               <div>
-                <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-                  Max total <span class="text-error-500">*</span>
-                </label>
+                <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Max total <span class="text-error-500">*</span> </label>
                 <SGInput
                   v-model="activityTypeRulesState[editingActivityType].maxHoursTotal"
                   type="number"
@@ -668,9 +606,7 @@ onMounted(async () => {
                 />
               </div>
               <div>
-                <label class="mb-1.5 block text-sm font-medium text-neutral-700">
-                  Max por unidade <span class="text-error-500">*</span>
-                </label>
+                <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Max por unidade <span class="text-error-500">*</span> </label>
                 <SGInput
                   v-model="activityTypeRulesState[editingActivityType].maxHoursPerCertificateOrSemester"
                   type="number"
@@ -683,9 +619,7 @@ onMounted(async () => {
         </template>
         <template #footer="{ close }">
           <div class="flex w-full justify-end gap-2">
-            <SGButton variant="secondary" test-id="modal-cancel-activity-type" @click="close">
-              Cancelar
-            </SGButton>
+            <SGButton variant="secondary" test-id="modal-cancel-activity-type" @click="close"> Cancelar </SGButton>
             <SGButton
               v-if="editingActivityType"
               variant="primary"

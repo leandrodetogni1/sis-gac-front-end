@@ -5,7 +5,7 @@ import type { SGTableColumn } from "~/types/SGTableColumn";
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 import type { UserFilters } from "~/composables/useUsers";
 
-useHead({ title: "Alunos — SWGAC" });
+useHead({ title: "Alunos — SISGAC" });
 
 const { user } = useAuthState();
 
@@ -222,35 +222,16 @@ onMounted(fetchMembers);
 
       <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
         <div class="w-full sm:max-w-sm">
-          <SGInput
-            v-model="search"
-            placeholder="Buscar por nome, email ou matrícula"
-            test-id="search-alunos"
-          />
+          <SGInput v-model="search" placeholder="Buscar por nome, email ou matrícula" test-id="search-alunos" />
         </div>
         <div class="w-full sm:max-w-xs">
-          <SGSelect
-            v-model="courseFilter"
-            placeholder="Filtrar por curso"
-            :options="courseOptions"
-            test-id="filter-course"
-          />
+          <SGSelect v-model="courseFilter" placeholder="Filtrar por curso" :options="courseOptions" test-id="filter-course" />
         </div>
         <div class="w-full sm:max-w-xs">
-          <SGSelect
-            v-model="situationFilter"
-            placeholder="Filtrar por situação"
-            :options="situationOptions"
-            test-id="filter-situation"
-          />
+          <SGSelect v-model="situationFilter" placeholder="Filtrar por situação" :options="situationOptions" test-id="filter-situation" />
         </div>
         <div class="w-full sm:max-w-xs md:hidden">
-          <SGSelect
-            v-model="sortValue"
-            placeholder="Ordenar por"
-            :options="sortOptions"
-            test-id="sort-mobile"
-          />
+          <SGSelect v-model="sortValue" placeholder="Ordenar por" :options="sortOptions" test-id="sort-mobile" />
         </div>
         <SGButton
           variant="primary"
@@ -285,12 +266,7 @@ onMounted(fetchMembers);
         >
           <template #cell-name="{ item: member }">
             <div class="flex items-center gap-2.5">
-              <SGAvatar
-                :first-name="member.firstName"
-                :last-name="member.lastName"
-                :picture="member.picture"
-                size="sm"
-              />
+              <SGAvatar :first-name="member.firstName" :last-name="member.lastName" :picture="member.picture" size="sm" />
               <span class="font-medium text-neutral-900">{{ member.firstName }} {{ member.lastName }}</span>
             </div>
           </template>
@@ -308,9 +284,7 @@ onMounted(fetchMembers);
           </template>
 
           <template #cell-situation="{ item: member }">
-            <span
-              :class="['inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold', situationBadgeClass(member.situation)]"
-            >
+            <span :class="['inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold', situationBadgeClass(member.situation)]">
               {{ formatSituation(member.situation) }}
             </span>
           </template>
@@ -322,12 +296,7 @@ onMounted(fetchMembers);
           <template #mobile="{ item: member }">
             <div class="flex items-start justify-between gap-2">
               <div class="flex items-center gap-2.5">
-                <SGAvatar
-                  :first-name="member.firstName"
-                  :last-name="member.lastName"
-                  :picture="member.picture"
-                  size="sm"
-                />
+                <SGAvatar :first-name="member.firstName" :last-name="member.lastName" :picture="member.picture" size="sm" />
                 <div class="min-w-0">
                   <p class="font-medium text-neutral-900">{{ member.firstName }} {{ member.lastName }}</p>
                   <p class="truncate text-sm text-neutral-500">{{ member.email }}</p>
@@ -353,9 +322,7 @@ onMounted(fetchMembers);
           v-if="!loading && !error && users.length > 0"
           class="mt-4 flex flex-col gap-3 border-t border-neutral-100 pt-4 sm:flex-row sm:items-center sm:justify-between"
         >
-          <p class="text-center text-xs text-neutral-500 sm:text-left">
-            Mostrando {{ rangeStart }}–{{ rangeEnd }} de {{ total }} alunos
-          </p>
+          <p class="text-center text-xs text-neutral-500 sm:text-left">Mostrando {{ rangeStart }}–{{ rangeEnd }} de {{ total }} alunos</p>
           <div class="flex items-center justify-between gap-2 sm:justify-end">
             <SGButton
               variant="secondary"

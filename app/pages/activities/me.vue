@@ -3,7 +3,7 @@ import { Category, CategoryLabels } from "~/enums/Category";
 import type { ActivityResponseDto, ActivityStatus } from "~/interfaces/ActivityResponseDto";
 import type { ActivitySortBy } from "~/composables/useActivities";
 
-useHead({ title: "Minhas Atividades — SWGAC" });
+useHead({ title: "Minhas Atividades — SISGAC" });
 
 const { user } = useAuthState();
 const { activities, total, page, pageSize, totalPages, fetched, error, getMyActivities } = useActivities();
@@ -143,28 +143,13 @@ onMounted(fetchActivities);
 
       <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
         <div class="w-full sm:w-56">
-          <SGSelect
-            v-model="categoryFilter"
-            placeholder="Filtrar por categoria"
-            :options="categoryOptions"
-            test-id="filter-category"
-          />
+          <SGSelect v-model="categoryFilter" placeholder="Filtrar por categoria" :options="categoryOptions" test-id="filter-category" />
         </div>
         <div class="w-full sm:w-56">
-          <SGSelect
-            v-model="statusFilter"
-            placeholder="Filtrar por status"
-            :options="statusOptions"
-            test-id="filter-status"
-          />
+          <SGSelect v-model="statusFilter" placeholder="Filtrar por status" :options="statusOptions" test-id="filter-status" />
         </div>
         <div class="w-full sm:w-56 md:hidden">
-          <SGSelect
-            v-model="sortValue"
-            placeholder="Ordenar por"
-            :options="sortOptions"
-            test-id="sort-mobile"
-          />
+          <SGSelect v-model="sortValue" placeholder="Ordenar por" :options="sortOptions" test-id="sort-mobile" />
         </div>
       </div>
 
@@ -184,9 +169,7 @@ onMounted(fetchActivities);
         v-if="!error && activities.length > 0"
         class="mt-4 flex flex-col gap-3 border-t border-neutral-100 pt-4 sm:flex-row sm:items-center sm:justify-between"
       >
-        <p class="text-center text-xs text-neutral-500 sm:text-left">
-          Mostrando {{ rangeStart }}–{{ rangeEnd }} de {{ total }} atividades
-        </p>
+        <p class="text-center text-xs text-neutral-500 sm:text-left">Mostrando {{ rangeStart }}–{{ rangeEnd }} de {{ total }} atividades</p>
         <div class="flex items-center justify-between gap-2 sm:justify-end">
           <SGButton
             variant="secondary"
@@ -224,10 +207,6 @@ onMounted(fetchActivities);
       @edit="onEdit"
     />
 
-    <activities-edit-modal
-      v-model:open="editModalOpen"
-      :activity="selectedActivity"
-      @updated="onUpdated"
-    />
+    <activities-edit-modal v-model:open="editModalOpen" :activity="selectedActivity" @updated="onUpdated" />
   </div>
 </template>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useHead({ title: "Dashboard — SWGAC" });
+useHead({ title: "Dashboard — SISGAC" });
 
 const { user } = useAuthState();
 

@@ -2,7 +2,7 @@
 import type { SGTableColumn } from "~/types/SGTableColumn";
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 
-useHead({ title: "Usuários — Configurações — SWGAC" });
+useHead({ title: "Usuários — Configurações — SISGAC" });
 
 const { fetched, loading, error, getUsers, deleteUser } = useUsers();
 const {
@@ -35,9 +35,7 @@ const fetchStaff = async () => {
   staffError.value = failed ? "Falha ao carregar administradores" : null;
 };
 
-const staffUsers = computed(() =>
-  staff.value.filter((u) => u.role && STAFF_ROLES.includes(u.role.toLowerCase())),
-);
+const staffUsers = computed(() => staff.value.filter((u) => u.role && STAFF_ROLES.includes(u.role.toLowerCase())));
 
 type StaffRow = {
   rowKey: string;
@@ -83,8 +81,7 @@ const staffRows = computed<StaffRow[]>(() => {
   }));
 
   const ROLE_ORDER: Record<string, number> = { owner: 0, admin: 1, reviewer: 2 };
-  const roleRank = (role: string | null) =>
-    role && ROLE_ORDER[role.toLowerCase()] !== undefined ? ROLE_ORDER[role.toLowerCase()]! : 99;
+  const roleRank = (role: string | null) => (role && ROLE_ORDER[role.toLowerCase()] !== undefined ? ROLE_ORDER[role.toLowerCase()]! : 99);
 
   return [...fromUsers, ...fromInvitations].sort((a, b) => {
     if (a.kind !== b.kind) return a.kind === "invitation" ? 1 : -1;
@@ -123,11 +120,7 @@ const handleInvitationCreated = async () => {
 };
 
 const handleRevoke = async (id: string, email: string) => {
-  const confirmed = await confirmAlert(
-    `O convite enviado para "${email}" será revogado.`,
-    "Revogar convite?",
-    "warning",
-  );
+  const confirmed = await confirmAlert(`O convite enviado para "${email}" será revogado.`, "Revogar convite?", "warning");
   if (!confirmed) return;
 
   try {
@@ -139,11 +132,7 @@ const handleRevoke = async (id: string, email: string) => {
 };
 
 const handleDelete = async (id: string, name: string) => {
-  const confirmed = await confirmAlert(
-    `O usuário "${name}" será removido permanentemente.`,
-    "Remover usuário?",
-    "warning",
-  );
+  const confirmed = await confirmAlert(`O usuário "${name}" será removido permanentemente.`, "Remover usuário?", "warning");
   if (!confirmed) return;
 
   try {
@@ -162,11 +151,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <div
-      v-if="!fetched || !invitationsFetched"
-      class="flex min-h-[40vh] items-center justify-center"
-      data-testid="page-loading"
-    >
+    <div v-if="!fetched || !invitationsFetched" class="flex min-h-[40vh] items-center justify-center" data-testid="page-loading">
       <div class="flex flex-col items-center gap-4">
         <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
         <p class="text-sm text-neutral-500">Carregando usuários...</p>
@@ -197,170 +182,149 @@ onMounted(async () => {
       </SGModal>
 
       <SGCard test-id="card-staff">
-          <SGTable
-            :columns="staffColumns"
-            :items="staffRows"
-            item-key="rowKey"
-            :error="staffError ?? invitationsError"
-            error-text="Falha ao carregar administradores"
-            empty-text="Nenhum administrador cadastrado"
-            empty-description="Convide um admin ou reviewer para começar."
-            empty-icon="lucide:shield"
-            test-id="staff-table"
-            @retry="fetchStaff(); getInvitations()"
-          >
-            <template #cell-name="{ item: row }">
-              <div v-if="row.kind === 'user'" class="flex items-center gap-2.5">
-                <SGAvatar
-                  :first-name="row.firstName"
-                  :last-name="row.lastName"
-                  :picture="row.picture"
-                  size="sm"
-                />
-                <span class="font-medium text-neutral-900">{{ row.firstName }} {{ row.lastName }}</span>
+        <SGTable
+          :columns="staffColumns"
+          :items="staffRows"
+          item-key="rowKey"
+          :error="staffError ?? invitationsError"
+          error-text="Falha ao carregar administradores"
+          empty-text="Nenhum administrador cadastrado"
+          empty-description="Convide um admin ou reviewer para começar."
+          empty-icon="lucide:shield"
+          test-id="staff-table"
+          @retry="
+            fetchStaff();
+            getInvitations();
+          "
+        >
+          <template #cell-name="{ item: row }">
+            <div v-if="row.kind === 'user'" class="flex items-center gap-2.5">
+              <SGAvatar :first-name="row.firstName" :last-name="row.lastName" :picture="row.picture" size="sm" />
+              <span class="font-medium text-neutral-900">{{ row.firstName }} {{ row.lastName }}</span>
+            </div>
+            <div v-else class="flex items-center gap-2.5">
+              <div class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
+                <Icon name="lucide:mail" size="1rem" />
               </div>
-              <div v-else class="flex items-center gap-2.5">
-                <div
-                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400"
-                >
+              <span class="text-neutral-400 italic">Aguardando 1º acesso</span>
+            </div>
+          </template>
+
+          <template #cell-email="{ item: row }">
+            <div class="flex flex-col">
+              <span class="text-neutral-700">{{ row.email }}</span>
+              <span v-if="row.kind === 'invitation' && row.inviterEmail" class="text-xs text-neutral-400">
+                convidado por {{ row.inviterEmail }}
+              </span>
+            </div>
+          </template>
+
+          <template #cell-role="{ item: row }">
+            <span class="text-neutral-500">{{ roleLabel(row.role) }}</span>
+          </template>
+
+          <template #cell-status="{ item: row }">
+            <span
+              v-if="row.kind === 'invitation'"
+              class="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              Pendente
+            </span>
+            <span
+              v-else
+              class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700"
+            >
+              <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
+              Ativo
+            </span>
+          </template>
+
+          <template #cell-createdAt="{ item: row }">
+            <span class="text-neutral-500">{{ formatDateTimeBR(row.createdAt) }}</span>
+          </template>
+
+          <template #cell-actions="{ item: row }">
+            <button
+              v-if="row.kind === 'user'"
+              :data-testid="`delete-user-${row.id}`"
+              class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-neutral-400"
+              :disabled="loading || row.isOwner"
+              :aria-label="row.isOwner ? 'Não é possível remover o owner' : 'Remover usuário'"
+              :title="row.isOwner ? 'Não é possível remover o owner' : 'Remover usuário'"
+              @click="handleDelete(row.id, `${row.firstName} ${row.lastName}`)"
+            >
+              <Icon name="lucide:trash-2" size="1rem" />
+            </button>
+            <button
+              v-else
+              :data-testid="`revoke-invitation-${row.id}`"
+              class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
+              :disabled="invitationsLoading"
+              aria-label="Revogar convite"
+              title="Revogar convite"
+              @click="handleRevoke(row.id, row.email)"
+            >
+              <Icon name="lucide:trash-2" size="1rem" />
+            </button>
+          </template>
+
+          <template #empty-action>
+            <SGButton test-id="empty-state-add-staff-button" variant="primary" icon="lucide:user-plus" size="sm" @click="openInvitationModal = true">
+              Convidar admin/reviewer
+            </SGButton>
+          </template>
+
+          <template #mobile="{ item: row }">
+            <div class="flex items-start justify-between gap-2">
+              <div class="flex items-center gap-2.5">
+                <SGAvatar v-if="row.kind === 'user'" :first-name="row.firstName" :last-name="row.lastName" :picture="row.picture" size="sm" />
+                <div v-else class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
                   <Icon name="lucide:mail" size="1rem" />
                 </div>
-                <span class="text-neutral-400 italic">Aguardando 1º acesso</span>
+                <div>
+                  <p v-if="row.kind === 'user'" class="font-medium text-neutral-900">{{ row.firstName }} {{ row.lastName }}</p>
+                  <p v-else class="text-sm italic text-neutral-500">Aguardando 1º acesso</p>
+                  <p class="text-sm text-neutral-500">{{ row.email }}</p>
+                </div>
               </div>
-            </template>
-
-            <template #cell-email="{ item: row }">
-              <div class="flex flex-col">
-                <span class="text-neutral-700">{{ row.email }}</span>
-                <span v-if="row.kind === 'invitation' && row.inviterEmail" class="text-xs text-neutral-400">
-                  convidado por {{ row.inviterEmail }}
-                </span>
-              </div>
-            </template>
-
-            <template #cell-role="{ item: row }">
-              <span class="text-neutral-500">{{ roleLabel(row.role) }}</span>
-            </template>
-
-            <template #cell-status="{ item: row }">
-              <span
-                v-if="row.kind === 'invitation'"
-                class="inline-flex items-center gap-1.5 rounded-full border border-amber-300 bg-amber-50 px-2.5 py-0.5 text-xs font-semibold text-amber-700"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-amber-500" />
-                Pendente
-              </span>
-              <span
-                v-else
-                class="inline-flex items-center gap-1.5 rounded-full border border-emerald-300 bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700"
-              >
-                <span class="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-                Ativo
-              </span>
-            </template>
-
-            <template #cell-createdAt="{ item: row }">
-              <span class="text-neutral-500">{{ formatDateTimeBR(row.createdAt) }}</span>
-            </template>
-
-            <template #cell-actions="{ item: row }">
               <button
                 v-if="row.kind === 'user'"
-                :data-testid="`delete-user-${row.id}`"
-                class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-transparent disabled:hover:text-neutral-400"
+                :data-testid="`delete-user-mobile-${row.id}`"
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 disabled:opacity-40 sm:h-9 sm:w-9"
+                aria-label="Remover usuário"
                 :disabled="loading || row.isOwner"
-                :aria-label="row.isOwner ? 'Não é possível remover o owner' : 'Remover usuário'"
-                :title="row.isOwner ? 'Não é possível remover o owner' : 'Remover usuário'"
                 @click="handleDelete(row.id, `${row.firstName} ${row.lastName}`)"
               >
                 <Icon name="lucide:trash-2" size="1rem" />
               </button>
               <button
                 v-else
-                :data-testid="`revoke-invitation-${row.id}`"
-                class="rounded-lg p-1.5 text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500"
-                :disabled="invitationsLoading"
+                :data-testid="`revoke-invitation-mobile-${row.id}`"
+                class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 sm:h-9 sm:w-9"
                 aria-label="Revogar convite"
-                title="Revogar convite"
+                :disabled="invitationsLoading"
                 @click="handleRevoke(row.id, row.email)"
               >
                 <Icon name="lucide:trash-2" size="1rem" />
               </button>
-            </template>
-
-            <template #empty-action>
-              <SGButton
-                test-id="empty-state-add-staff-button"
-                variant="primary"
-                icon="lucide:user-plus"
-                size="sm"
-                @click="openInvitationModal = true"
-              >
-                Convidar admin/reviewer
-              </SGButton>
-            </template>
-
-            <template #mobile="{ item: row }">
-              <div class="flex items-start justify-between gap-2">
-                <div class="flex items-center gap-2.5">
-                  <SGAvatar
-                    v-if="row.kind === 'user'"
-                    :first-name="row.firstName"
-                    :last-name="row.lastName"
-                    :picture="row.picture"
-                    size="sm"
-                  />
-                  <div
-                    v-else
-                    class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400"
-                  >
-                    <Icon name="lucide:mail" size="1rem" />
-                  </div>
-                  <div>
-                    <p v-if="row.kind === 'user'" class="font-medium text-neutral-900">
-                      {{ row.firstName }} {{ row.lastName }}
-                    </p>
-                    <p v-else class="text-sm italic text-neutral-500">Aguardando 1º acesso</p>
-                    <p class="text-sm text-neutral-500">{{ row.email }}</p>
-                  </div>
-                </div>
-                <button
-                  v-if="row.kind === 'user'"
-                  :data-testid="`delete-user-mobile-${row.id}`"
-                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 disabled:opacity-40 sm:h-9 sm:w-9"
-                  aria-label="Remover usuário"
-                  :disabled="loading || row.isOwner"
-                  @click="handleDelete(row.id, `${row.firstName} ${row.lastName}`)"
+            </div>
+            <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
+              <span class="flex items-center gap-2">
+                {{ roleLabel(row.role) }}
+                <span
+                  v-if="row.kind === 'invitation'"
+                  class="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700"
                 >
-                  <Icon name="lucide:trash-2" size="1rem" />
-                </button>
-                <button
-                  v-else
-                  :data-testid="`revoke-invitation-mobile-${row.id}`"
-                  class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-error-50 hover:text-error-500 sm:h-9 sm:w-9"
-                  aria-label="Revogar convite"
-                  :disabled="invitationsLoading"
-                  @click="handleRevoke(row.id, row.email)"
-                >
-                  <Icon name="lucide:trash-2" size="1rem" />
-                </button>
-              </div>
-              <div class="mt-2 flex items-center justify-between text-xs text-neutral-500">
-                <span class="flex items-center gap-2">
-                  {{ roleLabel(row.role) }}
-                  <span
-                    v-if="row.kind === 'invitation'"
-                    class="inline-flex items-center gap-1 rounded-full border border-amber-300 bg-amber-50 px-2 py-0.5 text-xs font-semibold text-amber-700"
-                  >
-                    <span class="h-1 w-1 rounded-full bg-amber-500" />
-                    Pendente
-                  </span>
+                  <span class="h-1 w-1 rounded-full bg-amber-500" />
+                  Pendente
                 </span>
-                <span>{{ formatDateTimeBR(row.createdAt) }}</span>
-              </div>
-            </template>
-          </SGTable>
-        </SGCard>
+              </span>
+              <span>{{ formatDateTimeBR(row.createdAt) }}</span>
+            </div>
+          </template>
+        </SGTable>
+      </SGCard>
     </div>
   </div>
 </template>

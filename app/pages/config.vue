@@ -1,5 +1,5 @@
 <script setup lang="ts">
-useHead({ title: "Configurações — SWGAC" });
+useHead({ title: "Configurações — SISGAC" });
 
 const { user } = useAuthState();
 

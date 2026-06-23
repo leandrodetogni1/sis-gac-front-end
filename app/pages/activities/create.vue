@@ -2,7 +2,7 @@
 import type { ActivityTypeResponseDto } from "~/interfaces/ActivityTypeResponseDto";
 import type { CreateActivityDto } from "~/interfaces/CreateActivityDto";
 
-useHead({ title: "Nova Atividade — SWGAC" });
+useHead({ title: "Nova Atividade — SISGAC" });
 
 const router = useRouter();
 const { user } = useAuthState();
@@ -49,12 +49,8 @@ const cod = computed(() => selectedType.value?.cod ?? null);
 
 const isSemesterUnit = computed(() => unity.value === "SEMESTRE");
 const isHoursUnit = computed(() => unity.value === "HORAS");
-const isFixedUnit = computed(
-  () => unity.value === "UNIDADE" && cod.value !== null && UNIT_FIXED_CODS.includes(cod.value),
-);
-const isEventHoursUnit = computed(
-  () => unity.value === "UNIDADE" && cod.value !== null && UNIT_EVENT_CODS.includes(cod.value),
-);
+const isFixedUnit = computed(() => unity.value === "UNIDADE" && cod.value !== null && UNIT_FIXED_CODS.includes(cod.value));
+const isEventHoursUnit = computed(() => unity.value === "UNIDADE" && cod.value !== null && UNIT_EVENT_CODS.includes(cod.value));
 
 const showHoursInput = computed(() => isHoursUnit.value || isEventHoursUnit.value);
 
@@ -225,11 +221,7 @@ const handleSubmit = async () => {
 
           <div class="sm:col-span-2">
             <label class="mb-1.5 block text-sm font-medium text-neutral-700"> Tipo de Atividade <span class="text-error-500">*</span> </label>
-            <activities-activity-type-select
-              v-model="activityTypeId"
-              test-id="select-activity-type"
-              @change="handleTypeChange"
-            />
+            <activities-activity-type-select v-model="activityTypeId" test-id="select-activity-type" @change="handleTypeChange" />
           </div>
 
           <div>
@@ -263,11 +255,7 @@ const handleSubmit = async () => {
             >
               Valor único registrado automaticamente.
             </p>
-            <p
-              v-else
-              class="rounded-md border border-dashed border-default bg-elevated px-3 py-2 text-xs text-dimmed"
-              data-testid="hours-info-none"
-            >
+            <p v-else class="rounded-md border border-dashed border-default bg-elevated px-3 py-2 text-xs text-dimmed" data-testid="hours-info-none">
               Selecione o tipo de atividade para definir as horas.
             </p>
           </div>
@@ -294,15 +282,8 @@ const handleSubmit = async () => {
             <label class="mb-1.5 block text-sm font-medium text-neutral-700">
               Link de validação do certificado <span class="text-xs text-neutral-500">(opcional)</span>
             </label>
-            <SGInput
-              v-model="certificateUrl"
-              type="url"
-              placeholder="https://..."
-              test-id="input-certificate-url"
-            />
-            <p v-if="!isCertificateUrlValid" class="mt-1 text-xs text-error-500">
-              O link deve ter no máximo 500 caracteres.
-            </p>
+            <SGInput v-model="certificateUrl" type="url" placeholder="https://..." test-id="input-certificate-url" />
+            <p v-if="!isCertificateUrlValid" class="mt-1 text-xs text-error-500">O link deve ter no máximo 500 caracteres.</p>
           </div>
         </div>
 
@@ -343,8 +324,20 @@ const handleSubmit = async () => {
       </div>
 
       <div class="mt-8 flex flex-col-reverse gap-3 border-t border-neutral-200 pt-6 sm:flex-row sm:items-center sm:justify-end">
-        <SGButton variant="secondary" test-id="cancel-button" type="button" block class="min-h-11 sm:min-h-0 sm:w-auto" @click="router.back()"> Cancelar </SGButton>
-        <SGButton variant="primary" test-id="submit-button" type="submit" :loading="loading" :disabled="!isValid || loading" block class="min-h-11 sm:min-h-0 sm:w-auto"> Criar </SGButton>
+        <SGButton variant="secondary" test-id="cancel-button" type="button" block class="min-h-11 sm:min-h-0 sm:w-auto" @click="router.back()">
+          Cancelar
+        </SGButton>
+        <SGButton
+          variant="primary"
+          test-id="submit-button"
+          type="submit"
+          :loading="loading"
+          :disabled="!isValid || loading"
+          block
+          class="min-h-11 sm:min-h-0 sm:w-auto"
+        >
+          Criar
+        </SGButton>
       </div>
     </form>
   </div>

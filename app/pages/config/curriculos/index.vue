@@ -2,7 +2,7 @@
 import type { SGTableColumn } from "~/types/SGTableColumn";
 import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 
-useHead({ title: "Currículos — Configurações — SWGAC" });
+useHead({ title: "Currículos — Configurações — SISGAC" });
 
 const router = useRouter();
 const { user } = useAuthState();
@@ -61,17 +61,9 @@ onMounted(async () => {
       <div class="mb-4 flex items-center justify-between">
         <div>
           <h2 class="text-base font-semibold text-neutral-900 md:text-lg">Currículos</h2>
-          <p class="mt-0.5 text-xs text-neutral-500">
-            Regras globais, por curso e por tipo de atividade.
-          </p>
+          <p class="mt-0.5 text-xs text-neutral-500">Regras globais, por curso e por tipo de atividade.</p>
         </div>
-        <SGButton
-          v-if="canCreate"
-          test-id="add-curriculum-button"
-          variant="primary"
-          icon="lucide:plus"
-          @click="createModal = true"
-        >
+        <SGButton v-if="canCreate" test-id="add-curriculum-button" variant="primary" icon="lucide:plus" @click="createModal = true">
           Adicionar Currículo
         </SGButton>
       </div>
@@ -126,9 +118,18 @@ onMounted(async () => {
                   </span>
                 </div>
                 <div class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-neutral-500">
-                  <span>Min. cat.: <span class="font-medium text-neutral-700">{{ formatNullable(c.minHoursPerCategory) }}h × {{ formatNullable(c.minCategoriesRequired) }}</span></span>
-                  <span>Mult.: <span class="font-medium text-neutral-700">{{ c.excessToFreeMultiplier }}×</span></span>
-                  <span>Livres: <span class="font-medium text-neutral-700">{{ c.minFreeHours }}h</span></span>
+                  <span
+                    >Min. cat.:
+                    <span class="font-medium text-neutral-700"
+                      >{{ formatNullable(c.minHoursPerCategory) }}h × {{ formatNullable(c.minCategoriesRequired) }}</span
+                    ></span
+                  >
+                  <span
+                    >Mult.: <span class="font-medium text-neutral-700">{{ c.excessToFreeMultiplier }}×</span></span
+                  >
+                  <span
+                    >Livres: <span class="font-medium text-neutral-700">{{ c.minFreeHours }}h</span></span
+                  >
                 </div>
               </div>
               <Icon name="lucide:chevron-right" size="1.25rem" class="mt-0.5 shrink-0 text-neutral-400" />
@@ -143,15 +144,8 @@ onMounted(async () => {
         </SGTable>
       </SGCard>
 
-      <SGModal
-        v-model:open="createModal"
-        title="Novo Currículo"
-        description="Configure as regras globais para um novo ano de currículo."
-      >
-        <config-curriculum-form
-          :available-years="availableYears"
-          @created="handleCreated"
-        />
+      <SGModal v-model:open="createModal" title="Novo Currículo" description="Configure as regras globais para um novo ano de currículo.">
+        <config-curriculum-form :available-years="availableYears" @created="handleCreated" />
       </SGModal>
     </div>
   </div>

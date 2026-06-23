@@ -78,15 +78,12 @@ const onStatusChanged = async () => {
 
 onMounted(async () => {
   pageLoading.value = true;
-  const [fetchedUser] = await Promise.all([
-    getUser(memberId.value),
-    fetchActivities(),
-  ]);
+  const [fetchedUser] = await Promise.all([getUser(memberId.value), fetchActivities()]);
   if (!fetchedUser) {
     userError.value = "Usuário não encontrado";
   } else {
     user.value = fetchedUser;
-    useHead({ title: `${fetchedUser.firstName} ${fetchedUser.lastName} — SWGAC` });
+    useHead({ title: `${fetchedUser.firstName} ${fetchedUser.lastName} — SISGAC` });
   }
   pageLoading.value = false;
 });
@@ -120,12 +117,7 @@ onMounted(async () => {
       <div v-if="user" class="mb-6">
         <SGCard>
           <div class="flex items-start gap-4">
-            <SGAvatar
-              :first-name="user.firstName"
-              :last-name="user.lastName"
-              :picture="user.picture"
-              size="xl"
-            />
+            <SGAvatar :first-name="user.firstName" :last-name="user.lastName" :picture="user.picture" size="xl" />
             <div class="min-w-0 flex-1">
               <h1 class="text-lg font-semibold text-neutral-900">{{ fullName }}</h1>
               <p class="text-sm text-neutral-500">{{ user.email }}</p>
@@ -175,13 +167,7 @@ onMounted(async () => {
 
       <div>
         <h2 class="mb-3 text-base font-semibold text-neutral-900">Atividades Complementares</h2>
-        <activities-list
-          :activities="activities"
-          :error="activitiesError"
-          :show-user="false"
-          @retry="fetchActivities"
-          @select="onSelect"
-        />
+        <activities-list :activities="activities" :error="activitiesError" :show-user="false" @retry="fetchActivities" @select="onSelect" />
       </div>
     </div>
 
@@ -193,11 +179,6 @@ onMounted(async () => {
       @rejected="onStatusChanged"
     />
 
-    <members-edit-modal
-      v-if="user && canEdit"
-      v-model:open="editOpen"
-      :user="user"
-      @updated="onUserUpdated"
-    />
+    <members-edit-modal v-if="user && canEdit" v-model:open="editOpen" :user="user" @updated="onUserUpdated" />
   </div>
 </template>

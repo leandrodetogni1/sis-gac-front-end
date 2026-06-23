@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { SGTableColumn } from "~/types/SGTableColumn";
 
-useHead({ title: "Auditoria — Configurações — SWGAC" });
+useHead({ title: "Auditoria — Configurações — SISGAC" });
 
 const { logs, total, page, limit, loading, fetched, error, getLogs } = useAudit();
 
@@ -82,11 +82,7 @@ onMounted(() => {
 
 <template>
   <div>
-    <div
-      v-if="!fetched"
-      class="flex min-h-[40vh] items-center justify-center"
-      data-testid="page-loading"
-    >
+    <div v-if="!fetched" class="flex min-h-[40vh] items-center justify-center" data-testid="page-loading">
       <div class="flex flex-col items-center gap-4">
         <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
         <p class="text-sm text-neutral-500">Carregando auditoria...</p>
@@ -120,12 +116,8 @@ onMounted(() => {
             <SGSelect v-model="pageSize" :options="pageSizeOptions" test-id="audit-page-size" />
           </div>
           <div class="grid grid-cols-2 gap-2 sm:flex">
-            <SGButton variant="secondary" icon="lucide:x" size="sm" test-id="audit-clear" @click="clearFilters">
-              Limpar
-            </SGButton>
-            <SGButton variant="primary" icon="lucide:filter" size="sm" test-id="audit-apply" @click="applyFilters">
-              Filtrar
-            </SGButton>
+            <SGButton variant="secondary" icon="lucide:x" size="sm" test-id="audit-clear" @click="clearFilters"> Limpar </SGButton>
+            <SGButton variant="primary" icon="lucide:filter" size="sm" test-id="audit-apply" @click="applyFilters"> Filtrar </SGButton>
           </div>
         </div>
       </SGCard>
@@ -151,17 +143,8 @@ onMounted(() => {
 
           <template #cell-actor="{ item: row }">
             <div class="flex items-center gap-2.5">
-              <SGAvatar
-                v-if="row.actor"
-                :first-name="row.actor.firstName"
-                :last-name="row.actor.lastName"
-                :picture="row.actor.picture"
-                size="sm"
-              />
-              <div
-                v-else
-                class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400"
-              >
+              <SGAvatar v-if="row.actor" :first-name="row.actor.firstName" :last-name="row.actor.lastName" :picture="row.actor.picture" size="sm" />
+              <div v-else class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
                 <Icon name="lucide:server" size="1rem" />
               </div>
               <div class="flex flex-col">
@@ -172,13 +155,13 @@ onMounted(() => {
           </template>
 
           <template #cell-action="{ item: row }">
-            <span class="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700" :title="row.action">{{ formatAuditAction(row.action) }}</span>
+            <span class="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700" :title="row.action">{{
+              formatAuditAction(row.action)
+            }}</span>
           </template>
 
           <template #cell-status="{ item: row }">
-            <span
-              :class="['inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold', statusBadge(row.statusCode).cls]"
-            >
+            <span :class="['inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold', statusBadge(row.statusCode).cls]">
               {{ statusBadge(row.statusCode).label }}
             </span>
           </template>
@@ -193,24 +176,17 @@ onMounted(() => {
           <template #mobile="{ item: row }">
             <div class="flex items-start justify-between gap-2">
               <div class="flex min-w-0 items-start gap-2.5">
-                <SGAvatar
-                  v-if="row.actor"
-                  :first-name="row.actor.firstName"
-                  :last-name="row.actor.lastName"
-                  :picture="row.actor.picture"
-                  size="sm"
-                />
-                <div
-                  v-else
-                  class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400"
-                >
+                <SGAvatar v-if="row.actor" :first-name="row.actor.firstName" :last-name="row.actor.lastName" :picture="row.actor.picture" size="sm" />
+                <div v-else class="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
                   <Icon name="lucide:server" size="1rem" />
                 </div>
                 <div class="min-w-0">
                   <p class="truncate font-medium text-neutral-900">{{ actorName(row) }}</p>
                   <p v-if="row.actor" class="truncate text-xs text-neutral-400">{{ row.actor.email }}</p>
                   <p class="mt-1">
-                    <span class="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700" :title="row.action">{{ formatAuditAction(row.action) }}</span>
+                    <span class="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700" :title="row.action">{{
+                      formatAuditAction(row.action)
+                    }}</span>
                   </p>
                 </div>
               </div>
@@ -232,18 +208,9 @@ onMounted(() => {
           v-if="!loading && !error && logs.length > 0"
           class="mt-4 flex flex-col gap-3 border-t border-neutral-100 pt-4 sm:flex-row sm:items-center sm:justify-between"
         >
-          <p class="text-center text-xs text-neutral-500 sm:text-left">
-            Mostrando {{ rangeStart }}–{{ rangeEnd }} de {{ total }} registros
-          </p>
+          <p class="text-center text-xs text-neutral-500 sm:text-left">Mostrando {{ rangeStart }}–{{ rangeEnd }} de {{ total }} registros</p>
           <div class="flex items-center justify-between gap-2 sm:justify-end">
-            <SGButton
-              variant="secondary"
-              icon="lucide:chevron-left"
-              size="sm"
-              test-id="audit-prev"
-              :disabled="page <= 1"
-              @click="goToPage(page - 1)"
-            >
+            <SGButton variant="secondary" icon="lucide:chevron-left" size="sm" test-id="audit-prev" :disabled="page <= 1" @click="goToPage(page - 1)">
               Anterior
             </SGButton>
             <span class="shrink-0 text-xs text-neutral-500">Página {{ page }} de {{ totalPages }}</span>
