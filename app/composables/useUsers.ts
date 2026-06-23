@@ -1,5 +1,6 @@
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 import type { PaginatedUsers } from "~/interfaces/PaginatedUsers";
+import type { FormandosAptosResponseDto } from "~/interfaces/FormandoAptoResponseDto";
 
 export interface UserFilters {
   search?: string;
@@ -91,6 +92,20 @@ export const useUsers = () => {
     }
   };
 
+  const getFormandosAptos = async (): Promise<FormandosAptosResponseDto> => {
+    loading.value = true;
+    error.value = null;
+    try {
+      const data = await api<FormandosAptosResponseDto>("/api/users/formandos-aptos");
+      return data;
+    } catch (e: any) {
+      error.value = e?.data?.message ?? "Erro ao carregar formandos aptos";
+      return { items: [], total: 0 };
+    } finally {
+      loading.value = false;
+    }
+  };
+
   const patchUser = async (
     id: string,
     payload: {
@@ -130,5 +145,6 @@ export const useUsers = () => {
     getUser,
     deleteUser,
     patchUser,
+    getFormandosAptos,
   };
 };

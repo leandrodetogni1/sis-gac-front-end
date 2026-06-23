@@ -203,6 +203,14 @@ const situationBadgeClass = (value: string | null) => {
   return map[value ?? ""] ?? "border-neutral-200 bg-neutral-100 text-neutral-700";
 };
 
+const courseDotClass = (value: string | null) => {
+  const map: Record<string, string> = {
+    [Course.CIENCIA_DA_COMPUTACAO]: "bg-sky-500",
+    [Course.ENGENHARIA_DA_COMPUTACAO]: "bg-violet-500",
+  };
+  return map[value ?? ""] ?? "bg-neutral-300";
+};
+
 onMounted(fetchMembers);
 </script>
 
@@ -216,13 +224,14 @@ onMounted(fetchMembers);
     </div>
 
     <div v-else>
-      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
-        <h2 class="text-base font-semibold text-neutral-900 md:text-lg">Alunos</h2>
+      <div class="mb-5 flex flex-wrap items-center justify-between gap-3">
+        <members-tabs />
+        <span class="text-sm font-medium tabular-nums text-neutral-500">{{ total }} alunos</span>
       </div>
 
       <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:flex-wrap">
         <div class="w-full sm:max-w-sm">
-          <SGInput v-model="search" placeholder="Buscar por nome, email ou matrícula" test-id="search-alunos" />
+          <SGInput v-model="search" placeholder="Buscar por nome, email ou matrícula" icon="lucide:search" test-id="search-alunos" />
         </div>
         <div class="w-full sm:max-w-xs">
           <SGSelect v-model="courseFilter" placeholder="Filtrar por curso" :options="courseOptions" test-id="filter-course" />
@@ -236,9 +245,9 @@ onMounted(fetchMembers);
         <SGButton
           variant="primary"
           icon="lucide:filter-x"
+          size="sm"
           :disabled="!hasActiveFilters"
           test-id="clear-filters"
-          class="min-h-11 sm:min-h-8"
           @click="clearFilters"
         >
           Limpar filtros
@@ -265,9 +274,9 @@ onMounted(fetchMembers);
           @sort="handleSort"
         >
           <template #cell-name="{ item: member }">
-            <div class="flex items-center gap-2.5">
-              <SGAvatar :first-name="member.firstName" :last-name="member.lastName" :picture="member.picture" size="sm" />
-              <span class="font-medium text-neutral-900">{{ member.firstName }} {{ member.lastName }}</span>
+            <div class="flex items-center gap-3">
+              <SGAvatar :first-name="member.firstName" :last-name="member.lastName" :picture="member.picture" size="md" />
+              <span class="font-semibold text-neutral-900">{{ member.firstName }} {{ member.lastName }}</span>
             </div>
           </template>
 
@@ -276,43 +285,56 @@ onMounted(fetchMembers);
           </template>
 
           <template #cell-matricula="{ item: member }">
-            <span class="text-neutral-500">{{ member.matricula ?? "—" }}</span>
+            <span class="tabular-nums text-neutral-600">{{ member.matricula ?? "—" }}</span>
           </template>
 
           <template #cell-course="{ item: member }">
-            <span class="text-neutral-500">{{ formatCourse(member.course) }}</span>
+            <span v-if="member.course" class="inline-flex items-center gap-2 text-neutral-600">
+              <span class="h-2 w-2 shrink-0 rounded-full" :class="courseDotClass(member.course)" />
+              {{ formatCourse(member.course) }}
+            </span>
+            <span v-else class="text-neutral-400">—</span>
           </template>
 
           <template #cell-situation="{ item: member }">
-            <span :class="['inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold', situationBadgeClass(member.situation)]">
+            <span :class="['inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-semibold', situationBadgeClass(member.situation)]">
+              <span class="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
               {{ formatSituation(member.situation) }}
             </span>
           </template>
 
           <template #cell-createdAt="{ item: member }">
-            <span class="text-neutral-500">{{ formatDateTimeBR(member.createdAt) }}</span>
+            <span class="tabular-nums text-neutral-500">{{ formatDateBR(member.createdAt) }}</span>
           </template>
 
           <template #mobile="{ item: member }">
             <div class="flex items-start justify-between gap-2">
-              <div class="flex items-center gap-2.5">
-                <SGAvatar :first-name="member.firstName" :last-name="member.lastName" :picture="member.picture" size="sm" />
+              <div class="flex items-center gap-3">
+                <SGAvatar :first-name="member.firstName" :last-name="member.lastName" :picture="member.picture" size="md" />
                 <div class="min-w-0">
-                  <p class="font-medium text-neutral-900">{{ member.firstName }} {{ member.lastName }}</p>
+                  <p class="font-semibold text-neutral-900">{{ member.firstName }} {{ member.lastName }}</p>
                   <p class="truncate text-sm text-neutral-500">{{ member.email }}</p>
                 </div>
               </div>
               <Icon name="lucide:chevron-right" size="1.125rem" class="shrink-0 text-neutral-400" />
             </div>
-            <div class="mt-2 flex flex-col gap-1.5 text-sm text-neutral-500">
-              <span>{{ member.matricula ?? "—" }} · {{ formatCourse(member.course) }}</span>
+            <div class="mt-2.5 flex flex-col gap-2 text-sm text-neutral-500">
+              <span class="inline-flex items-center gap-2">
+                <span class="tabular-nums">{{ member.matricula ?? "—" }}</span>
+                <span class="text-neutral-300">·</span>
+                <span class="inline-flex items-center gap-1.5">
+                  <span class="h-2 w-2 shrink-0 rounded-full" :class="courseDotClass(member.course)" />
+                  {{ formatCourse(member.course) }}
+                </span>
+              </span>
               <div class="flex items-center justify-between gap-2">
                 <span
-                  :class="['inline-flex items-center rounded-full border px-2 py-0.5 text-xs font-semibold', situationBadgeClass(member.situation)]"
+                  :class="['inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-xs font-semibold', situationBadgeClass(member.situation)]"
                 >
+                  <span class="h-1.5 w-1.5 rounded-full bg-current opacity-70" />
                   {{ formatSituation(member.situation) }}
                 </span>
-                <span class="text-xs text-neutral-500">{{ formatDateTimeBR(member.createdAt) }}</span>
+                <span class="text-xs tabular-nums text-neutral-500">{{ formatDateBR(member.createdAt) }}</span>
               </div>
             </div>
           </template>
