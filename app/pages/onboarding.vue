@@ -8,6 +8,7 @@ useHead({ title: "Bem-vindo — SISGAC" });
 const { user, setUser } = useAuthState();
 const { patchUser, loading, error } = useUsers();
 const { curricula, getCurricula } = useCurricula();
+const { signOut } = useGoogleSignIn();
 
 const matricula = ref<string>("");
 const course = ref<Course | undefined>();
@@ -43,6 +44,13 @@ const submit = async () => {
   });
   setUser({ ...user.value, ...updated });
   await navigateTo("/");
+};
+
+const leaving = ref(false);
+
+const leave = async () => {
+  leaving.value = true;
+  await signOut();
 };
 </script>
 
@@ -85,6 +93,16 @@ const submit = async () => {
       aria-label="Completar cadastro"
     >
       <div class="flex w-full max-w-md flex-1 flex-col lg:flex-none">
+        <button
+          type="button"
+          class="mb-6 inline-flex w-fit items-center gap-1.5 text-sm font-medium text-neutral-500 transition-colors hover:text-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
+          :disabled="leaving"
+          @click="leave"
+        >
+          <Icon :name="leaving ? 'lucide:loader-circle' : 'lucide:arrow-left'" size="1rem" :class="leaving ? 'animate-spin' : ''" />
+          Usar outra conta
+        </button>
+
         <div>
           <div class="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-primary-600">Quase lá</div>
 
