@@ -1,6 +1,10 @@
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 
+const publicPages = ["/privacidade", "/termos"];
+
 export default defineNuxtRouteMiddleware(async (to) => {
+  if (publicPages.includes(to.path)) return;
+
   const { user, setUser } = useAuthState();
   const isLoginPage = to.path === "/login";
   const isOnboardingPage = to.path === "/onboarding";

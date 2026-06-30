@@ -56,57 +56,73 @@ onMounted(async () => {
     </section>
 
     <section
-      class="flex w-full flex-1 flex-col items-center bg-white px-6 py-10 sm:px-10 lg:w-136 lg:flex-none lg:justify-center lg:px-12"
+      class="flex w-full flex-1 flex-col items-center bg-white px-6 py-10 sm:px-10 lg:w-136 lg:flex-none lg:px-12"
       aria-label="Autenticação"
     >
-      <div class="flex w-full max-w-sm flex-1 flex-col lg:flex-none">
-        <div>
-          <div class="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-primary-600">Bem-vindo</div>
+      <div class="flex w-full flex-1 flex-col items-center justify-center">
+        <div class="flex w-full max-w-sm flex-col">
+          <div>
+            <div class="mb-2 inline-flex items-center gap-2 text-[10px] font-bold uppercase tracking-[0.22em] text-primary-600">Bem-vindo</div>
 
-          <h2 class="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">Acesse sua conta</h2>
+            <h2 class="text-3xl font-bold tracking-tight text-neutral-900 sm:text-4xl">Acesse sua conta</h2>
 
-          <p class="mt-3 text-sm leading-relaxed text-neutral-500">Use sua conta Google para entrar</p>
-        </div>
+            <p class="mt-3 text-sm leading-relaxed text-neutral-500">Use sua conta Google para entrar</p>
+          </div>
 
-        <div class="flex flex-1 flex-col justify-center lg:mt-8 lg:flex-none lg:justify-start">
-          <div class="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-4">
-            <div class="mb-3 flex items-center gap-2">
-              <Icon name="lucide:shield-check" size="0.875rem" class="text-primary-600" />
-              <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-700"> Autenticação segura </span>
-            </div>
-
-            <div class="flex min-h-11 items-center justify-center">
-              <div v-show="loading" class="flex items-center justify-center gap-2 text-xs text-neutral-400">
-                <span class="h-3 w-3 animate-spin rounded-full border-2 border-neutral-300 border-t-primary-500" />
-                Carregando autenticação...
+          <div class="mt-8">
+            <div class="rounded-2xl border border-neutral-200 bg-neutral-50/50 p-4">
+              <div class="mb-3 flex items-center gap-2">
+                <Icon name="lucide:shield-check" size="0.875rem" class="text-primary-600" />
+                <span class="text-[11px] font-semibold uppercase tracking-wider text-neutral-700"> Autenticação segura </span>
               </div>
-              <div ref="buttonRef" data-testid="google-signin-button" />
+
+              <div class="flex min-h-11 items-center justify-center">
+                <div v-show="loading" class="flex items-center justify-center gap-2 text-xs text-neutral-400">
+                  <span class="h-3 w-3 animate-spin rounded-full border-2 border-neutral-300 border-t-primary-500" />
+                  Carregando autenticação...
+                </div>
+                <div ref="buttonRef" data-testid="google-signin-button" />
+              </div>
+            </div>
+
+            <div
+              v-if="error"
+              class="mt-4 flex items-start gap-3 rounded-lg border border-error-200 bg-error-50 px-3 py-2.5"
+              data-testid="login-error"
+              role="alert"
+            >
+              <Icon name="lucide:circle-alert" size="1rem" class="mt-0.5 shrink-0 text-error-600" />
+              <p class="text-sm text-error-700">{{ error }}</p>
             </div>
           </div>
 
-          <div
-            v-if="error"
-            class="mt-4 flex items-start gap-3 rounded-lg border border-error-200 bg-error-50 px-3 py-2.5"
-            data-testid="login-error"
-            role="alert"
-          >
-            <Icon name="lucide:circle-alert" size="1rem" class="mt-0.5 shrink-0 text-error-600" />
-            <p class="text-sm text-error-700">{{ error }}</p>
-          </div>
-        </div>
+          <div class="mt-8">
+            <div class="flex items-center gap-3">
+              <div class="h-px flex-1 bg-neutral-200" />
+              <span class="text-xs font-medium uppercase tracking-widest text-neutral-400">Suporte</span>
+              <div class="h-px flex-1 bg-neutral-200" />
+            </div>
 
-        <div class="mt-8">
-          <div class="flex items-center gap-3">
-            <div class="h-px flex-1 bg-neutral-200" />
-            <span class="text-xs font-medium uppercase tracking-widest text-neutral-400">Suporte</span>
-            <div class="h-px flex-1 bg-neutral-200" />
+            <p class="mt-4 text-center text-xs leading-relaxed text-neutral-500">
+              Problemas para entrar?
+              <contact-email
+                label="Entre em contato"
+                link-class="cursor-pointer font-medium text-neutral-600 underline underline-offset-2 transition-colors hover:text-primary-600"
+              />
+              com o administrador do sistema.
+            </p>
           </div>
-
-          <p class="mt-4 text-center text-xs leading-relaxed text-neutral-500">
-            Problemas para entrar? Entre em contato com o administrador do sistema.
-          </p>
         </div>
       </div>
+
+      <footer class="mx-auto w-full max-w-sm pt-8">
+        <p class="text-center text-xs leading-relaxed text-neutral-400">
+          Ao entrar, você concorda com os
+          <NuxtLink to="/termos" class="font-medium text-neutral-600 underline underline-offset-2 transition-colors hover:text-primary-600">Termos de Uso</NuxtLink>
+          e a
+          <NuxtLink to="/privacidade" class="font-medium text-neutral-600 underline underline-offset-2 transition-colors hover:text-primary-600">Política de Privacidade</NuxtLink>.
+        </p>
+      </footer>
     </section>
   </div>
 </template>
