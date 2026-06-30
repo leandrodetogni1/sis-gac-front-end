@@ -9,9 +9,6 @@ export default defineNuxtConfig({
       link: [
         { rel: "icon", type: "image/svg+xml", href: "/favicon.svg" }
       ],
-      meta: [
-        { name: "robots", content: "noindex, nofollow" }
-      ],
     },
   },
 
