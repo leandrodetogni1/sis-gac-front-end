@@ -8,6 +8,7 @@ export const useToastNotification = () => {
     toast.success(message, {
       theme: "colored",
       position: toast.POSITION.BOTTOM_CENTER,
+      autoClose: 2500,
     });
   };
 
@@ -15,6 +16,7 @@ export const useToastNotification = () => {
     toast.error(message, {
       theme: "colored",
       position: toast.POSITION.BOTTOM_CENTER,
+      autoClose: 2500,
     });
   };
 
@@ -22,6 +24,7 @@ export const useToastNotification = () => {
     toast.info(message, {
       theme: "colored",
       position: toast.POSITION.BOTTOM_CENTER,
+      autoClose: 2500,
     });
   };
 
@@ -29,6 +32,7 @@ export const useToastNotification = () => {
     toast.warning(message, {
       theme: "colored",
       position: toast.POSITION.BOTTOM_CENTER,
+      autoClose: 2500,
     });
   };
 
