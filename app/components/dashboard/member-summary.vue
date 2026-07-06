@@ -95,12 +95,7 @@ onMounted(async () => {
 
 <template>
   <div>
-    <div v-if="loading && !summary" class="flex min-h-[60vh] items-center justify-center" data-testid="page-loading">
-      <div class="flex flex-col items-center gap-4">
-        <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
-        <p class="text-sm text-muted">Carregando dados...</p>
-      </div>
-    </div>
+    <dashboard-summary-skeleton v-if="loading && !summary" data-testid="page-loading" />
 
     <div v-else-if="error" class="flex min-h-[60vh] items-center justify-center">
       <div class="flex flex-col items-center gap-3 text-center">

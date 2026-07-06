@@ -93,10 +93,41 @@ onMounted(async () => {
 
 <template>
   <div>
-    <div v-if="pageLoading" class="flex min-h-[60vh] items-center justify-center" data-testid="page-loading">
-      <div class="flex flex-col items-center gap-4">
-        <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
-        <p class="text-sm text-neutral-500">Carregando dados...</p>
+    <div v-if="pageLoading" data-testid="page-loading">
+      <div class="mb-6 flex items-center gap-3">
+        <SGSkeleton class="h-5 w-20" />
+      </div>
+
+      <div class="mb-6">
+        <SGCard>
+          <div class="flex items-start gap-4">
+            <SGSkeleton class="h-14 w-14 rounded-full" />
+            <div class="min-w-0 flex-1">
+              <SGSkeleton class="h-5 w-48" />
+              <SGSkeleton class="mt-2 h-4 w-56" />
+            </div>
+            <SGSkeleton v-if="canEdit" class="h-11 w-24 sm:h-9" />
+          </div>
+
+          <div class="mt-5 grid grid-cols-2 gap-4 border-t border-neutral-100 pt-4 md:grid-cols-3 lg:grid-cols-5">
+            <div v-for="i in 5" :key="i">
+              <SGSkeleton class="h-3 w-16" />
+              <SGSkeleton class="mt-1.5 h-4 w-24" />
+            </div>
+          </div>
+        </SGCard>
+      </div>
+
+      <div class="mb-6">
+        <SGSkeleton class="mb-3 h-5 w-20" />
+        <dashboard-summary-skeleton />
+      </div>
+
+      <div>
+        <SGSkeleton class="mb-3 h-5 w-56" />
+        <SGCard>
+          <SGTableSkeleton mobile-cards :columns="6" :rows="5" :align-last-right="false" />
+        </SGCard>
       </div>
     </div>
 

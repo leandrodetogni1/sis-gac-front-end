@@ -126,10 +126,35 @@ onMounted(fetchActivities);
 
 <template>
   <div>
-    <div v-if="!fetched" class="flex min-h-[60vh] items-center justify-center" data-testid="page-loading">
-      <div class="flex flex-col items-center gap-4">
-        <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
-        <p class="text-sm text-neutral-500">Carregando dados...</p>
+    <div v-if="!fetched" data-testid="page-loading">
+      <div class="mb-4 flex flex-wrap items-center justify-between gap-3">
+        <SGSkeleton class="h-6 w-40" />
+        <SGSkeleton class="h-9 w-36" />
+      </div>
+
+      <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div class="w-full sm:w-56">
+          <SGSkeleton class="h-11 w-full sm:h-8" />
+        </div>
+        <div class="w-full sm:w-56">
+          <SGSkeleton class="h-11 w-full sm:h-8" />
+        </div>
+        <div class="w-full sm:w-56 md:hidden">
+          <SGSkeleton class="h-11 w-full sm:h-8" />
+        </div>
+      </div>
+
+      <SGCard>
+        <SGTableSkeleton mobile-cards :columns="6" :rows="5" :align-last-right="false" />
+      </SGCard>
+
+      <div class="mt-4 flex flex-col gap-3 border-t border-neutral-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+        <SGSkeleton class="mx-auto h-3 w-56 sm:mx-0" />
+        <div class="flex items-center justify-between gap-2 sm:justify-end">
+          <SGSkeleton class="h-8 w-24" />
+          <SGSkeleton class="h-3 w-24" />
+          <SGSkeleton class="h-8 w-24" />
+        </div>
       </div>
     </div>
 

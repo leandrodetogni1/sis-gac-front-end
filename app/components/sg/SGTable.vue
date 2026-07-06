@@ -7,7 +7,6 @@ const props = defineProps<{
   itemKey?: string;
   loading?: boolean;
   error?: string | null;
-  loadingText?: string;
   errorText?: string;
   emptyText?: string;
   emptyDescription?: string;
@@ -55,6 +54,18 @@ const tdClass = (col: SGTableColumn, isLast: boolean) => {
 
 const hasMobileSlot = computed(() => !!slots.mobile);
 
+const SKELETON_WIDTHS = ["w-32", "w-20", "w-24", "w-16", "w-28"];
+
+const skeletonWidth = (row: number, col: number) => {
+  return SKELETON_WIDTHS[(row + col) % SKELETON_WIDTHS.length];
+};
+
+const skeletonAlign = (col: SGTableColumn) => {
+  if (col.align === "right") return "ml-auto";
+  if (col.align === "center") return "mx-auto";
+  return "";
+};
+
 const sortIcon = (col: SGTableColumn) => {
   if (col.sortKey !== props.sortBy) return "lucide:chevrons-up-down";
   return props.sortOrder === "desc" ? "lucide:chevron-down" : "lucide:chevron-up";
@@ -62,10 +73,36 @@ const sortIcon = (col: SGTableColumn) => {
 </script>
 
 <template>
-  <div v-if="loading" class="flex min-h-[40vh] items-center justify-center" data-testid="table-loading">
-    <div class="flex flex-col items-center gap-4">
-      <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
-      <p class="text-sm text-neutral-500">{{ loadingText ?? "Carregando dados..." }}</p>
+  <div v-if="loading" data-testid="table-loading">
+    <div :class="hasMobileSlot ? 'hidden overflow-x-auto md:block' : 'overflow-x-auto'">
+      <table class="w-full text-left text-sm">
+        <thead>
+          <tr class="border-b border-neutral-200 text-xs font-medium uppercase text-neutral-500">
+            <th v-for="(col, i) in columns" :key="col.key" :class="thClass(col, i === columns.length - 1)">
+              {{ col.label }}
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr v-for="row in 5" :key="row" class="border-b border-neutral-100">
+            <td v-for="(col, i) in columns" :key="col.key" :class="tdClass(col, i === columns.length - 1)">
+              <SGSkeleton class="h-4" :class="[skeletonWidth(row, i), skeletonAlign(col)]" />
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div v-if="hasMobileSlot" class="space-y-3 md:hidden">
+      <div v-for="row in 5" :key="row" class="rounded-lg border border-neutral-200 p-3">
+        <div class="flex items-center gap-2.5">
+          <SGSkeleton class="h-8 w-8 rounded-full" />
+          <div class="flex-1">
+            <SGSkeleton class="h-4 w-32" />
+            <SGSkeleton class="mt-1.5 h-3 w-24" />
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 

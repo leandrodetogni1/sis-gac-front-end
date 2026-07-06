@@ -71,7 +71,6 @@ onMounted(fetchFormandos);
         :items="items"
         :loading="loading"
         :error="error"
-        loading-text="Carregando formandos aptos..."
         error-text="Falha ao carregar formandos aptos"
         empty-text="Nenhum formando atingiu todos os requisitos ainda."
         empty-description="Assim que um provável formando cumprir todas as horas, ele aparecerá aqui."

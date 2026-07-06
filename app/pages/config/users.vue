@@ -151,11 +151,15 @@ onMounted(async () => {
 
 <template>
   <div>
-    <div v-if="!fetched || !invitationsFetched" class="flex min-h-[40vh] items-center justify-center" data-testid="page-loading">
-      <div class="flex flex-col items-center gap-4">
-        <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
-        <p class="text-sm text-neutral-500">Carregando usuários...</p>
+    <div v-if="!fetched || !invitationsFetched" class="space-y-6" data-testid="page-loading">
+      <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <SGSkeleton class="h-6 w-28" />
+        <SGSkeleton class="h-11 w-full sm:h-9 sm:w-56" />
       </div>
+
+      <SGCard>
+        <SGTableSkeleton mobile-cards :columns="6" :rows="5" />
+      </SGCard>
     </div>
 
     <div v-else class="space-y-6">

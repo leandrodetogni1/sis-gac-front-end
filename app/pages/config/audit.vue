@@ -82,11 +82,50 @@ onMounted(() => {
 
 <template>
   <div>
-    <div v-if="!fetched" class="flex min-h-[40vh] items-center justify-center" data-testid="page-loading">
-      <div class="flex flex-col items-center gap-4">
-        <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
-        <p class="text-sm text-neutral-500">Carregando auditoria...</p>
+    <div v-if="!fetched" class="space-y-6" data-testid="page-loading">
+      <div class="flex flex-col gap-1">
+        <SGSkeleton class="h-6 w-32" />
+        <SGSkeleton class="h-4 w-72" />
       </div>
+
+      <SGCard>
+        <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
+          <div class="sm:col-span-2">
+            <SGSkeleton class="mb-1 h-3 w-10" />
+            <SGSkeleton class="h-10 w-full" />
+          </div>
+          <div>
+            <SGSkeleton class="mb-1 h-3 w-8" />
+            <SGSkeleton class="h-10 w-full" />
+          </div>
+          <div>
+            <SGSkeleton class="mb-1 h-3 w-8" />
+            <SGSkeleton class="h-10 w-full" />
+          </div>
+        </div>
+
+        <div class="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <div class="w-full sm:w-48">
+            <SGSkeleton class="h-10 w-full" />
+          </div>
+          <div class="grid grid-cols-2 gap-2 sm:flex">
+            <SGSkeleton class="h-9 w-full sm:w-24" />
+            <SGSkeleton class="h-9 w-full sm:w-24" />
+          </div>
+        </div>
+      </SGCard>
+
+      <SGCard>
+        <SGTableSkeleton mobile-cards :columns="5" :rows="5" :align-last-right="false" />
+        <div class="mt-4 flex flex-col gap-3 border-t border-neutral-100 pt-4 sm:flex-row sm:items-center sm:justify-between">
+          <SGSkeleton class="mx-auto h-3 w-56 sm:mx-0" />
+          <div class="flex items-center justify-between gap-2 sm:justify-end">
+            <SGSkeleton class="h-9 w-24" />
+            <SGSkeleton class="h-3 w-24" />
+            <SGSkeleton class="h-9 w-24" />
+          </div>
+        </div>
+      </SGCard>
     </div>
 
     <div v-else class="space-y-6">
@@ -129,7 +168,6 @@ onMounted(() => {
           item-key="id"
           :loading="loading"
           :error="error"
-          loading-text="Carregando logs..."
           error-text="Falha ao carregar a auditoria"
           empty-text="Nenhum registro encontrado"
           empty-description="Ajuste os filtros ou aguarde novas ações."

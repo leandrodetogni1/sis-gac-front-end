@@ -50,11 +50,18 @@ onMounted(async () => {
 
 <template>
   <div>
-    <div v-if="!fetched" class="flex min-h-[40vh] items-center justify-center" data-testid="page-loading">
-      <div class="flex flex-col items-center gap-4">
-        <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
-        <p class="text-sm text-neutral-500">Carregando currículos...</p>
+    <div v-if="!fetched" data-testid="page-loading">
+      <div class="mb-4 flex items-center justify-between">
+        <div>
+          <SGSkeleton class="h-5 w-28 md:h-6" />
+          <SGSkeleton class="mt-2 h-3 w-64" />
+        </div>
+        <SGSkeleton class="h-10 w-44 rounded-lg" />
       </div>
+
+      <SGCard>
+        <SGTableSkeleton mobile-cards :columns="6" :rows="5" />
+      </SGCard>
     </div>
 
     <div v-else>

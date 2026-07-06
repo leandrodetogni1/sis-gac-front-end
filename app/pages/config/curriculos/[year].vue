@@ -275,11 +275,88 @@ onMounted(async () => {
 
 <template>
   <div>
-    <div v-if="!ready" class="flex min-h-[40vh] items-center justify-center" data-testid="page-loading">
-      <div class="flex flex-col items-center gap-4">
-        <div class="h-10 w-10 animate-spin rounded-full border-4 border-primary-200 border-t-primary-500" />
-        <p class="text-sm text-neutral-500">Carregando currículo...</p>
+    <div v-if="!ready" class="space-y-5" data-testid="page-loading">
+      <div>
+        <SGSkeleton class="h-4 w-24" />
+        <div class="mt-2 flex items-center justify-between gap-3">
+          <div class="flex items-center gap-3">
+            <SGSkeleton class="h-7 w-14 rounded-md" />
+            <SGSkeleton class="h-7 w-28" />
+          </div>
+          <SGSkeleton class="h-11 w-40 rounded-md sm:h-8" />
+        </div>
       </div>
+
+      <SGCard>
+        <div class="mb-5 flex items-start justify-between gap-3">
+          <div>
+            <SGSkeleton class="h-4 w-28" />
+            <SGSkeleton class="mt-1.5 h-3 w-56" />
+          </div>
+          <SGSkeleton class="h-11 w-20 rounded-md sm:h-8" />
+        </div>
+        <div class="grid grid-cols-2 gap-x-6 gap-y-4 sm:grid-cols-4">
+          <div v-for="i in 4" :key="i">
+            <SGSkeleton class="h-3 w-24" />
+            <SGSkeleton class="mt-1.5 h-5 w-12" />
+          </div>
+        </div>
+      </SGCard>
+
+      <SGCard>
+        <div class="mb-3 flex items-start justify-between gap-3">
+          <div>
+            <SGSkeleton class="h-4 w-32" />
+            <SGSkeleton class="mt-1.5 h-3 w-64" />
+          </div>
+        </div>
+        <div class="divide-y divide-neutral-100">
+          <div
+            v-for="i in 2"
+            :key="i"
+            class="flex flex-col gap-1.5 py-3 first:pt-0 last:pb-0 sm:grid sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-4"
+          >
+            <SGSkeleton class="h-4 w-48" />
+            <div class="flex items-center justify-between gap-3 sm:contents">
+              <div class="w-auto sm:w-44 sm:shrink-0">
+                <SGSkeleton class="h-4 w-20 sm:ml-auto" />
+              </div>
+              <SGSkeleton class="h-11 w-11 rounded-md sm:h-8 sm:w-8" />
+            </div>
+          </div>
+        </div>
+      </SGCard>
+
+      <SGCard>
+        <div class="mb-3 flex items-start justify-between gap-3">
+          <div>
+            <SGSkeleton class="h-4 w-48" />
+            <SGSkeleton class="mt-1.5 h-3 w-64" />
+          </div>
+        </div>
+        <div class="space-y-5">
+          <section v-for="s in 3" :key="s">
+            <div class="mb-1 flex items-center gap-3">
+              <SGSkeleton class="h-3 w-16" />
+              <div class="h-px flex-1 bg-neutral-200" />
+            </div>
+            <div class="divide-y divide-neutral-100">
+              <div v-for="i in 3" :key="i" class="flex flex-col gap-1.5 py-2.5 sm:grid sm:grid-cols-[1fr_auto_auto] sm:items-center sm:gap-4">
+                <div class="flex min-w-0 items-center gap-2.5">
+                  <SGSkeleton class="h-6 w-7 rounded-md" />
+                  <SGSkeleton class="h-4 w-56" />
+                </div>
+                <div class="flex items-center justify-between gap-3 pl-9 sm:contents sm:pl-0">
+                  <div class="w-auto sm:w-44 sm:shrink-0">
+                    <SGSkeleton class="h-4 w-24 sm:ml-auto" />
+                  </div>
+                  <SGSkeleton class="h-11 w-11 rounded-md sm:h-8 sm:w-8" />
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </SGCard>
     </div>
 
     <div v-else-if="error && !curriculum" class="flex min-h-[40vh] flex-col items-center justify-center gap-3 text-center">
