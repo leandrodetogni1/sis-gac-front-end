@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { CalendarDate, DateFormatter, getLocalTimeZone } from "@internationalized/date";
+import { CalendarDate } from "@internationalized/date";
 
 const props = defineProps<{
   modelValue?: string;
-  placeholder?: string;
   disabled?: boolean;
   minDate?: string;
   maxDate?: string;
@@ -11,8 +10,6 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits(["update:modelValue"]);
-
-const df = new DateFormatter("pt-BR", { dateStyle: "medium" });
 
 const toCalendarDate = (value?: string | null): CalendarDate | undefined => {
   if (!value) return undefined;
@@ -38,36 +35,43 @@ const calendarValue = computed({
   },
 });
 
-const displayText = computed(() => {
-  if (calendarValue.value) {
-    return df.format(calendarValue.value.toDate(getLocalTimeZone()));
-  }
-  return props.placeholder ?? "Selecione uma data";
-});
+const open = ref(false);
 </script>
 
 <template>
-  <UPopover :disabled="disabled">
-    <button
-      type="button"
-      :disabled="disabled"
-      :data-testid="testId"
-      class="flex min-h-11 w-full items-center gap-2 rounded-md border border-accented bg-default px-2.5 py-1.5 text-base transition-colors hover:border-inverted focus:outline-none focus:ring-2 focus:ring-primary disabled:cursor-not-allowed disabled:opacity-50 sm:min-h-8 sm:text-sm"
-    >
-      <Icon name="lucide:calendar" size="1rem" class="shrink-0 text-dimmed" />
-      <span :class="calendarValue ? 'text-default' : 'text-dimmed'">
-        {{ displayText }}
-      </span>
-    </button>
+  <UInputDate
+    v-model="calendarValue"
+    locale="pt-BR"
+    :min-value="minCalendarValue"
+    :max-value="maxCalendarValue"
+    :disabled="disabled"
+    :data-testid="testId"
+    class="w-full"
+    :ui="{ base: 'h-11 py-0 text-base sm:h-8 sm:text-sm' }"
+  >
+    <template #trailing>
+      <UPopover v-model:open="open" :disabled="disabled">
+        <button
+          type="button"
+          :disabled="disabled"
+          aria-label="Abrir calendário"
+          :data-testid="testId ? `${testId}-calendar` : undefined"
+          class="rounded p-0.5 text-dimmed transition-colors hover:bg-neutral-100 hover:text-neutral-700 disabled:cursor-not-allowed disabled:opacity-50"
+        >
+          <Icon name="lucide:calendar" size="1rem" class="block" />
+        </button>
 
-    <template #content>
-      <UCalendar
-        v-model="calendarValue"
-        locale="pt-BR"
-        :min-value="minCalendarValue"
-        :max-value="maxCalendarValue"
-        class="p-2"
-      />
+        <template #content>
+          <UCalendar
+            v-model="calendarValue"
+            locale="pt-BR"
+            :min-value="minCalendarValue"
+            :max-value="maxCalendarValue"
+            class="p-2"
+            @update:model-value="open = false"
+          />
+        </template>
+      </UPopover>
     </template>
-  </UPopover>
+  </UInputDate>
 </template>

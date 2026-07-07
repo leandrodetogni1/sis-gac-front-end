@@ -184,11 +184,11 @@ onMounted(() => {
           </div>
           <div>
             <label class="mb-1 block text-xs font-medium text-neutral-600">De</label>
-            <SGDatePicker v-model="from" placeholder="Data inicial" test-id="audit-filter-from" />
+            <SGDatePicker v-model="from" test-id="audit-filter-from" />
           </div>
           <div>
             <label class="mb-1 block text-xs font-medium text-neutral-600">Até</label>
-            <SGDatePicker v-model="to" placeholder="Data final" test-id="audit-filter-to" />
+            <SGDatePicker v-model="to" test-id="audit-filter-to" />
           </div>
         </div>
 
