@@ -46,9 +46,8 @@ const userName = computed(() => {
 const currentStatus = computed(() => props.activity?.status?.toLowerCase() ?? "pending");
 
 const canVerify = computed(() => {
-  if (isAdminOrOwner.value) return currentStatus.value !== "verified";
-  if (isReviewer.value) return currentStatus.value === "pending";
-  return false;
+  if (!isAdminOrOwner.value && !isReviewer.value) return false;
+  return currentStatus.value === "pending";
 });
 
 const canApprove = computed(() => {
