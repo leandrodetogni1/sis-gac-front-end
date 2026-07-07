@@ -43,19 +43,24 @@ const userName = computed(() => {
   return `${props.activity.users.firstName} ${props.activity.users.lastName}`;
 });
 
+const currentStatus = computed(() => props.activity?.status?.toLowerCase() ?? "pending");
+
 const canVerify = computed(() => {
-  if (!isReviewer.value) return false;
-  const status = props.activity?.status?.toLowerCase();
-  return status === "pending" || status === undefined || status === null;
+  if (isAdminOrOwner.value) return currentStatus.value !== "verified";
+  if (isReviewer.value) return currentStatus.value === "pending";
+  return false;
 });
 
 const canApprove = computed(() => {
   if (!isAdminOrOwner.value) return false;
-  const status = props.activity?.status?.toLowerCase();
-  return status === "pending" || status === "verified" || status === undefined || status === null;
+  return currentStatus.value !== "approved";
 });
 
-const canReject = computed(() => canVerify.value || canApprove.value);
+const canReject = computed(() => {
+  if (isAdminOrOwner.value) return currentStatus.value !== "rejected";
+  if (isReviewer.value) return currentStatus.value === "pending";
+  return false;
+});
 
 const canEdit = computed(() => {
   const status = props.activity?.status?.toLowerCase();
@@ -79,7 +84,9 @@ const handleApprove = async () => {
   open.value = false;
   await nextTick();
   const confirmed = await confirmAlert(
-    `A atividade "${label.value}" será aprovada.`,
+    currentStatus.value === "rejected"
+      ? `A atividade "${label.value}" foi rejeitada anteriormente e será aprovada.`
+      : `A atividade "${label.value}" será aprovada.`,
     "Aprovar atividade?",
   );
   if (!confirmed) {
@@ -132,7 +139,9 @@ const handleReject = async () => {
   await nextTick();
   const observation = await promptAlert(
     "Rejeitar atividade?",
-    `A atividade "${label.value}" será rejeitada. Adicione uma observação para o aluno (opcional).`,
+    currentStatus.value === "approved"
+      ? `A atividade "${label.value}" está aprovada e será rejeitada. Adicione uma observação para o aluno (opcional).`
+      : `A atividade "${label.value}" será rejeitada. Adicione uma observação para o aluno (opcional).`,
     { placeholder: "Motivo da reprovação...", confirmText: "Rejeitar", icon: "warning" },
   );
   if (observation === null) {
