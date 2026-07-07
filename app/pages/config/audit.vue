@@ -180,7 +180,7 @@ onMounted(() => {
         <div class="grid grid-cols-1 gap-3 sm:grid-cols-2">
           <div class="sm:col-span-2">
             <label class="mb-1 block text-xs font-medium text-neutral-600">Ator</label>
-            <audit-actor-filter v-model="actorId" test-id="audit-filter-actor" />
+            <users-filter v-model="actorId" show-role placeholder="Filtrar por ator" test-id="audit-filter-actor" />
           </div>
           <div>
             <label class="mb-1 block text-xs font-medium text-neutral-600">De</label>

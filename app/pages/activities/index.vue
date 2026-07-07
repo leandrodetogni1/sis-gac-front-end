@@ -29,6 +29,7 @@ const readStatusFromQuery = (): ActivityStatus | "ALL" => {
 
 const statusFilter = ref<ActivityStatus | "ALL">(readStatusFromQuery());
 const categoryFilter = ref<Category | "ALL">("ALL");
+const authorFilter = ref("");
 const sortBy = ref<ActivitySortBy>("createdAt");
 const sortOrder = ref<"asc" | "desc">("desc");
 const currentPage = ref(1);
@@ -50,6 +51,7 @@ const fetchActivities = () =>
   getActivities({
     status: statusFilter.value === "ALL" ? undefined : statusFilter.value,
     category: categoryFilter.value === "ALL" ? undefined : categoryFilter.value,
+    authorId: authorFilter.value || undefined,
     sortBy: sortBy.value,
     sortOrder: sortOrder.value,
     page: currentPage.value,
@@ -138,6 +140,8 @@ watch(statusFilter, async (value) => {
 
 watch(categoryFilter, applyFilters);
 
+watch(authorFilter, applyFilters);
+
 watch(
   () => route.query.status,
   () => {
@@ -157,6 +161,9 @@ onMounted(fetchActivities);
       </div>
 
       <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
+        <div class="w-full sm:w-72">
+          <SGSkeleton class="h-11 w-full sm:h-8" />
+        </div>
         <div class="w-full sm:w-56">
           <SGSkeleton class="h-11 w-full sm:h-8" />
         </div>
@@ -188,11 +195,32 @@ onMounted(fetchActivities);
       </div>
 
       <div class="mb-4 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
-        <div class="w-full sm:w-56">
-          <SGSelect v-model="categoryFilter" placeholder="Filtrar por categoria" :options="categoryOptions" test-id="filter-category" />
+        <div class="w-full sm:w-72">
+          <users-filter
+            v-model="authorFilter"
+            :roles="['member']"
+            placeholder="Filtrar por aluno"
+            search-placeholder="Buscar aluno..."
+            test-id="filter-author"
+          />
         </div>
         <div class="w-full sm:w-56">
-          <SGSelect v-model="statusFilter" placeholder="Filtrar por status" :options="statusOptions" test-id="filter-status" />
+          <SGSelect
+            v-model="categoryFilter"
+            placeholder="Filtrar por categoria"
+            icon="lucide:tag"
+            :options="categoryOptions"
+            test-id="filter-category"
+          />
+        </div>
+        <div class="w-full sm:w-56">
+          <SGSelect
+            v-model="statusFilter"
+            placeholder="Filtrar por status"
+            icon="lucide:badge-check"
+            :options="statusOptions"
+            test-id="filter-status"
+          />
         </div>
         <div class="w-full sm:w-56 md:hidden">
           <SGSelect v-model="sortValue" placeholder="Ordenar por" :options="sortOptions" test-id="sort-mobile" />

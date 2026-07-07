@@ -3,6 +3,7 @@ defineProps<{
   modelValue?: string;
   placeholder?: string;
   label?: string;
+  icon?: string;
   disabled?: boolean;
   testId?: string;
   options: { label: string; value: string }[];
@@ -15,6 +16,7 @@ const emit = defineEmits(["update:modelValue"]);
   <USelect
     :model-value="modelValue"
     :placeholder="placeholder"
+    :icon="icon"
     :disabled="disabled"
     :items="options"
     :data-testid="testId"
@@ -22,7 +24,7 @@ const emit = defineEmits(["update:modelValue"]);
     class="w-full"
     value-key="value"
     label-key="label"
-    :ui="{ base: 'min-h-11 text-base sm:min-h-8 sm:text-sm', item: 'min-h-11 text-base sm:min-h-8 sm:text-sm' }"
+    :ui="{ base: 'h-11 py-0 text-base sm:h-8 sm:text-sm', item: 'min-h-11 text-base sm:min-h-8 sm:text-sm' }"
     @update:model-value="emit('update:modelValue', $event)"
   />
 </template>
