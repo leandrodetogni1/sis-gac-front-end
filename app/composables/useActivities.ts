@@ -181,6 +181,10 @@ export const useActivities = () => {
     }
   };
 
+  const getActivity = async (id: string): Promise<ActivityResponseDto> => {
+    return await api<ActivityResponseDto>(`/api/activities/${id}`);
+  };
+
   const deleteActivity = async (id: string): Promise<void> => {
     await api(`/api/activities/${id}`, { method: "DELETE" });
   };
@@ -246,6 +250,7 @@ export const useActivities = () => {
     fetched,
     error,
     getActivities,
+    getActivity,
     getMyActivities,
     getActivitiesByUser,
     createActivity,

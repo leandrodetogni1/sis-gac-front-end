@@ -1,9 +1,13 @@
 <script setup lang="ts">
+import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
+import type { AuditLogResponseDto } from "~/interfaces/AuditLogResponseDto";
 import type { SGTableColumn } from "~/types/SGTableColumn";
 
 useHead({ title: "Auditoria — Configurações — SISGAC" });
 
 const { logs, total, page, limit, loading, fetched, error, getLogs } = useAudit();
+const { getActivity } = useActivities();
+const { showToastError } = useToastNotification();
 
 const actorId = ref("");
 const from = ref("");
@@ -69,6 +73,44 @@ const statusBadge = (code: number | null) => {
   if (code >= 300 && code < 400) return { label: String(code), cls: "border-blue-300 bg-blue-50 text-blue-700" };
   if (code >= 400 && code < 500) return { label: String(code), cls: "border-amber-300 bg-amber-50 text-amber-700" };
   return { label: String(code), cls: "border-red-300 bg-red-50 text-red-700" };
+};
+
+const selectedActivity = ref<ActivityResponseDto | null>(null);
+const activityModalOpen = ref(false);
+const loadingActivityId = ref<string | null>(null);
+
+const openActivity = async (row: AuditLogResponseDto) => {
+  if (!row.entityId || loadingActivityId.value) return;
+  loadingActivityId.value = row.entityId;
+  try {
+    selectedActivity.value = await getActivity(row.entityId);
+    activityModalOpen.value = true;
+  } catch (e: any) {
+    const status = e?.status ?? e?.statusCode;
+    if (status === 404) {
+      showToastError("Esta atividade não existe mais.");
+    } else {
+      showToastError(e?.data?.message ?? "Erro ao carregar a atividade.");
+    }
+  } finally {
+    loadingActivityId.value = null;
+  }
+};
+
+const onActivityStatusChanged = () => {
+  activityModalOpen.value = false;
+  fetchLogs();
+};
+
+const editModalOpen = ref(false);
+
+const onActivityEdit = () => {
+  editModalOpen.value = true;
+};
+
+const onActivityUpdated = () => {
+  editModalOpen.value = false;
+  fetchLogs();
 };
 
 watch([pageSize, actorId], () => {
@@ -193,9 +235,12 @@ onMounted(() => {
           </template>
 
           <template #cell-action="{ item: row }">
-            <span class="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700" :title="row.action">{{
-              formatAuditAction(row.action)
-            }}</span>
+            <div class="flex flex-col items-start">
+              <span class="rounded bg-neutral-100 px-2 py-0.5 text-xs font-medium text-neutral-700" :title="row.action">{{
+                formatAuditAction(row.action)
+              }}</span>
+              <audit-context-line :row="row" :loading="loadingActivityId === row.entityId" @open-activity="openActivity" />
+            </div>
           </template>
 
           <template #cell-status="{ item: row }">
@@ -226,6 +271,7 @@ onMounted(() => {
                       formatAuditAction(row.action)
                     }}</span>
                   </p>
+                  <audit-context-line :row="row" :loading="loadingActivityId === row.entityId" test-suffix="-mobile" @open-activity="openActivity" />
                 </div>
               </div>
               <span
@@ -266,5 +312,17 @@ onMounted(() => {
         </div>
       </SGCard>
     </div>
+
+    <activities-detail-modal
+      v-model:open="activityModalOpen"
+      :activity="selectedActivity"
+      @approved="onActivityStatusChanged"
+      @verified="onActivityStatusChanged"
+      @rejected="onActivityStatusChanged"
+      @deleted="onActivityStatusChanged"
+      @edit="onActivityEdit"
+    />
+
+    <activities-edit-modal v-model:open="editModalOpen" :activity="selectedActivity" @updated="onActivityUpdated" />
   </div>
 </template>

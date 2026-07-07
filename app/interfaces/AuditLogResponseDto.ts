@@ -6,6 +6,13 @@ export interface AuditActorDto {
   picture: string | null;
 }
 
+export interface AuditLogMetadata {
+  label?: string;
+  email?: string;
+  role?: string;
+  userId?: string;
+}
+
 export interface AuditLogResponseDto {
   id: string;
   action: string;
@@ -18,6 +25,7 @@ export interface AuditLogResponseDto {
   userAgent: string | null;
   createdAt: string | null;
   actor: AuditActorDto | null;
+  metadata: AuditLogMetadata | null;
 }
 
 export interface AuditLogsPageDto {
