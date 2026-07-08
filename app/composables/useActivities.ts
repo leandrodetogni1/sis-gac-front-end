@@ -204,6 +204,13 @@ export const useActivities = () => {
     });
   };
 
+  const updateActivityNote = async (id: string, note: string | null): Promise<void> => {
+    await api(`/api/activities/${id}/note`, {
+      method: "PATCH",
+      body: { note },
+    });
+  };
+
   const getUserSummary = async (userId: string): Promise<MeSummaryResponseDto> => {
     return await api<MeSummaryResponseDto>(`/api/users/${userId}/activities/summary`);
   };
@@ -259,6 +266,7 @@ export const useActivities = () => {
     approveActivity,
     verifyActivity,
     rejectActivity,
+    updateActivityNote,
     getUserSummary,
     getActivityEvents,
     filterByStatus,

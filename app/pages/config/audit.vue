@@ -319,6 +319,7 @@ onMounted(() => {
       @approved="onActivityStatusChanged"
       @verified="onActivityStatusChanged"
       @rejected="onActivityStatusChanged"
+      @note-updated="onActivityStatusChanged"
       @deleted="onActivityStatusChanged"
       @edit="onActivityEdit"
     />

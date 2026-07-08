@@ -210,6 +210,7 @@ onMounted(async () => {
       @approved="onStatusChanged"
       @verified="onStatusChanged"
       @rejected="onStatusChanged"
+      @note-updated="onStatusChanged"
     />
 
     <members-edit-modal v-if="user && canEdit" v-model:open="editOpen" :user="user" @updated="onUserUpdated" />

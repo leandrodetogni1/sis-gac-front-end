@@ -276,6 +276,7 @@ onMounted(fetchActivities);
       @approved="onStatusChanged"
       @verified="onStatusChanged"
       @rejected="onStatusChanged"
+      @note-updated="onStatusChanged"
       @deleted="onStatusChanged"
       @edit="onEdit"
     />

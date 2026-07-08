@@ -58,6 +58,7 @@ const promptAlert = async (
     confirmText?: string;
     icon?: SweetAlertIcon;
     required?: boolean;
+    initialValue?: string;
   },
 ): Promise<string | null> => {
   const result = await Swal.fire({
@@ -65,6 +66,7 @@ const promptAlert = async (
     text: message,
     icon: options?.icon,
     input: "textarea",
+    inputValue: options?.initialValue ?? "",
     inputPlaceholder: options?.placeholder ?? "",
     confirmButtonText: options?.confirmText ?? "Confirmar",
     confirmButtonColor: "#111",

@@ -11,10 +11,11 @@ const props = withDefaults(
 
 const open = defineModel<boolean>("open", { default: false });
 
-const emit = defineEmits(["approved", "verified", "rejected", "deleted", "edit"]);
+const emit = defineEmits(["approved", "verified", "rejected", "deleted", "edit", "note-updated"]);
 
 const { user } = useAuthState();
-const { approveActivity, verifyActivity, rejectActivity, deleteActivity } = useActivities();
+const { approveActivity, verifyActivity, rejectActivity, deleteActivity, updateActivityNote } =
+  useActivities();
 const { showToastSuccess, showToastError } = useToastNotification();
 const { confirmAlert, promptAlert } = useAlerts();
 
@@ -71,6 +72,8 @@ const canDelete = computed(() => {
   const status = props.activity?.status?.toLowerCase();
   return status === "pending" && isActivityAuthor.value;
 });
+
+const canManageNote = computed(() => isAdminOrOwner.value || isReviewer.value);
 
 const handleEdit = () => {
   if (!props.activity) return;
@@ -155,6 +158,38 @@ const handleReject = async () => {
     emit("rejected");
   } catch {
     showToastError("Erro ao rejeitar atividade");
+    open.value = true;
+  } finally {
+    actionLoading.value = false;
+  }
+};
+
+const handleNote = async () => {
+  if (!props.activity) return;
+  const hadNote = !!props.activity.note;
+  open.value = false;
+  await nextTick();
+  const note = await promptAlert(
+    hadNote ? "Editar nota" : "Adicionar nota",
+    `Escreva uma nota para o aluno sobre a atividade "${label.value}". Deixe em branco para remover a nota.`,
+    {
+      placeholder: "Ex.: certificado está errado, verifique...",
+      confirmText: "Salvar",
+      initialValue: props.activity.note ?? "",
+    },
+  );
+  if (note === null) {
+    open.value = true;
+    return;
+  }
+
+  actionLoading.value = true;
+  try {
+    await updateActivityNote(props.activity.id, note || null);
+    showToastSuccess(note ? "Nota salva com sucesso" : "Nota removida");
+    emit("note-updated");
+  } catch {
+    showToastError("Erro ao salvar nota");
     open.value = true;
   } finally {
     actionLoading.value = false;
@@ -265,6 +300,21 @@ const handleDelete = async () => {
           </div>
         </div>
 
+        <div
+          v-if="activity.note"
+          class="rounded-md border border-[#F59E0B]/35 bg-[#F59E0B]/10 p-3"
+          data-testid="activity-note-box"
+        >
+          <div class="flex items-center gap-1.5">
+            <Icon name="lucide:sticky-note" size="0.95rem" class="text-[#B45309]" />
+            <p class="text-xs font-medium uppercase text-[#B45309]">Nota do professor</p>
+          </div>
+          <p class="mt-1 whitespace-pre-line text-sm text-highlighted">{{ activity.note }}</p>
+          <p v-if="activity.noteUpdatedAt" class="mt-1 text-xs text-muted">
+            Atualizada em {{ formatDateBR(activity.noteUpdatedAt) }}
+          </p>
+        </div>
+
         <template v-if="canSeeEvents">
           <USeparator />
           <activities-events-timeline :activity-id="activity.id" />
@@ -274,6 +324,18 @@ const handleDelete = async () => {
 
     <template #footer>
       <div class="flex w-full justify-end gap-2">
+        <span v-show="canManageNote">
+          <SGButton
+            test-id="note-activity-button"
+            variant="secondary"
+            icon="lucide:sticky-note"
+            size="sm"
+            :disabled="actionLoading"
+            @click="handleNote"
+          >
+            {{ activity?.note ? "Editar nota" : "Adicionar nota" }}
+          </SGButton>
+        </span>
         <span v-show="canDelete">
           <SGButton
             test-id="delete-activity-button"

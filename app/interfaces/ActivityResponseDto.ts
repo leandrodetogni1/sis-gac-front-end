@@ -14,6 +14,8 @@ export interface ActivityResponseDto {
   certificateUrl: string | null;
   startDate: string | null;
   endDate: string | null;
+  note: string | null;
+  noteUpdatedAt: string | null;
   createdAt: string | null;
   updatedAt: string | null;
   users: ActivityUserSummaryDto | null;
