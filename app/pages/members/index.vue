@@ -271,7 +271,7 @@ onMounted(fetchMembers);
           <SGSelect v-model="sortValue" placeholder="Ordenar por" :options="sortOptions" test-id="sort-mobile" />
         </div>
         <SGButton
-          variant="primary"
+          variant="secondary"
           icon="lucide:filter-x"
           size="sm"
           :disabled="!hasActiveFilters"
@@ -386,7 +386,7 @@ onMounted(fetchMembers);
             <span class="shrink-0 text-xs text-neutral-500">Página {{ page }} de {{ totalPages }}</span>
             <SGButton
               variant="secondary"
-              icon="lucide:chevron-right"
+              trailing-icon="lucide:chevron-right"
               size="sm"
               test-id="alunos-next"
               :disabled="page >= totalPages"

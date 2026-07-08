@@ -197,7 +197,7 @@ onMounted(() => {
             <SGSelect v-model="pageSize" :options="pageSizeOptions" test-id="audit-page-size" />
           </div>
           <div class="grid grid-cols-2 gap-2 sm:flex">
-            <SGButton variant="secondary" icon="lucide:x" size="sm" test-id="audit-clear" @click="clearFilters"> Limpar </SGButton>
+            <SGButton variant="secondary" icon="lucide:filter-x" size="sm" test-id="audit-clear" @click="clearFilters"> Limpar </SGButton>
             <SGButton variant="primary" icon="lucide:filter" size="sm" test-id="audit-apply" @click="applyFilters"> Filtrar </SGButton>
           </div>
         </div>
@@ -300,7 +300,7 @@ onMounted(() => {
             <span class="shrink-0 text-xs text-neutral-500">Página {{ page }} de {{ totalPages }}</span>
             <SGButton
               variant="secondary"
-              icon="lucide:chevron-right"
+              trailing-icon="lucide:chevron-right"
               size="sm"
               test-id="audit-next"
               :disabled="page >= totalPages"

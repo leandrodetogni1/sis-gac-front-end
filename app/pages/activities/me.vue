@@ -209,7 +209,7 @@ onMounted(fetchActivities);
           <span class="shrink-0 text-xs text-neutral-500">Página {{ page }} de {{ totalPages }}</span>
           <SGButton
             variant="secondary"
-            icon="lucide:chevron-right"
+            trailing-icon="lucide:chevron-right"
             size="sm"
             test-id="activities-next"
             :disabled="page >= totalPages"

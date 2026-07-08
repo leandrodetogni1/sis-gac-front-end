@@ -323,79 +323,83 @@ const handleDelete = async () => {
     </template>
 
     <template #footer>
-      <div class="flex w-full justify-end gap-2">
-        <span v-show="canManageNote">
-          <SGButton
-            test-id="note-activity-button"
-            variant="secondary"
-            icon="lucide:sticky-note"
-            size="sm"
-            :disabled="actionLoading"
-            @click="handleNote"
-          >
-            {{ activity?.note ? "Editar nota" : "Adicionar nota" }}
-          </SGButton>
-        </span>
-        <span v-show="canDelete">
-          <SGButton
-            test-id="delete-activity-button"
-            variant="danger"
-            icon="lucide:trash-2"
-            size="sm"
-            :disabled="actionLoading"
-            @click="handleDelete"
-          >
-            Excluir
-          </SGButton>
-        </span>
-        <span v-show="canEdit">
-          <SGButton
-            test-id="edit-activity-button"
-            variant="secondary"
-            icon="lucide:pencil"
-            size="sm"
-            :disabled="actionLoading"
-            @click="handleEdit"
-          >
-            Editar
-          </SGButton>
-        </span>
-        <span v-show="canReject">
-          <SGButton
-            test-id="reject-activity-button"
-            variant="danger"
-            icon="lucide:x"
-            size="sm"
-            :disabled="actionLoading"
-            @click="handleReject"
-          >
-            Rejeitar
-          </SGButton>
-        </span>
-        <span v-show="canVerify">
-          <SGButton
-            test-id="verify-activity-button"
-            variant="primary"
-            icon="lucide:check"
-            size="sm"
-            :disabled="actionLoading"
-            @click="handleVerify"
-          >
-            Verificar
-          </SGButton>
-        </span>
-        <span v-show="canApprove">
-          <SGButton
-            test-id="approve-activity-button"
-            variant="primary"
-            icon="lucide:check"
-            size="sm"
-            :disabled="actionLoading"
-            @click="handleApprove"
-          >
-            Aprovar
-          </SGButton>
-        </span>
+      <div class="flex w-full flex-wrap items-center justify-between gap-2">
+        <div class="flex flex-wrap items-center gap-2">
+          <span v-show="canManageNote">
+            <SGButton
+              test-id="note-activity-button"
+              variant="ghost"
+              icon="lucide:sticky-note"
+              size="sm"
+              :disabled="actionLoading"
+              @click="handleNote"
+            >
+              {{ activity?.note ? "Editar nota" : "Adicionar nota" }}
+            </SGButton>
+          </span>
+          <span v-show="canEdit">
+            <SGButton
+              test-id="edit-activity-button"
+              variant="secondary"
+              icon="lucide:pencil"
+              size="sm"
+              :disabled="actionLoading"
+              @click="handleEdit"
+            >
+              Editar
+            </SGButton>
+          </span>
+          <span v-show="canDelete">
+            <SGButton
+              test-id="delete-activity-button"
+              variant="danger"
+              icon="lucide:trash-2"
+              size="sm"
+              :disabled="actionLoading"
+              @click="handleDelete"
+            >
+              Excluir
+            </SGButton>
+          </span>
+        </div>
+        <div class="ml-auto flex flex-wrap items-center gap-2">
+          <span v-show="canReject">
+            <SGButton
+              test-id="reject-activity-button"
+              variant="danger"
+              icon="lucide:circle-x"
+              size="sm"
+              :disabled="actionLoading"
+              @click="handleReject"
+            >
+              Rejeitar
+            </SGButton>
+          </span>
+          <span v-show="canVerify">
+            <SGButton
+              test-id="verify-activity-button"
+              variant="primary"
+              icon="lucide:search-check"
+              size="sm"
+              :disabled="actionLoading"
+              @click="handleVerify"
+            >
+              Verificar
+            </SGButton>
+          </span>
+          <span v-show="canApprove">
+            <SGButton
+              test-id="approve-activity-button"
+              variant="success"
+              icon="lucide:circle-check"
+              size="sm"
+              :disabled="actionLoading"
+              @click="handleApprove"
+            >
+              Aprovar
+            </SGButton>
+          </span>
+        </div>
       </div>
     </template>
   </SGModal>
