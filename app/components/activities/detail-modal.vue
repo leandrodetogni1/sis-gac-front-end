@@ -1,4 +1,5 @@
 <script setup lang="ts">
+import type { DropdownMenuItem } from "@nuxt/ui";
 import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
 
 const props = withDefaults(
@@ -76,11 +77,45 @@ const canDelete = computed(() => {
 
 const canManageNote = computed(() => isAdminOrOwner.value || isReviewer.value);
 
+const hasDecisionActions = computed(() => canReject.value || canVerify.value || canApprove.value);
+
 const handleEdit = () => {
   if (!props.activity) return;
   open.value = false;
   emit("edit", props.activity);
 };
+
+const handleStudentOpen = () => {
+  if (!props.activity?.users?.id) return;
+  open.value = false;
+  navigateTo(`/members/${props.activity.users.id}`);
+};
+
+const menuItems = computed<DropdownMenuItem[][]>(() => {
+  const manage: DropdownMenuItem[] = [];
+  if (canManageNote.value) {
+    manage.push({
+      label: props.activity?.note ? "Editar nota" : "Adicionar nota",
+      icon: "lucide:sticky-note",
+      onSelect: handleNote,
+    });
+  }
+  if (canEdit.value) {
+    manage.push({ label: "Editar atividade", icon: "lucide:pencil", onSelect: handleEdit });
+  }
+  const danger: DropdownMenuItem[] = [];
+  if (canDelete.value) {
+    danger.push({
+      label: "Excluir atividade",
+      icon: "lucide:trash-2",
+      color: "error",
+      onSelect: handleDelete,
+    });
+  }
+  return [manage, danger].filter((group) => group.length > 0);
+});
+
+const hasMenuActions = computed(() => menuItems.value.length > 0);
 
 const handleApprove = async () => {
   if (!props.activity) return;
@@ -226,7 +261,38 @@ const handleDelete = async () => {
 </script>
 
 <template>
-  <SGModal v-model:open="open" title="Detalhes da Atividade" description="Informações da atividade complementar" test-id="activity-detail-modal">
+  <SGModal v-model:open="open" test-id="activity-detail-modal">
+    <template #header>
+      <div class="flex w-full items-start justify-between gap-3">
+        <div>
+          <h2 class="text-base font-semibold text-highlighted">Detalhes da Atividade</h2>
+          <p class="mt-1 text-sm text-muted">Informações da atividade complementar</p>
+        </div>
+        <div class="flex items-center gap-1">
+          <UDropdownMenu v-if="activity && hasMenuActions" :items="menuItems" :content="{ align: 'end' }">
+            <button
+              type="button"
+              class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
+              aria-label="Mais ações"
+              data-testid="activity-actions-menu"
+              :disabled="actionLoading"
+            >
+              <Icon name="lucide:ellipsis-vertical" size="1.1rem" />
+            </button>
+          </UDropdownMenu>
+          <button
+            type="button"
+            class="flex h-8 w-8 cursor-pointer items-center justify-center rounded-lg text-neutral-400 transition-colors hover:bg-neutral-100 hover:text-neutral-700"
+            aria-label="Fechar"
+            data-testid="activity-detail-close"
+            @click="open = false"
+          >
+            <Icon name="lucide:x" size="1.1rem" />
+          </button>
+        </div>
+      </div>
+    </template>
+
     <template #body>
       <div v-if="activity" class="space-y-4">
         <div class="flex items-center justify-between">
@@ -234,71 +300,111 @@ const handleDelete = async () => {
           <SGBadge :status="activity.status || 'pending'" />
         </div>
 
-        <div class="grid grid-cols-2 gap-3 text-sm">
-          <div>
-            <p class="text-xs font-medium uppercase text-muted">Categoria</p>
-            <p class="mt-0.5 text-highlighted">{{ formatCategory(activity.activity_types?.category) }}</p>
-          </div>
-          <div>
-            <p class="text-xs font-medium uppercase text-muted">Horas reconhecidas</p>
-            <p class="mt-0.5 text-highlighted">{{ formatHours(activity.hoursEquivalent) }}</p>
-          </div>
-          <div>
-            <p class="text-xs font-medium uppercase text-muted">Horas informadas</p>
-            <p class="mt-0.5 text-highlighted">{{ activity.hours !== null ? formatHours(activity.hours) : "—" }}</p>
-          </div>
-          <div>
-            <p class="text-xs font-medium uppercase text-muted">Organização</p>
-            <p class="mt-0.5 text-highlighted">{{ activity.organization ?? "—" }}</p>
-          </div>
-          <div>
-            <p class="text-xs font-medium uppercase text-muted">Data Início</p>
-            <p class="mt-0.5 text-highlighted">{{ formatDateBR(activity.startDate) }}</p>
-          </div>
-          <div>
-            <p class="text-xs font-medium uppercase text-muted">Data Fim</p>
-            <p class="mt-0.5 text-highlighted">{{ formatDateBR(activity.endDate) }}</p>
-          </div>
-          <div v-if="showUser">
-            <p class="text-xs font-medium uppercase text-muted">Aluno</p>
-            <p class="mt-0.5 text-highlighted">{{ userName }}</p>
-          </div>
-          <div>
-            <p class="text-xs font-medium uppercase text-muted">Certificado</p>
-
-            <div v-if="activity.file && certificateFileUrl" class="mt-1">
-              <a
-                :href="certificateFileUrl"
-                target="_blank"
-                rel="noopener noreferrer"
-                class="inline-flex w-fit items-center gap-1.5 rounded-md border border-default bg-elevated px-2.5 py-1.5 text-sm text-highlighted transition-colors hover:border-primary-300 hover:text-primary"
-                data-testid="certificate-file-button"
-              >
-                <Icon name="lucide:file-text" size="0.95rem" />
-                Ver certificado
-              </a>
+        <div class="grid grid-cols-2 gap-2.5">
+          <button
+            v-if="showUser && activity.users"
+            type="button"
+            class="group col-span-2 flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5 text-left transition-all duration-200 hover:border-primary-200 hover:bg-white hover:shadow-md hover:shadow-primary-500/10 active:scale-[0.99]"
+            data-testid="activity-student-link"
+            @click="handleStudentOpen"
+          >
+            <SGAvatar :first-name="activity.users.firstName" :last-name="activity.users.lastName" :picture="activity.users.picture" size="md" />
+            <div class="min-w-0 flex-1">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Aluno</p>
+              <p class="truncate text-sm font-semibold text-neutral-900">{{ userName }}</p>
             </div>
+            <span class="flex shrink-0 items-center gap-1 text-xs font-medium text-neutral-400 transition-colors group-hover:text-primary-400">
+              Ver aluno
+              <Icon name="lucide:chevron-right" size="0.9rem" class="transition-transform duration-200 group-hover:translate-x-0.5" />
+            </span>
+          </button>
 
-            <p v-else class="mt-0.5 text-muted">—</p>
+          <div class="flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-primary-50 text-primary-400">
+              <Icon name="lucide:flask-conical" size="1rem" />
+            </span>
+            <div class="min-w-0">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Categoria</p>
+              <p class="truncate text-sm font-semibold text-neutral-900">{{ formatCategory(activity.activity_types?.category) }}</p>
+            </div>
           </div>
 
-          <div>
-            <p class="text-xs font-medium uppercase text-muted">Link</p>
-
-            <a
-              v-if="activity.certificateUrl"
-              :href="activity.certificateUrl"
-              target="_blank"
-              rel="noopener noreferrer"
-              class="mt-1 inline-flex items-center gap-1 text-sm text-primary hover:underline"
-              data-testid="certificate-link"
-            >
-              <Icon name="lucide:external-link" size="0.875rem" />
-              Abrir link
-            </a>
-
-            <p v-else class="mt-0.5 text-muted">—</p>
+          <div class="flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-success-50 text-success-600">
+              <Icon name="lucide:clock" size="1rem" />
+            </span>
+            <div class="min-w-0">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Horas</p>
+              <p class="truncate text-sm font-semibold text-neutral-900">
+                {{ formatHours(activity.hoursEquivalent) }}
+                <span v-if="activity.hours !== null" class="text-xs font-medium text-neutral-500">· informadas {{ formatHours(activity.hours) }}</span>
+              </p>
+            </div>
           </div>
+
+          <div class="col-span-2 flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-primary-50 text-primary-400">
+              <Icon name="lucide:calendar" size="1rem" />
+            </span>
+            <div class="min-w-0">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Período</p>
+              <p class="truncate text-sm font-semibold text-neutral-900">{{ formatDateBR(activity.startDate) }} até {{ formatDateBR(activity.endDate) }}</p>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-primary-50 text-primary-400">
+              <Icon name="lucide:building-2" size="1rem" />
+            </span>
+            <div class="min-w-0">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Organização</p>
+              <p class="truncate text-sm font-semibold text-neutral-900">{{ activity.organization ?? "—" }}</p>
+            </div>
+          </div>
+
+          <a
+            v-if="activity.file && certificateFileUrl"
+            :href="certificateFileUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5 transition-transform duration-150 active:scale-[0.98]"
+            data-testid="certificate-file-button"
+          >
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-error-50 text-error-600">
+              <Icon name="lucide:file-text" size="1rem" />
+            </span>
+            <div class="min-w-0">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Certificado</p>
+              <p class="truncate text-sm font-semibold text-primary-400">Ver certificado</p>
+            </div>
+          </a>
+
+          <div v-else class="flex items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5">
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-neutral-100 text-neutral-400">
+              <Icon name="lucide:file-text" size="1rem" />
+            </span>
+            <div class="min-w-0">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Certificado</p>
+              <p class="truncate text-sm font-semibold text-neutral-500">—</p>
+            </div>
+          </div>
+
+          <a
+            v-if="activity.certificateUrl"
+            :href="activity.certificateUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="col-span-2 flex cursor-pointer items-center gap-3 rounded-xl border border-neutral-100 bg-neutral-50 px-3 py-2.5 transition-transform duration-150 active:scale-[0.98]"
+            data-testid="certificate-link"
+          >
+            <span class="flex h-9 w-9 shrink-0 items-center justify-center rounded-[10px] bg-primary-50 text-primary-400">
+              <Icon name="lucide:external-link" size="1rem" />
+            </span>
+            <div class="min-w-0">
+              <p class="text-[10px] font-semibold uppercase tracking-wider text-neutral-400">Link</p>
+              <p class="truncate text-sm font-semibold text-primary-400">Abrir link do certificado</p>
+            </div>
+          </a>
         </div>
 
         <div
@@ -323,84 +429,44 @@ const handleDelete = async () => {
       </div>
     </template>
 
-    <template #footer>
-      <div class="flex w-full flex-wrap items-center justify-between gap-2">
-        <div class="flex flex-wrap items-center gap-2">
-          <span v-show="canManageNote">
-            <SGButton
-              test-id="note-activity-button"
-              variant="ghost"
-              icon="lucide:sticky-note"
-              size="sm"
-              :disabled="actionLoading"
-              @click="handleNote"
-            >
-              {{ activity?.note ? "Editar nota" : "Adicionar nota" }}
-            </SGButton>
-          </span>
-          <span v-show="canEdit">
-            <SGButton
-              test-id="edit-activity-button"
-              variant="secondary"
-              icon="lucide:pencil"
-              size="sm"
-              :disabled="actionLoading"
-              @click="handleEdit"
-            >
-              Editar
-            </SGButton>
-          </span>
-          <span v-show="canDelete">
-            <SGButton
-              test-id="delete-activity-button"
-              variant="danger"
-              icon="lucide:trash-2"
-              size="sm"
-              :disabled="actionLoading"
-              @click="handleDelete"
-            >
-              Excluir
-            </SGButton>
-          </span>
-        </div>
-        <div class="ml-auto flex flex-wrap items-center gap-2">
-          <span v-show="canReject">
-            <SGButton
-              test-id="reject-activity-button"
-              variant="danger"
-              icon="lucide:circle-x"
-              size="sm"
-              :disabled="actionLoading"
-              @click="handleReject"
-            >
-              Rejeitar
-            </SGButton>
-          </span>
-          <span v-show="canVerify">
-            <SGButton
-              test-id="verify-activity-button"
-              variant="primary"
-              icon="lucide:search-check"
-              size="sm"
-              :disabled="actionLoading"
-              @click="handleVerify"
-            >
-              Verificar
-            </SGButton>
-          </span>
-          <span v-show="canApprove">
-            <SGButton
-              test-id="approve-activity-button"
-              variant="success"
-              icon="lucide:circle-check"
-              size="sm"
-              :disabled="actionLoading"
-              @click="handleApprove"
-            >
-              Aprovar
-            </SGButton>
-          </span>
-        </div>
+    <template v-if="hasDecisionActions" #footer>
+      <div class="flex w-full flex-wrap items-center justify-end gap-2">
+        <span v-show="canReject">
+          <SGButton
+            test-id="reject-activity-button"
+            variant="danger"
+            icon="lucide:circle-x"
+            size="sm"
+            :disabled="actionLoading"
+            @click="handleReject"
+          >
+            Rejeitar
+          </SGButton>
+        </span>
+        <span v-show="canVerify">
+          <SGButton
+            test-id="verify-activity-button"
+            variant="primary"
+            icon="lucide:search-check"
+            size="sm"
+            :disabled="actionLoading"
+            @click="handleVerify"
+          >
+            Verificar
+          </SGButton>
+        </span>
+        <span v-show="canApprove">
+          <SGButton
+            test-id="approve-activity-button"
+            variant="success"
+            icon="lucide:circle-check"
+            size="sm"
+            :disabled="actionLoading"
+            @click="handleApprove"
+          >
+            Aprovar
+          </SGButton>
+        </span>
       </div>
     </template>
   </SGModal>
