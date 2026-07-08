@@ -78,6 +78,18 @@ const onStatusChanged = async () => {
   await Promise.all([fetchActivities(), summaryRef.value?.refresh()]);
 };
 
+const activityEditOpen = ref(false);
+
+const onActivityEdit = (activity: ActivityResponseDto) => {
+  selectedActivity.value = activity;
+  activityEditOpen.value = true;
+};
+
+const onActivityUpdated = async () => {
+  activityEditOpen.value = false;
+  await Promise.all([fetchActivities(), summaryRef.value?.refresh()]);
+};
+
 onMounted(async () => {
   pageLoading.value = true;
   const [fetchedUser] = await Promise.all([getUser(memberId.value), fetchActivities()]);
@@ -211,7 +223,10 @@ onMounted(async () => {
       @verified="onStatusChanged"
       @rejected="onStatusChanged"
       @note-updated="onStatusChanged"
+      @edit="onActivityEdit"
     />
+
+    <activities-edit-modal v-model:open="activityEditOpen" :activity="selectedActivity" @updated="onActivityUpdated" />
 
     <members-edit-modal v-if="user && canEdit" v-model:open="editOpen" :user="user" @updated="onUserUpdated" />
   </div>

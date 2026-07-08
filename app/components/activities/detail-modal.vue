@@ -63,9 +63,10 @@ const canReject = computed(() => {
 });
 
 const canEdit = computed(() => {
+  if (isAdminOrOwner.value) return true;
   const status = props.activity?.status?.toLowerCase();
   if (status !== "pending") return false;
-  return isActivityAuthor.value || isReviewer.value || isAdminOrOwner.value;
+  return isActivityAuthor.value || isReviewer.value;
 });
 
 const canDelete = computed(() => {
