@@ -71,6 +71,7 @@ const activityHours = (a: ActivityResponseDto) => a.hoursEquivalent ?? a.hours ?
 const pendingByCategory = computed<Record<SummaryCategory, number>>(() => {
   const acc: Record<SummaryCategory, number> = { ENSINO: 0, PESQUISA: 0, EXTENSAO: 0 };
   for (const a of inReviewActivities.value) {
+    if (a.class !== "COMPLEMENTAR") continue;
     const category = a.activity_types?.category as SummaryCategory | undefined;
     if (category && category in acc) acc[category] += activityHours(a);
   }
