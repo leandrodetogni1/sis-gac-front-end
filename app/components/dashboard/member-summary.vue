@@ -206,9 +206,6 @@ onMounted(async () => {
 
       <SGCard v-if="summary.cappedTypes.length > 0" test-id="card-capped-types">
         <h3 class="text-base font-semibold text-highlighted">Tetos atingidos</h3>
-        <p class="mt-1 text-xs text-muted">
-          Horas extras nesses tipos são transferidas para Formação Livre.
-        </p>
         <ul class="mt-3 flex flex-col gap-2">
           <li
             v-for="capped in summary.cappedTypes"
