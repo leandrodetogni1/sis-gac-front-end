@@ -29,7 +29,7 @@ const userName = computed(() => {
       <div>
         <p class="font-medium text-highlighted">{{ title }}</p>
         <p class="mt-0.5 text-xs text-muted">
-          <template v-if="typeLabel && activity.event">{{ typeLabel }} · </template>{{ formatCategory(activity.activity_types?.category) }}<template v-if="showUser"> · {{ userName }}</template>
+          <template v-if="typeLabel && activity.event">{{ typeLabel }} · </template>{{ formatCategory(activity.activity_types?.category) }}<template v-if="activity.class"> · {{ formatActivityClass(activity.class) }}</template><template v-if="showUser"> · {{ userName }}</template>
         </p>
       </div>
       <SGBadge :status="activity.status || 'pending'" />

@@ -22,6 +22,7 @@ const columns = computed<SGTableColumn[]>(() => {
     { key: "event", label: "Evento" },
     { key: "activity", label: "Atividade" },
     { key: "category", label: "Categoria" },
+    { key: "class", label: "Tipo" },
     { key: "hours", label: "Horas", sortKey: props.sortable ? "hoursEquivalent" : undefined },
     { key: "createdAt", label: "Data de criação", sortKey: props.sortable ? "createdAt" : undefined },
   ];
@@ -72,6 +73,11 @@ const emptyDescription = computed(() => {
 
       <template #cell-category="{ item: activity }">
         <span class="text-neutral-500">{{ formatCategory(activity.activity_types?.category) }}</span>
+      </template>
+
+      <template #cell-class="{ item: activity }">
+        <activities-class-badge :activity-class="activity.class" :test-id="`class-badge-${activity.id}`" />
+        <span v-if="!activity.class" class="text-neutral-500">—</span>
       </template>
 
       <template #cell-hours="{ item: activity }">

@@ -295,9 +295,12 @@ const handleDelete = async () => {
 
     <template #body>
       <div v-if="activity" class="space-y-4">
-        <div class="flex items-center justify-between">
+        <div class="flex items-center justify-between gap-2">
           <h3 class="text-base font-semibold text-highlighted">{{ label }}</h3>
-          <SGBadge :status="activity.status || 'pending'" />
+          <div class="flex shrink-0 items-center gap-1.5">
+            <activities-class-badge :activity-class="activity.class" test-id="activity-class-badge" />
+            <SGBadge :status="activity.status || 'pending'" />
+          </div>
         </div>
 
         <div class="grid grid-cols-2 gap-2.5">
