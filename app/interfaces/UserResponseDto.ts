@@ -7,7 +7,7 @@ export interface UserResponseDto {
   role: string | null;
   matricula: number | null;
   course: string | null;
-  curriculumYear: string | null;
+  curriculumYear: number | null;
   situation: string | null;
   createdAt: string | null;
   updatedAt: string | null;

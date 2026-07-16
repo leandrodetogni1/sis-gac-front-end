@@ -111,7 +111,7 @@ export const useUsers = () => {
     payload: {
       matricula?: number;
       course?: string;
-      curriculumYear?: string;
+      curriculumYear?: number;
       situation?: string;
       picture?: string;
     },

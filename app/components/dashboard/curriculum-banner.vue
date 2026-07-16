@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
-
 const emit = defineEmits(["saved"]);
 
 const { user, setUser } = useAuthState();
@@ -9,12 +7,12 @@ const { curricula, getCurricula } = useCurricula();
 const { showToastSuccess, showToastError } = useToastNotification();
 
 const open = ref(false);
-const selectedYear = ref<CurriculumYear | undefined>();
+const selectedYear = ref<number | undefined>();
 const fetchingCurricula = ref(false);
 
 const options = computed(() =>
   curricula.value.map((c) => ({
-    label: CurriculumYearLabels[c.year as CurriculumYear] ?? c.year,
+    label: String(c.year),
     value: c.year,
   })),
 );
@@ -33,7 +31,7 @@ const handleSave = async () => {
 };
 
 const handleOpen = async () => {
-  selectedYear.value = (user.value?.curriculumYear as CurriculumYear | null) ?? undefined;
+  selectedYear.value = user.value?.curriculumYear ?? undefined;
   open.value = true;
   fetchingCurricula.value = true;
   try {

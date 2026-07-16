@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import type { SGTableColumn } from "~/types/SGTableColumn";
-import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 
 useHead({ title: "Currículos — Configurações — SISGAC" });
 
@@ -21,13 +20,9 @@ const columns: SGTableColumn[] = [
   { key: "chevron", label: "", align: "right" },
 ];
 
-const availableYears = computed(() => {
-  const all = Object.values(CurriculumYear);
-  const existing = new Set(curricula.value.map((c) => c.year));
-  return all.filter((year) => !existing.has(year));
-});
+const existingYears = computed(() => curricula.value.map((c) => c.year));
 
-const canCreate = computed(() => canEdit.value && availableYears.value.length > 0);
+const canCreate = computed(() => canEdit.value);
 
 const formatNullable = (value: number | null): string => {
   if (value === null || value === undefined) return "—";
@@ -39,7 +34,7 @@ const handleCreated = async () => {
   await getCurricula();
 };
 
-const goToDetail = (year: string) => {
+const goToDetail = (year: number | string) => {
   router.push(`/config/curriculos/${year}`);
 };
 
@@ -92,7 +87,7 @@ onMounted(async () => {
         >
           <template #cell-year="{ item: c }">
             <span class="inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-xs font-bold text-primary-700">
-              {{ CurriculumYearLabels[c.year as CurriculumYear] ?? c.year }}
+              {{ c.year }}
             </span>
           </template>
 
@@ -121,7 +116,7 @@ onMounted(async () => {
               <div class="min-w-0 flex-1">
                 <div class="flex items-center gap-2">
                   <span class="inline-flex items-center rounded-md bg-primary-50 px-2 py-0.5 text-xs font-bold text-primary-700">
-                    {{ CurriculumYearLabels[c.year as CurriculumYear] ?? c.year }}
+                    {{ c.year }}
                   </span>
                 </div>
                 <div class="mt-2 grid grid-cols-2 gap-x-3 gap-y-1 text-xs text-neutral-500">
@@ -152,7 +147,7 @@ onMounted(async () => {
       </SGCard>
 
       <SGModal v-model:open="createModal" title="Novo Currículo" description="Configure as regras globais para um novo ano de currículo.">
-        <config-curriculum-form :available-years="availableYears" @created="handleCreated" />
+        <config-curriculum-form :existing-years="existingYears" @created="handleCreated" />
       </SGModal>
     </div>
   </div>

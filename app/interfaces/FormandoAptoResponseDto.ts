@@ -5,7 +5,7 @@ export interface FormandoAptoItemDto {
   email: string;
   matricula: string | null;
   course: string | null;
-  curriculumYear: string | null;
+  curriculumYear: number | null;
   hoursEnsino: number;
   hoursPesquisa: number;
   hoursExtensao: number;

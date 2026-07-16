@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 import type { CreateCurriculumDto } from "~/interfaces/CreateCurriculumDto";
 
 const props = defineProps<{
-  availableYears: CurriculumYear[];
+  existingYears: number[];
 }>();
 
 const emit = defineEmits(["created"]);
@@ -11,18 +10,19 @@ const emit = defineEmits(["created"]);
 const { createCurriculum, loading } = useCurricula();
 const { showToastSuccess, showToastError } = useToastNotification();
 
-const year = ref<string>(props.availableYears[0] ?? "");
+const year = ref<string | number>("");
 const minHoursPerCategory = ref<string | number>("");
 const minCategoriesRequired = ref<string>("");
 const excessToFreeMultiplier = ref<string | number>("1");
 const minFreeHours = ref<string | number>("");
 
-const yearOptions = computed(() =>
-  props.availableYears.map((y) => ({
-    value: y,
-    label: CurriculumYearLabels[y],
-  })),
+const yearNumber = computed(() => Number(year.value));
+
+const isYearValid = computed(
+  () => Number.isInteger(yearNumber.value) && yearNumber.value >= 1900 && yearNumber.value <= 2100,
 );
+
+const isYearDuplicate = computed(() => props.existingYears.includes(yearNumber.value));
 
 const minCategoriesOptions = [
   { value: "2", label: "2 categorias" },
@@ -34,7 +34,7 @@ const isBlank = (v: unknown): boolean => v === null || v === undefined || v === 
 const requireMinCategories = computed(() => !isBlank(minHoursPerCategory.value));
 
 const isValid = computed(() => {
-  if (!year.value) return false;
+  if (isBlank(year.value) || !isYearValid.value || isYearDuplicate.value) return false;
   if (isBlank(excessToFreeMultiplier.value) || Number(excessToFreeMultiplier.value) < 0) return false;
   if (isBlank(minFreeHours.value) || Number(minFreeHours.value) < 0) return false;
   if (requireMinCategories.value && !minCategoriesRequired.value) return false;
@@ -43,7 +43,7 @@ const isValid = computed(() => {
 
 const buildPayload = (): CreateCurriculumDto => {
   const payload: CreateCurriculumDto = {
-    year: year.value as CurriculumYear,
+    year: yearNumber.value,
     excessToFreeMultiplier: Number(excessToFreeMultiplier.value),
     minFreeHours: Number(minFreeHours.value),
   };
@@ -76,12 +76,18 @@ const handleSubmit = async () => {
         <label class="mb-1.5 block text-sm font-medium text-neutral-700">
           Ano <span class="text-error-500">*</span>
         </label>
-        <SGSelect
+        <SGInput
           v-model="year"
-          :options="yearOptions"
-          placeholder="Selecione o ano"
-          test-id="select-year"
+          type="number"
+          placeholder="Ex: 2026"
+          test-id="input-year"
         />
+        <p v-if="!isBlank(year) && !isYearValid" class="mt-1 text-xs text-error-500">
+          Informe um ano entre 1900 e 2100
+        </p>
+        <p v-else-if="isYearDuplicate" class="mt-1 text-xs text-error-500">
+          Já existe um currículo para este ano
+        </p>
       </div>
 
       <div>

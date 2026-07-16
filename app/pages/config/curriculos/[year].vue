@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Course, CourseLabels } from "~/enums/Course";
-import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 import type { ActivityTypeResponseDto } from "~/interfaces/ActivityTypeResponseDto";
 
 useHead({ title: "Currículo — Configurações — SISGAC" });
@@ -251,7 +250,7 @@ const handleSaveActivityTypeRule = async (cod: string) => {
 
 const handleDeleteCurriculum = async () => {
   if (!canEdit.value || loading.value || anyEditing.value) return;
-  const yearLabel = CurriculumYearLabels[yearParam.value as CurriculumYear] ?? yearParam.value;
+  const yearLabel = yearParam.value;
   const confirmed = await confirmAlert(
     `O currículo "${yearLabel}" será removido permanentemente, incluindo todas as regras configuradas. Essa ação não pode ser desfeita.`,
     "Remover currículo?",
@@ -378,7 +377,7 @@ onMounted(async () => {
         <div class="mt-2 flex items-center justify-between gap-3">
           <div class="flex items-center gap-3">
             <span class="inline-flex items-center rounded-md bg-primary-50 px-2.5 py-1 text-sm font-bold text-primary-700">
-              {{ CurriculumYearLabels[curriculum.year] ?? curriculum.year }}
+              {{ curriculum.year }}
             </span>
             <h1 class="text-xl font-bold text-neutral-900 md:text-2xl">Currículo</h1>
           </div>

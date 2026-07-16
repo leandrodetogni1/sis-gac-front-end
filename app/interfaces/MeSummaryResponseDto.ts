@@ -40,7 +40,7 @@ export interface MeSummaryResponseDto {
   approvedHoursByCategory: Record<SummaryCategory, number>;
   approvedHoursByClass: { COMPLEMENTAR: number; LIVRE: number };
   curriculum: {
-    curriculumYear: string | null;
+    curriculumYear: number | null;
     course: string | null;
   };
   categoryProgress: CategoryProgress[];

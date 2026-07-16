@@ -1,7 +1,6 @@
-import type { CurriculumYear } from "~/enums/CurriculumYear";
 
 export interface CurriculumSummaryDto {
-  year: CurriculumYear;
+  year: number;
   minHoursPerCategory: number | null;
   minCategoriesRequired: number | null;
   excessToFreeMultiplier: number;

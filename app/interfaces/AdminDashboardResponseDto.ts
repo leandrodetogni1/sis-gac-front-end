@@ -1,5 +1,4 @@
 import type { Course } from "~/enums/Course";
-import type { CurriculumYear } from "~/enums/CurriculumYear";
 import type { SummaryCategory } from "~/interfaces/MeSummaryResponseDto";
 
 export interface AdminDashboardFormandoUser {
@@ -10,7 +9,7 @@ export interface AdminDashboardFormandoUser {
   picture: string | null;
   matricula: string | null;
   course: Course | null;
-  curriculumYear: CurriculumYear | null;
+  curriculumYear: number | null;
 }
 
 export interface AdminDashboardCategoryGap {

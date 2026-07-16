@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Course, CourseLabels } from "~/enums/Course";
-import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 import { Situation } from "~/enums/Situation";
 import type { AdminDashboardFormando } from "~/interfaces/AdminDashboardResponseDto";
 import type { SGTableColumn } from "~/types/SGTableColumn";
@@ -22,9 +21,9 @@ const formatCourse = (value: Course | null) => {
   return CourseLabels[value] ?? value;
 };
 
-const formatCurriculum = (value: CurriculumYear | null) => {
+const formatCurriculum = (value: number | null) => {
   if (!value) return "—";
-  return CurriculumYearLabels[value] ?? value;
+  return String(value);
 };
 
 const handleRowClick = (formando: AdminDashboardFormando) => {

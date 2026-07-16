@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 import { Situation, SituationLabels } from "~/enums/Situation";
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 
@@ -23,24 +22,24 @@ const situationOptions = Object.values(Situation).map((value) => ({
 
 const curriculumOptions = computed(() =>
   curricula.value.map((c) => ({
-    label: CurriculumYearLabels[c.year as CurriculumYear] ?? c.year,
+    label: String(c.year),
     value: c.year,
   })),
 );
 
 const situation = ref<Situation | undefined>();
-const curriculumYear = ref<CurriculumYear | undefined>();
+const curriculumYear = ref<number | undefined>();
 
 watch(open, async (value) => {
   if (!value) return;
   situation.value = (props.user.situation as Situation | null) ?? undefined;
-  curriculumYear.value = (props.user.curriculumYear as CurriculumYear | null) ?? undefined;
+  curriculumYear.value = props.user.curriculumYear ?? undefined;
   await getCurricula();
 });
 
 const hasChanges = computed(() => {
   const originalSituation = (props.user.situation as Situation | null) ?? undefined;
-  const originalCurriculum = (props.user.curriculumYear as CurriculumYear | null) ?? undefined;
+  const originalCurriculum = props.user.curriculumYear ?? undefined;
   return situation.value !== originalSituation || curriculumYear.value !== originalCurriculum;
 });
 
@@ -50,7 +49,7 @@ const handleSave = async () => {
     return;
   }
   try {
-    const payload: { situation?: string; curriculumYear?: string } = {};
+    const payload: { situation?: string; curriculumYear?: number } = {};
     if (situation.value) payload.situation = situation.value;
     if (curriculumYear.value) payload.curriculumYear = curriculumYear.value;
     const updated = await patchUser(props.user.id, payload);

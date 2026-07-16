@@ -1,5 +1,4 @@
 import type { Course } from "~/enums/Course";
-import type { CurriculumYear } from "~/enums/CurriculumYear";
 import type { CreateCurriculumDto } from "~/interfaces/CreateCurriculumDto";
 import type { CurriculumResponseDto } from "~/interfaces/CurriculumResponseDto";
 import type { CurriculumSummaryDto } from "~/interfaces/CurriculumSummaryDto";
@@ -31,7 +30,7 @@ export const useCurricula = () => {
     }
   };
 
-  const getCurriculum = async (year: CurriculumYear | string): Promise<CurriculumResponseDto | null> => {
+  const getCurriculum = async (year: number | string): Promise<CurriculumResponseDto | null> => {
     loading.value = true;
     error.value = null;
     try {
@@ -61,7 +60,7 @@ export const useCurricula = () => {
     }
   };
 
-  const updateCurriculum = async (year: CurriculumYear | string, payload: UpdateCurriculumDto): Promise<void> => {
+  const updateCurriculum = async (year: number | string, payload: UpdateCurriculumDto): Promise<void> => {
     loading.value = true;
     error.value = null;
     try {
@@ -75,7 +74,7 @@ export const useCurricula = () => {
     }
   };
 
-  const deleteCurriculum = async (year: CurriculumYear | string): Promise<void> => {
+  const deleteCurriculum = async (year: number | string): Promise<void> => {
     loading.value = true;
     error.value = null;
     try {
@@ -89,7 +88,7 @@ export const useCurricula = () => {
   };
 
   const upsertCourseRule = async (
-    year: CurriculumYear | string,
+    year: number | string,
     course: Course | string,
     payload: UpsertCourseRuleDto,
   ): Promise<void> => {
@@ -106,7 +105,7 @@ export const useCurricula = () => {
     }
   };
 
-  const deleteCourseRule = async (year: CurriculumYear | string, course: Course | string): Promise<void> => {
+  const deleteCourseRule = async (year: number | string, course: Course | string): Promise<void> => {
     loading.value = true;
     error.value = null;
     try {
@@ -121,7 +120,7 @@ export const useCurricula = () => {
   };
 
   const upsertActivityTypeRule = async (
-    year: CurriculumYear | string,
+    year: number | string,
     cod: string,
     payload: UpsertActivityTypeRuleDto,
   ): Promise<void> => {
@@ -138,7 +137,7 @@ export const useCurricula = () => {
     }
   };
 
-  const deleteActivityTypeRule = async (year: CurriculumYear | string, cod: string): Promise<void> => {
+  const deleteActivityTypeRule = async (year: number | string, cod: string): Promise<void> => {
     loading.value = true;
     error.value = null;
     try {

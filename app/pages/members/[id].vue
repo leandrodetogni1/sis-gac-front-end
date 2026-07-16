@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Course, CourseLabels } from "~/enums/Course";
-import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 import { Situation, SituationLabels } from "~/enums/Situation";
 import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
@@ -59,7 +58,7 @@ const courseLabel = computed(() => {
 const curriculumLabel = computed(() => {
   const value = user.value?.curriculumYear;
   if (!value) return "—";
-  return CurriculumYearLabels[value as CurriculumYear] ?? value;
+  return String(value);
 });
 
 const situationLabel = computed(() => {

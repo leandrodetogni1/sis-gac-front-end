@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { Course, CourseLabels } from "~/enums/Course";
-import { CurriculumYear, CurriculumYearLabels } from "~/enums/CurriculumYear";
 
 definePageMeta({ layout: false });
 useHead({ title: "Bem-vindo — SISGAC" });
@@ -12,7 +11,7 @@ const { signOut } = useGoogleSignIn();
 
 const matricula = ref<string>("");
 const course = ref<Course | undefined>();
-const curriculumYear = ref<CurriculumYear | undefined>();
+const curriculumYear = ref<number | undefined>();
 
 const courseOptions = Object.values(Course).map((value) => ({
   label: CourseLabels[value],
@@ -21,7 +20,7 @@ const courseOptions = Object.values(Course).map((value) => ({
 
 const curriculumYearOptions = computed(() =>
   curricula.value.map((c) => ({
-    label: CurriculumYearLabels[c.year as CurriculumYear] ?? c.year,
+    label: String(c.year),
     value: c.year,
   })),
 );
