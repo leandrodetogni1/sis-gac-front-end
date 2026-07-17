@@ -76,7 +76,9 @@ onMounted(fetchFormandos);
         empty-description="Assim que um provável formando cumprir todas as horas, ele aparecerá aqui."
         empty-icon="lucide:award"
         test-id="formandos-aptos-table"
+        clickable
         @retry="fetchFormandos"
+        @row-click="navigateTo(`/members/${$event.id}`)"
       >
         <template #cell-name="{ item: formando }">
           <div class="flex items-center gap-2.5">
