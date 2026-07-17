@@ -2,6 +2,7 @@
 import { Course, CourseLabels } from "~/enums/Course";
 import { Situation, SituationLabels } from "~/enums/Situation";
 import type { ActivityResponseDto } from "~/interfaces/ActivityResponseDto";
+import type { MeSummaryResponseDto } from "~/interfaces/MeSummaryResponseDto";
 import type { UserResponseDto } from "~/interfaces/UserResponseDto";
 
 const route = useRoute();
@@ -32,6 +33,10 @@ const modalOpen = ref(false);
 const editOpen = ref(false);
 
 const summaryRef = ref<{ refresh: () => Promise<void> } | null>(null);
+
+const memberSummary = ref<MeSummaryResponseDto | null>(null);
+
+const isAptoAColarGrau = computed(() => memberSummary.value?.isReadyToGraduate ?? false);
 
 const onUserUpdated = (updated: UserResponseDto) => {
   user.value = updated;
@@ -163,7 +168,17 @@ onMounted(async () => {
           <div class="flex items-start gap-4">
             <SGAvatar :first-name="user.firstName" :last-name="user.lastName" :picture="user.picture" size="xl" />
             <div class="min-w-0 flex-1">
-              <h1 class="text-lg font-semibold text-neutral-900">{{ fullName }}</h1>
+              <div class="flex items-center gap-2">
+                <h1 class="text-lg font-semibold text-neutral-900">{{ fullName }}</h1>
+                <span
+                  v-if="isAptoAColarGrau"
+                  class="inline-flex shrink-0 items-center gap-1.5 rounded-full border border-[#16A34A]/30 bg-[#16A34A]/12 px-3 py-1 text-xs font-bold text-[#15803D]"
+                  data-testid="member-apto-badge"
+                >
+                  <Icon name="lucide:award" size="0.9rem" />
+                  Apto a colar grau
+                </span>
+              </div>
               <p class="text-sm text-neutral-500">{{ user.email }}</p>
             </div>
             <SGButton
@@ -206,7 +221,7 @@ onMounted(async () => {
 
       <div class="mb-6">
         <h2 class="mb-3 text-base font-semibold text-neutral-900">Resumo</h2>
-        <dashboard-member-summary ref="summaryRef" :user-id="memberId" />
+        <dashboard-member-summary ref="summaryRef" :user-id="memberId" @loaded="memberSummary = $event" />
       </div>
 
       <div>

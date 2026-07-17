@@ -47,4 +47,5 @@ export interface MeSummaryResponseDto {
   complementaryProgress: ComplementaryProgress;
   freeProgress: FreeProgress;
   cappedTypes: CappedType[];
+  isReadyToGraduate: boolean;
 }

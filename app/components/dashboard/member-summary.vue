@@ -6,6 +6,10 @@ const props = defineProps<{
   userId?: string;
 }>();
 
+const emit = defineEmits<{
+  (e: "loaded", summary: MeSummaryResponseDto): void;
+}>();
+
 const { getUserSummary, getMyActivities, getActivitiesByUser } = useActivities();
 const { user } = useAuthState();
 
@@ -33,6 +37,7 @@ const fetchSummary = async () => {
     ]);
     summary.value = summaryData;
     userActivities.value = activitiesData.items;
+    emit("loaded", summaryData);
   } catch (e: any) {
     error.value = e?.data?.message ?? "Erro ao carregar resumo";
   } finally {
